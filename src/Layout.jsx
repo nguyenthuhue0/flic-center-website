@@ -4,6 +4,8 @@ import Register from "./pages/auth/Register";
 import App from "./App";
 import { ToastContainer } from "react-toastify";
 import Home from "./pages/user/Home";
+import FeedbackStudent from "./pages/user/FeedbackStudent";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 const NotFound = () =>{
     return(
@@ -16,8 +18,10 @@ const Layout = () => {
         <Routes>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="forgotPassword" element={<ForgotPassword />} />
             <Route path="/" element={<App />} >
                 <Route index element={<Home />} />
+                <Route path="feedback" element={<FeedbackStudent />} />
             </Route>
             <Route path="*" element={<NotFound />}></Route>
         </Routes>
