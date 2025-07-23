@@ -16,7 +16,9 @@ import ScheduleGrid from "./pages/user/ScheduleGrid";
 
 import Introduce from "./pages/user/Introduce";
 import RegisterForm from "./pages/user/RegisterForm";
-
+import Dashboard from "./Dashboard";
+import MaterialsDashboard from "./pages/lecturer/MaterialsDashboard";
+// import Teachingschedule from "./pages/lecturer/Teachingschedule";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -41,9 +43,10 @@ const Layout = () => {
           {/* <Route path="news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} /> */}
         </Route>
-        {/* <Route path="/lecturer" element={<App />}>
-          <Route path="materialsdashboard" element={<MaterialsDashboard />} />
-        </Route> */}
+        <Route path="lecturer" element={<Dashboard />}>
+          <Route path="materialsdashboard" element={<MaterialsDashboard   />} />
+          
+        </Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
       <ToastContainer
