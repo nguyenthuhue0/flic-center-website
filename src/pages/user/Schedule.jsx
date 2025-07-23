@@ -71,11 +71,6 @@ export default function Schedule() {
 
     return (
         <main className="container mx-auto px-4 py-8">
-            <div className="text-blue-600 text-sm mb-6">
-                <span>Trang chủ</span>
-                <span className="mx-2 text-gray-400">»</span>
-                <span>Lịch thi</span>
-            </div>
             <h1 className="text-3xl font-bold mb-8 text-blue-600">Lịch thi</h1>
 
             {/* Filters */}

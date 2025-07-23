@@ -1,20 +1,14 @@
 import React, { useState } from "react";
 import { TiArrowSortedUp } from "react-icons/ti";
 import { CgLogOut } from "react-icons/cg";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
+import Breadcrumb from "./Breadcrumb";
+import { navItemsLink } from "../utils/Constants";
 
 const Header = () => {
-  const navItems = [
-    { name: "Trang chủ", href: "#" },
-    { name: "Giới thiệu", href: "#", current: true },
-    { name: "Các khoá học", href: "#" },
-    { name: "Lịch thi", href: "#" },
-    { name: "Chia sẻ học viên", href: "#" },
-    { name: "Tin tức", href: "#" },
-  ];
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="sticky top-0 z-10 flex flex-col bg-white font-sans">
       {/* Header */}
@@ -50,18 +44,20 @@ const Header = () => {
 
           {/* Navigation Links */}
           <ul className="hidden items-center space-x-8 md:flex">
-            {navItems.map((item) => (
+            {navItemsLink.map((item) => (
               <li key={item.name}>
-                <a
-                  href={item.href}
-                  className={`text-base font-bold ${
-                    item.current
-                      ? "text-red-600"
-                      : "text-blue-500 hover:text-red-600"
-                  }`}
+                <NavLink
+                  to={item.href}
+                  className={({ isActive }) =>
+                    `block text-base font-bold p-2 ${
+                      isActive
+                        ? "text-red-600"
+                        : "text-blue-500 hover:text-red-600"
+                    }`
+                  }
                 >
                   {item.name}
-                </a>
+                </NavLink>
               </li>
             ))}
           </ul>
@@ -86,18 +82,21 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="md:hidden px-4 pb-4 text-center ">
             <ul className="space-y-2">
-              {navItems.map((item) => (
+              {navItemsLink.map((item) => (
                 <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className={`block text-base font-bold p-2 ${
-                      item.current
-                        ? "text-red-600"
-                        : "text-blue-500 hover:text-red-600"
-                    }`}
+                  <NavLink
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `block text-base font-bold p-2 ${
+                        isActive
+                          ? "text-red-600"
+                          : "text-blue-500 hover:text-red-600"
+                      }`
+                    }
                   >
                     {item.name}
-                  </a>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -122,11 +121,7 @@ const Header = () => {
       {/* Breadcrumbs */}
       <div className=" bg-gray-50/50">
         <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500">
-          <a href="#" className="text-blue-600">
-            Trang chủ
-          </a>
-          <span className="mx-2">»</span>
-          <span>Giới thiệu</span>
+          <Breadcrumb />
         </div>
       </div>
     </div>
