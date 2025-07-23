@@ -3,25 +3,29 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import App from "./App";
 import { ToastContainer } from "react-toastify";
-import Home from "./pages/user/Home";
-
-const NotFound = () =>{
-    return(
+import Course from "./pages/user/Course";
+import CourseDetail from "./pages/user/Coursedetail";
+import ScheduleGrid from "./pages/user/ScheduleGrid";
+const NotFound = () => {
+    return (
         <div className="container mt-3 alert alert-danger">404.Not found data</div>
     );
 }
 const Layout = () => {
     return (
         <>
-        <Routes>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="/" element={<App />} >
-                <Route index element={<Home />} />
-            </Route>
-            <Route path="*" element={<NotFound />}></Route>
-        </Routes>
-        <ToastContainer
+            <Routes>
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+                <Route path="/" element={<App />} >
+                    <Route index element={<Course />} />
+                    <Route path="coursedetail" element={<CourseDetail />} />
+                    <Route path="scheduleGrid" element={<ScheduleGrid />} />
+                </Route>
+
+                <Route path="*" element={<NotFound />}></Route>
+            </Routes>
+            <ToastContainer
                 position="top-right"
                 autoClose={5000}
                 hideProgressBar={false}
@@ -31,7 +35,7 @@ const Layout = () => {
                 pauseOnFocusLoss
                 draggable
                 pauseOnHover
-        />
+            />
         </>
     )
 }
