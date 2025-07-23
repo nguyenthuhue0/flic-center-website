@@ -5,7 +5,8 @@ export const breadcrumbNameMap = {
   "/feedback": "Chia sẻ học viên",
   "/feedback/detail": "Chi tiết",
   "/news": "Tin tức",
-  "/courses": "Các khoá học",
+  "/course": "Các khoá học",
+  "/coursedetail": "Chi tiết khóa học",
 };
 
 export const navItemsLink = [

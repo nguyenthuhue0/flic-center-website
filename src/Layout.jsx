@@ -7,6 +7,9 @@ import Home from "./pages/user/Home";
 import FeedbackStudent from "./pages/user/FeedbackStudent";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Schedule from "./pages/user/Schedule";
+import Course from "./pages/user/Course";
+import CourseDetail from "./pages/user/Coursedetail";
+import ScheduleGrid from "./pages/user/ScheduleGrid";
 // import News from "./pages/user/News";
 // import NewsDetail from "./pages/user/NewsDetail";
 // import MaterialsDashboard from "./pages/user/MaterialsDashboard";
@@ -32,6 +35,9 @@ const Layout = () => {
           <Route path="registerform" element={<RegisterForm />} />
           <Route path="feedback" element={<FeedbackStudent />} />
           <Route path="schedule" element={<Schedule />} />
+          <Route path="course" element={<Course />} />
+          <Route path="coursedetail" element={<CourseDetail />} />
+          <Route path="scheduleGrid" element={<ScheduleGrid />} />
           {/* <Route path="news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} /> */}
         </Route>
