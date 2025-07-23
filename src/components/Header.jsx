@@ -1,18 +1,20 @@
 import React from 'react';
 import { TiArrowSortedUp } from "react-icons/ti";
 import { CgLogOut } from "react-icons/cg";
-
+import { Link, useLocation } from 'react-router-dom';
 
 
 const Header = () => {
   const navItems = [
-    { name: 'Trang chủ', href: '#' },
-    { name: 'Giới thiệu', href: '#', current: true },
+    { name: 'Trang chủ', href: '/' },
+    { name: 'Giới thiệu', href: '#' },
     { name: 'Các khoá học', href: '#' },
-    { name: 'Lịch thi', href: '#' },
+    { name: 'Lịch thi', href: '/schedule' },
     { name: 'Chia sẻ học viên', href: '#' },
-    { name: 'Tin tức', href: '#' },
+    { name: 'Tin tức', href: '/news' },
   ];
+
+  const location = useLocation();
 
   return (
     <div className="flex flex-col bg-white font-sans">
@@ -43,16 +45,27 @@ const Header = () => {
           <ul className="hidden items-center space-x-8 md:flex">
             {navItems.map((item) => (
               <li key={item.name}>
-                <a
-                  href={item.href}
-                  className={`text-base font-bold ${
-                    item.current
-                      ? 'text-red-600'
-                      : 'text-blue-500 hover:text-red-600'
-                  }`}
-                >
-                  {item.name}
-                </a>
+                {item.href.startsWith('/') ? (
+                  <Link
+                    to={item.href}
+                    className={`text-base font-bold ${
+                      (item.href === '/news'
+                        ? location.pathname.startsWith('/news')
+                        : location.pathname === item.href)
+                        ? 'text-red-600'
+                        : 'text-blue-700 hover:text-red-600'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ) : (
+                  <a
+                    href={item.href}
+                    className={`text-base font-bold text-blue-700 hover:text-red-600`}
+                  >
+                    {item.name}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
@@ -76,13 +89,13 @@ const Header = () => {
       </header>
       
       {/* Breadcrumbs */}
-        <div className=" bg-gray-50/50">
+        {/* <div className=" bg-gray-50/50">
             <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500">
                 <a href="#" className="text-blue-600">Trang chủ</a>
                 <span className="mx-2">»</span>
                 <span>Giới thiệu</span>
             </div>
-        </div>
+        </div> */}
 
      
     </div>
