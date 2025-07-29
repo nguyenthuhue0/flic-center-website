@@ -42,7 +42,7 @@ const MaterialsDashboard = () => {
 
           <button
             onClick={() => setCurrentWeekStart(currentWeekStart.add(1, "week"))}
-            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 mr-[112px]"
           >
             Tuần sau →
           </button>
@@ -102,7 +102,7 @@ const MaterialsDashboard = () => {
       </div>
 
       {/* Bên phải: Thông báo + Thống kê */}
-      <div className="w-[280px] space-y-4">
+      {/* <div className="w-[280px] space-y-4">
         <div className="bg-white rounded shadow p-4">
           <h3 className="text-[#CC2B2B] font-bold mb-2">📢 Thông báo</h3>
           <ul className="list-disc list-inside text-sm space-y-1">
@@ -117,7 +117,7 @@ const MaterialsDashboard = () => {
           <p className="text-sm">🕒 5 giờ học</p>
           <p className="text-sm">📅 Lịch học rải từ T3–T6</p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
