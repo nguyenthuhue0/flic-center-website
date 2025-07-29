@@ -41,9 +41,9 @@ const Layout = () => {
           {/* <Route path="news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} /> */}
         </Route>
-        {/* <Route path="/lecturer" element={<App />}>
+        <Route path="/lecturer" element={<App />}>
           <Route path="materialsdashboard" element={<MaterialsDashboard />} />
-        </Route> */}
+        </Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
       <ToastContainer
