@@ -249,13 +249,6 @@ export default function News() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <div className="text-blue-600 text-sm mb-6">
-        <span>Trang chủ</span>
-        <span className="mx-2 text-gray-400">»</span>
-        <span>Tin tức</span>
-      </div>
-
       {/* Category Tags */}
       <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto">
         {categories.map((category) => (
