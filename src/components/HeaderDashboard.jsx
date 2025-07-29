@@ -1,23 +1,13 @@
 import React, { useState } from "react";
 import { TiArrowSortedUp } from "react-icons/ti";
 import { CgLogOut } from "react-icons/cg";
-import { Link, useLocation } from 'react-router-dom';
-
 import { NavLink, useNavigate } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
 import Breadcrumb from "./Breadcrumb";
 import { navItemsLink } from "../utils/Constants";
 
-const Header = () => {
-  const navItems = [
-    { name: 'Trang chủ', href: '/' },
-    { name: 'Giới thiệu', href: '#' },
-    { name: 'Các khoá học', href: '#' },
-    { name: 'Lịch thi', href: '/schedule' },
-    { name: 'Chia sẻ học viên', href: '#' },
-    { name: 'Tin tức', href: '/news' },
-  ];
-
+const HeaderDashboard = () => {
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="sticky top-0 z-10 flex flex-col bg-white font-sans">
@@ -127,15 +117,8 @@ const Header = () => {
           </div>
         )}
       </header>
-
-      {/* Breadcrumbs */}
-      <div className=" bg-gray-50/50">
-        <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500">
-          <Breadcrumb />
-        </div>
-      </div>
     </div>
   );
 };
 
-export default Header;
+export default HeaderDashboard;
