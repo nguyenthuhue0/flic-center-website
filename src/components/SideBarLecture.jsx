@@ -9,7 +9,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-export default function Sidebar() {
+export default function SideBarLecture() {
   const [openCourseMenu, setOpenCourseMenu] = useState(true);
   const [openScheduleMenu, setOpenScheduleMenu] = useState(true);
 

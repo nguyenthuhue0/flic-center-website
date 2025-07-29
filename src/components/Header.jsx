@@ -117,13 +117,6 @@ const Header = () => {
           </div>
         )}
       </header>
-
-      {/* Breadcrumbs */}
-      <div className=" bg-gray-50/50">
-        <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500">
-          <Breadcrumb />
-        </div>
-      </div>
     </div>
   );
 };

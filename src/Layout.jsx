@@ -16,11 +16,13 @@ import ScheduleGrid from "./pages/user/ScheduleGrid";
 
 import Introduce from "./pages/user/Introduce";
 import RegisterForm from "./pages/user/RegisterForm";
-import Dashboard from "./Dashboard";
 import MaterialsDashboard from "./pages/lecturer/MaterialsDashboard";
 import Teachingschedule from "./pages/lecturer/Teachingschedule";
 import  Rollcall from "./pages/lecturer/Rollcall";
 import RollcallDetail from "./pages/lecturer/RollcallDetail";
+import StudentSchedule from "./pages/student/StudentSchedule";
+import DashboardStudent from "./DashboardStudent";
+import DashboardLecture from "./DashboardLecture";
 // import Teachingschedule from "./pages/lecturer/Teachingschedule";
 const NotFound = () => {
   return (
@@ -46,11 +48,14 @@ const Layout = () => {
           {/* <Route path="news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} /> */}
         </Route>
-        <Route path="lecturer" element={<Dashboard />}>
+        <Route path="lecturer" element={<DashboardLecture />}>
           <Route path="materialsdashboard" element={<MaterialsDashboard   />} />
           <Route path="teachingschedule" element={<Teachingschedule   />} />
           <Route path="rollcall" element={<Rollcall   />} />
           <Route path="rollcalldetail" element={<RollcallDetail   />} />
+        </Route>
+        <Route path="student" element={<DashboardStudent />}>
+            
         </Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
