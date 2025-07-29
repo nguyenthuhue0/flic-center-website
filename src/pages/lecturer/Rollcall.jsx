@@ -51,7 +51,7 @@ const Rollcall = () => {
             <div className="font-semibold">KE.103</div>
             <div>
               <button
-                onClick={() => navigate(`/rollcall/${i}`)}
+                onClick={() => navigate("/lecturer/RollcallDetail")}
                 className="bg-[#1F5DE2] font-semibold text-white px-3  h-[30px] rounded hover:bg-blue-700 transition text-sm"
               >
                 Điểm danh
