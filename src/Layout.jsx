@@ -10,8 +10,8 @@ import Schedule from "./pages/user/Schedule";
 import Course from "./pages/user/Course";
 import CourseDetail from "./pages/user/Coursedetail";
 import ScheduleGrid from "./pages/user/ScheduleGrid";
-// import News from "./pages/user/News";
-// import NewsDetail from "./pages/user/NewsDetail";
+import News from "./pages/user/News";
+import NewsDetail from "./pages/user/NewsDetail";
 // import MaterialsDashboard from "./pages/user/MaterialsDashboard";
 
 import Introduce from "./pages/user/Introduce";
@@ -24,6 +24,11 @@ import StudentSchedule from "./pages/student/StudentSchedule";
 import DashboardStudent from "./DashboardStudent";
 import DashboardLecture from "./DashboardLecture";
 // import Teachingschedule from "./pages/lecturer/Teachingschedule";
+
+import DocumentList from "./pages/lecturer/DocumentList";
+import DocumentDetail from "./pages/lecturer/DocumentDetail";
+import DocumentUpload from "./pages/lecturer/DocumentUpload";
+
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -45,14 +50,19 @@ const Layout = () => {
           <Route path="course" element={<Course />} />
           <Route path="coursedetail" element={<CourseDetail />} />
           <Route path="scheduleGrid" element={<ScheduleGrid />} />
-          {/* <Route path="news" element={<News />} />
-          <Route path="/news/:id" element={<NewsDetail />} /> */}
+          <Route path="news" element={<News />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
         </Route>
         <Route path="lecturer" element={<DashboardLecture />}>
           <Route path="materialsdashboard" element={<MaterialsDashboard   />} />
           <Route path="teachingschedule" element={<Teachingschedule   />} />
           <Route path="rollcall" element={<Rollcall   />} />
           <Route path="rollcalldetail" element={<RollcallDetail   />} />
+
+          {/* Tài liệu học tập */}
+          <Route path="documentlist" element={<DocumentList />} />
+          <Route path="documentdetail" element={<DocumentDetail />} />
+          <Route path="documentupload" element={<DocumentUpload />} />
         </Route>
         <Route path="student" element={<DashboardStudent />}>
             

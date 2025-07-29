@@ -15,5 +15,5 @@ export const navItemsLink = [
   { name: "Các khoá học", href: "/course" },
   { name: "Lịch thi", href: "/schedule" },
   { name: "Chia sẻ học viên", href: "/feedback" },
-  { name: "Tin tức", href: "/new" },
+  { name: "Tin tức", href: "/news" },
 ];

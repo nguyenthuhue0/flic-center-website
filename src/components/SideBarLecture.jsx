@@ -67,7 +67,7 @@ export default function SideBarLecture() {
                 className={`flex items-center gap-2 relative z-10 text-[16px] cursor-pointer ${
                   isActive("/tai-lieu") ? "text-blue-200" : "hover:text-blue-200"
                 }`}
-                onClick={() => navigate("/tai-lieu")}
+                onClick={() => navigate("/lecturer/documentlist")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
                 <span>Tài liệu khóa học</span>
@@ -123,7 +123,7 @@ export default function SideBarLecture() {
 
         <li
           className="flex items-center text-[17px] gap-2 hover:bg-white/10 p-2 rounded text-red-300 cursor-pointer"
-          onClick={() => navigate("/dang-xuat")}
+          onClick={() => navigate("/login")}
         >
           <FaSignOutAlt /> Đăng xuất
         </li>
