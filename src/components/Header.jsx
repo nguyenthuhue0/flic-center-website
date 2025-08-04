@@ -103,7 +103,9 @@ const Header = () => {
               ))}
             </ul>
             <div className="mt-4 space-y-2">
-              <button className="w-full rounded-full bg-red-600 px-5 py-2 text-md font-bold text-white shadow-sm transition hover:bg-red-700">
+              <button 
+              className="w-full rounded-full bg-red-600 px-5 py-2 text-md font-bold text-white shadow-sm transition hover:bg-red-700"
+              >
                 Đăng ký học
               </button>
               <button

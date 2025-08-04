@@ -3,7 +3,6 @@ import './App.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import SideBar from './components/SideBarLecture'
-import HeaderDashboard from './components/HeaderDashboard'
 import SideBarStudent from './components/SideBarStudent'
 
 

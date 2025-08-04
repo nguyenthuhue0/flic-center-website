@@ -1,8 +1,43 @@
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/images/header-FLIC.png";
 import SlideAuth from "./SlideAuth";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { postRegister } from "../../services/AuthService";
 const Register = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    //validate
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      toast.error("email không đúng định dạng");
+      return;
+    }
+    if (!password) {
+      toast.error("password không đúng");
+      return;
+    }
+    //gọi api
+    let data = await postRegister(email, password, fullName);
+    if (data) {
+      toast.success("Đăng ký thành công!");
+      navigate("/login");
+    }
+    // if(data && data.ec !== 1){
+    //     toast.error("fail");
+    // }
+  };
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">
       <div className="flex flex-col md:flex-row items-center justify-center gap-10 w-full max-w-6xl p-10 shadow bg-white rounded-2xl">
@@ -25,20 +60,26 @@ const Register = () => {
             <h2 className="text-center text-2xl font-bold text-red-600 mb-6">
               ĐĂNG KÝ TÀI KHOẢN
             </h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleRegister}>
               <input
                 type="text"
                 placeholder="Họ và tên"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
               <input
                 type="email"
                 placeholder="Email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
               <input
                 type="password"
                 placeholder="Mật khẩu"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
               <button

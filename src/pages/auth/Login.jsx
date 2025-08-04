@@ -2,8 +2,41 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/images/header-FLIC.png";
 import SlideAuth from "./SlideAuth";
 import { HiHome } from "react-icons/hi2";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { postLogin } from "../../services/AuthService";
 const Login = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    //validate
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      toast.error("email không đúng định dạng");
+      return;
+    }
+    if (!password) {
+      toast.error("password không đúng");
+      return;
+    }
+    //api
+    let data = await postLogin(email, password);
+    if (data) {
+      toast.success("Đăng nhập thành công!");
+      sessionStorage.setItem("access_token", data.token);
+      navigate("/");
+    }
+    console.log("token", data);
+  };
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">
       <div className="flex flex-col md:flex-row items-center justify-center gap-10 w-full max-w-6xl p-10 shadow bg-white rounded-2xl">
@@ -41,6 +74,8 @@ const Login = () => {
                 <input
                   type="email"
                   placeholder="Email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 "
                 />
               </div>
@@ -48,6 +83,8 @@ const Login = () => {
                 <input
                   type="password"
                   placeholder="Mật khẩu"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 "
                 />
               </div>
@@ -57,13 +94,19 @@ const Login = () => {
                   <input type="checkbox" className="form-checkbox" />
                   <span>Ghi nhớ mật khẩu</span>
                 </label>
-                <a onClick={() => navigate('/forgotPassword')} className="text-blue-600 hover:underline hover:cursor-pointer">
+                <a
+                  onClick={() => navigate("/forgotPassword")}
+                  className="text-blue-600 hover:underline hover:cursor-pointer"
+                >
                   Quên mật khẩu?
                 </a>
               </div>
             </div>
 
-            <button className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-full transition mt-7 mb-4">
+            <button
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-full transition mt-7 mb-4"
+              onClick={(e) => handleLogin(e)}
+            >
               Đăng nhập
             </button>
 
