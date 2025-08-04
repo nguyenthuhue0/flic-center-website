@@ -28,6 +28,12 @@ import DashboardLecture from "./DashboardLecture";
 import DocumentList from "./pages/lecturer/DocumentList";
 import DocumentDetail from "./pages/lecturer/DocumentDetail";
 import DocumentUpload from "./pages/lecturer/DocumentUpload";
+import StudentCourse from "./pages/student/StudentCourse";
+import StudentScheduleDetail from "./pages/student/StudentScheduleDetail";
+import StudentCourseDetail from "./pages/student/StudentCourseDetail";
+import StudentSubmission from "./pages/student/StudentSubmission";
+import StudentInformation from "./pages/student/StudentInformation";
+import StudentEditProfile from "./pages/student/StudentEditProfile";
 
 const NotFound = () => {
   return (
@@ -65,7 +71,15 @@ const Layout = () => {
           <Route path="documentupload" element={<DocumentUpload />} />
         </Route>
         <Route path="student" element={<DashboardStudent />}>
-            
+          <Route index element={<StudentSchedule />} />
+          <Route path="studentcourse" element={<StudentCourse />} />
+          <Route path="studentprofile" element={<StudentInformation />} />
+          <Route path="studentprofile/:id" element={<StudentEditProfile />} />
+          <Route path="studentcourse/:id" element={<StudentCourseDetail />} />
+          <Route path="studentsubmission/:id" element={<StudentSubmission />} />
+          <Route path="studentschedule" element={<StudentSchedule />} />
+          <Route path="scheduledetail" element={<StudentScheduleDetail />} />
+
         </Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
