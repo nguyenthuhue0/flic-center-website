@@ -54,7 +54,6 @@ const Progress = () => {
                                         style={{
                                             position: 'absolute',
                                             left: `${student.progress}%`,
-                                            transform: 'translateX(-50%)',
                                             top: '50%',
                                             transform: 'translate(-50%, -50%)',
                                             fontSize: '12px',

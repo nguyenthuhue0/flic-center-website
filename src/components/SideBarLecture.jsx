@@ -219,7 +219,7 @@ export default function SideBarLecture() {
               ? "bg-white/10 text-blue-200"
               : "hover:bg-white/10"
           }`}
-          onClick={() => navigate("/tien-do")}
+          onClick={() => navigate("/lecturer/progress")}
         >
           <FaKey size={20} />
           <span className="text-sm text-center md:text-left">
