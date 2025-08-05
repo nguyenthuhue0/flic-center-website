@@ -69,7 +69,7 @@ export default function SideBarLecture() {
                     ? "text-blue-200"
                     : "hover:text-blue-200"
                 }`}
-                onClick={() => navigate("/lo-trinh")}
+                onClick={() => navigate("/lecturer/learningpath")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
                 <span>Lộ trình học</span>

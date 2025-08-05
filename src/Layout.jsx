@@ -18,11 +18,13 @@ import Introduce from "./pages/user/Introduce";
 import RegisterForm from "./pages/user/RegisterForm";
 import MaterialsDashboard from "./pages/lecturer/MaterialsDashboard";
 import Teachingschedule from "./pages/lecturer/Teachingschedule";
-import  Rollcall from "./pages/lecturer/Rollcall";
+import Rollcall from "./pages/lecturer/Rollcall";
 import RollcallDetail from "./pages/lecturer/RollcallDetail";
 import StudentSchedule from "./pages/student/StudentSchedule";
 import DashboardStudent from "./DashboardStudent";
 import DashboardLecture from "./DashboardLecture";
+import LearningPath from "./pages/lecturer/LearningPath";
+import Progress from "./pages/lecturer/Progress";
 // import Teachingschedule from "./pages/lecturer/Teachingschedule";
 
 import DocumentList from "./pages/lecturer/DocumentList";
@@ -60,15 +62,18 @@ const Layout = () => {
           <Route path="/news/:id" element={<NewsDetail />} />
         </Route>
         <Route path="lecturer" element={<DashboardLecture />}>
-          <Route path="materialsdashboard" element={<MaterialsDashboard   />} />
-          <Route path="teachingschedule" element={<Teachingschedule   />} />
-          <Route path="rollcall" element={<Rollcall   />} />
-          <Route path="rollcalldetail" element={<RollcallDetail   />} />
+          <Route path="materialsdashboard" element={<MaterialsDashboard />} />
+          <Route path="teachingschedule" element={<Teachingschedule />} />
+          <Route path="rollcall" element={<Rollcall />} />
+          <Route path="rollcalldetail" element={<RollcallDetail />} />
 
           {/* Tài liệu học tập */}
           <Route path="documentlist" element={<DocumentList />} />
           <Route path="documentdetail" element={<DocumentDetail />} />
           <Route path="documentupload" element={<DocumentUpload />} />
+
+          <Route path="learningpath" element={<LearningPath />} />
+          <Route path="progress" element={<Progress />} />
         </Route>
         <Route path="student" element={<DashboardStudent />}>
           <Route index element={<StudentSchedule />} />
@@ -79,7 +84,6 @@ const Layout = () => {
           <Route path="studentsubmission/:id" element={<StudentSubmission />} />
           <Route path="studentschedule" element={<StudentSchedule />} />
           <Route path="scheduledetail" element={<StudentScheduleDetail />} />
-
         </Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
