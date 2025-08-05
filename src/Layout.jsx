@@ -37,6 +37,23 @@ import StudentSubmission from "./pages/student/StudentSubmission";
 import StudentInformation from "./pages/student/StudentInformation";
 import StudentEditProfile from "./pages/student/StudentEditProfile";
 
+import DashboardAdmin from "./DashboardAdmin";
+// import Teachingschedule from "./pages/lecturer/Teachingschedule";
+import StudentManagement from "./pages/admin/StudentManagement";
+import AddStudent from "./pages/admin/AddStudent";
+import EditStudent from "./pages/admin/EditStudent";
+import LecturerManagement from "./pages/admin/LecturerManagement";
+import AddLecturer from "./pages/admin/AddLecturer";
+import EditLecturer from "./pages/admin/EditLecturer";
+
+import CourseManagement from "./pages/admin/CourseManagement";
+import AddCourse from "./pages/admin/AddCourse";
+import EditCourse from "./pages/admin/EditCourse";
+
+
+import StudentDetail from "./pages/admin/StudentDetail";
+import LecturerDetail from "./pages/admin/LecturerDetail";
+import CourseDetailAdmin from "./pages/admin/CourseDetailAdmin";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -74,6 +91,20 @@ const Layout = () => {
 
           <Route path="learningpath" element={<LearningPath />} />
           <Route path="progress" element={<Progress />} />
+        </Route>
+        <Route path="admin" element={<DashboardAdmin />}>
+          <Route path="studentManagement" element={<StudentManagement  />} />
+          <Route path="addStudent" element={<AddStudent />} />
+          <Route path="editStudent" element={<EditStudent />} />
+          <Route path="lecturerManagement" element={<LecturerManagement  />} />
+          <Route path="addlecturer" element={<AddLecturer />} />
+          <Route path="editlecturer" element={<EditLecturer />} />
+          <Route path="courseManagement" element={<CourseManagement  />} />
+          <Route path="addcourse" element={<AddCourse />} />
+          <Route path="editcourse" element={<EditCourse />} />
+          <Route path="courseDetailAdmin" element={<CourseDetailAdmin  />} />
+          <Route path="studentDetail" element={<StudentDetail />} />
+          <Route path="lecturerDetail" element={<LecturerDetail />} />
         </Route>
         <Route path="student" element={<DashboardStudent />}>
           <Route index element={<StudentSchedule />} />
