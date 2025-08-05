@@ -4,7 +4,7 @@ import SlideAuth from "./SlideAuth";
 import { HiHome } from "react-icons/hi2";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { postLogin } from "../../services/AuthService";
+import { postLogin } from "../../services/Auth/AuthService";
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -35,6 +35,10 @@ const Login = () => {
       sessionStorage.setItem("access_token", data.token);
       navigate("/");
     }
+         if (!data) {
+    toast.error("Đăng nhập thất bại!");
+    return;
+         }
     console.log("token", data);
   };
   return (

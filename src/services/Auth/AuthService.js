@@ -1,4 +1,4 @@
-import axios from "../utils/AxiosCustomize";
+import axios from "../../utils/AxiosCustomize";
 
 const postRegister = (email, password,fullName, phone ) => {
     return axios.post(`/register`, 

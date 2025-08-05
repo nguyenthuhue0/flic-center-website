@@ -3,7 +3,7 @@ import logo from "../../assets/images/header-FLIC.png";
 import SlideAuth from "./SlideAuth";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { postRegister } from "../../services/AuthService";
+import { postRegister } from "../../services/Auth/AuthService";
 const Register = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -34,6 +34,10 @@ const Register = () => {
       toast.success("Đăng ký thành công!");
       navigate("/login");
     }
+      if (!data) {
+    toast.error("Đăng ký thất bại!");
+    return;
+  }
     // if(data && data.ec !== 1){
     //     toast.error("fail");
     // }
