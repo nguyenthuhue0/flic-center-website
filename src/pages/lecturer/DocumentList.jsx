@@ -115,8 +115,6 @@ const courses = [
   },
 ];
 
-
-
 const ITEMS_PER_PAGE = 6;
 
 const DocumentList = () => {
@@ -148,9 +146,6 @@ const DocumentList = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
-
-        
-
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="space-y-8">
@@ -176,7 +171,7 @@ const DocumentList = () => {
                         : "text-white hover:bg-slate-700"
                     }`}
                   >
-                     {category}
+                    {category}
                   </button>
                 ))}
               </div>
@@ -200,9 +195,10 @@ const DocumentList = () => {
                         {course.title}
                       </h3>
                       <p className="text-gray-600 mb-4">{course.instructor}</p>
-                      <button 
-                      onClick={() => navigate("/lecturer/documentdetail")}
-                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 px-4 rounded">
+                      <button
+                        onClick={() => navigate("/lecturer/documentdetail")}
+                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 px-4 rounded"
+                      >
                         Chi tiết →
                       </button>
                     </div>
