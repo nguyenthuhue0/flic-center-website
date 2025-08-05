@@ -481,56 +481,60 @@ const DocumentDetail = () => {
                           </div>
                         </td> */}
                         <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            {item.type === "Google Meet" ? (
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition-colors"
-                                title="Tham gia Google Meet"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </a>
-                            ) : item.status === "Có sẵn" ? (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    handlePreview(item.id, item.title)
-                                  }
-                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                  title="Xem trước"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    handleDownload(item.id, item.title)
-                                  }
-                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="Tải xuống"
-                                >
-                                  <Download className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    navigate(`/materials-edit/${item.id}`)
-                                  }
-                                  className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-                                  title="Chỉnh sửa"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-                              </>
-                            ) : (
-                              item.status === "Đang cập nhật" && (
-                                <span className="text-xs text-gray-400 italic">
-                                  Chưa có sẵn
-                                </span>
-                              )
-                            )}
-                          </div>
-                        </td>
+  <div className="flex items-center space-x-2">
+    {item.type === "Google Meet" ? (
+      <>
+        <a
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition-colors"
+          title="Tham gia Google Meet"
+        >
+          <Eye className="w-4 h-4" />
+        </a>
+        <button
+          onClick={() => navigate(`/materials-edit/${item.id}`)}
+          className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+          title="Chỉnh sửa Google Meet"
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+      </>
+    ) : item.status === "Có sẵn" ? (
+      <>
+        <button
+          onClick={() => handlePreview(item.id, item.title)}
+          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          title="Xem trước"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => handleDownload(item.id, item.title)}
+          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+          title="Tải xuống"
+        >
+          <Download className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => navigate(`/materials-edit/${item.id}`)}
+          className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+          title="Chỉnh sửa"
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+      </>
+    ) : (
+      item.status === "Đang cập nhật" && (
+        <span className="text-xs text-gray-400 italic">
+          Chưa có sẵn
+        </span>
+      )
+    )}
+  </div>
+</td>
+
                       </tr>
                     ))}
                   </tbody>
