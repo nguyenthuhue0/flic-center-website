@@ -54,6 +54,7 @@ import EditCourse from "./pages/admin/EditCourse";
 import StudentDetail from "./pages/admin/StudentDetail";
 import LecturerDetail from "./pages/admin/LecturerDetail";
 import CourseDetailAdmin from "./pages/admin/CourseDetailAdmin";
+import SuccessPage from "./pages/user/SuccessPage";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -70,6 +71,7 @@ const Layout = () => {
           <Route index element={<Home />} />
           <Route path="introduce" element={<Introduce />} />
           <Route path="registerform" element={<RegisterForm />} />
+          <Route path="successpage" element={<SuccessPage />} />
           <Route path="feedback" element={<FeedbackStudent />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="course" element={<Course />} />
@@ -93,16 +95,16 @@ const Layout = () => {
           <Route path="progress" element={<Progress />} />
         </Route>
         <Route path="admin" element={<DashboardAdmin />}>
-          <Route path="studentManagement" element={<StudentManagement  />} />
+          <Route path="studentManagement" element={<StudentManagement />} />
           <Route path="addStudent" element={<AddStudent />} />
           <Route path="editStudent" element={<EditStudent />} />
-          <Route path="lecturerManagement" element={<LecturerManagement  />} />
+          <Route path="lecturerManagement" element={<LecturerManagement />} />
           <Route path="addlecturer" element={<AddLecturer />} />
           <Route path="editlecturer" element={<EditLecturer />} />
-          <Route path="courseManagement" element={<CourseManagement  />} />
+          <Route path="courseManagement" element={<CourseManagement />} />
           <Route path="addcourse" element={<AddCourse />} />
           <Route path="editcourse" element={<EditCourse />} />
-          <Route path="courseDetailAdmin" element={<CourseDetailAdmin  />} />
+          <Route path="courseDetailAdmin" element={<CourseDetailAdmin />} />
           <Route path="studentDetail" element={<StudentDetail />} />
           <Route path="lecturerDetail" element={<LecturerDetail />} />
         </Route>

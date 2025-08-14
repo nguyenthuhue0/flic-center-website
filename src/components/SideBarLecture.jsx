@@ -33,11 +33,10 @@ export default function SideBarLecture() {
       <ul className="mt-6 w-full px-4 text-sm space-y-1">
         {/* Thông tin cá nhân */}
         <li
-          className={`flex flex-col md:flex-row items-center md:items-start gap-1 md:gap-2 text-[17px] p-2 rounded cursor-pointer ${
-            isActive("/profile")
-              ? "bg-white/10 text-blue-200"
-              : "hover:bg-white/10"
-          }`}
+          className={`flex flex-col md:flex-row items-center md:items-start gap-1 md:gap-2 text-[17px] p-2 rounded cursor-pointer ${isActive("/profile")
+            ? "bg-white/10 text-blue-200"
+            : "hover:bg-white/10"
+            }`}
           onClick={() => navigate("/profile")}
         >
           <FaUser size={20} />
@@ -64,11 +63,10 @@ export default function SideBarLecture() {
               <div className="absolute left-[19px] top-3 h-[32px] w-[2px] bg-white z-0"></div>
 
               <div
-                className={`flex items-center gap-2 relative z-10 mb-3 text-[16px] cursor-pointer ${
-                  isActive("/lo-trinh")
-                    ? "text-blue-200"
-                    : "hover:text-blue-200"
-                }`}
+                className={`flex items-center gap-2 relative z-10 mb-3 text-[16px] cursor-pointer ${isActive("/lo-trinh")
+                  ? "text-blue-200"
+                  : "hover:text-blue-200"
+                  }`}
                 onClick={() => navigate("/lecturer/learningpath")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -76,11 +74,10 @@ export default function SideBarLecture() {
               </div>
 
               <div
-                className={`flex items-center gap-2 relative z-10 text-[16px] cursor-pointer ${
-                  isActive("/tai-lieu")
-                    ? "text-blue-200"
-                    : "hover:text-blue-200"
-                }`}
+                className={`flex items-center gap-2 relative z-10 text-[16px] cursor-pointer ${isActive("/tai-lieu")
+                  ? "text-blue-200"
+                  : "hover:text-blue-200"
+                  }`}
                 onClick={() => navigate("/lecturer/documentlist")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -91,9 +88,8 @@ export default function SideBarLecture() {
 
           {/* Submenu - Mobile off-canvas sidebar */}
           <div
-            className={`fixed top-0 right-0 h-full w-64 bg-white text-black z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
-              openCourseMenu ? "translate-x-0" : "translate-x-full"
-            }`}
+            className={`fixed top-0 right-0 h-full w-64 bg-white text-black z-50 transform transition-transform duration-300 ease-in-out md:hidden ${openCourseMenu ? "translate-x-0" : "translate-x-full"
+              }`}
           >
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="text-lg font-semibold">Quản lý khóa học</h3>
@@ -109,7 +105,7 @@ export default function SideBarLecture() {
               <div
                 className="text-[16px] cursor-pointer hover:text-blue-600"
                 onClick={() => {
-                  navigate("/lo-trinh");
+                  navigate("/lecturer/documentlist"); //fix
                   setOpenCourseMenu(false);
                 }}
               >
@@ -147,11 +143,10 @@ export default function SideBarLecture() {
               <div className="absolute left-[19px] top-3 h-[32px] w-[2px] bg-white z-0"></div>
 
               <div
-                className={`flex items-center gap-2 relative z-10 mb-3 text-[16px] cursor-pointer ${
-                  isActive("/lecturer/Teachingschedule")
-                    ? "text-blue-200"
-                    : "hover:text-blue-200"
-                }`}
+                className={`flex items-center gap-2 relative z-10 mb-3 text-[16px] cursor-pointer ${isActive("/lecturer/Teachingschedule")
+                  ? "text-blue-200"
+                  : "hover:text-blue-200"
+                  }`}
                 onClick={() => navigate("/lecturer/Teachingschedule")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -159,11 +154,10 @@ export default function SideBarLecture() {
               </div>
 
               <div
-                className={`flex items-center gap-2 relative z-10 text-[16px] cursor-pointer ${
-                  isActive("/lecturer/Rollcall")
-                    ? "text-blue-200"
-                    : "hover:text-blue-200"
-                }`}
+                className={`flex items-center gap-2 relative z-10 text-[16px] cursor-pointer ${isActive("/lecturer/Rollcall")
+                  ? "text-blue-200"
+                  : "hover:text-blue-200"
+                  }`}
                 onClick={() => navigate("/lecturer/Rollcall")}
               >
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -174,9 +168,8 @@ export default function SideBarLecture() {
 
           {/* Submenu - Mobile off-canvas */}
           <div
-            className={`fixed top-0 right-0 h-full w-64 bg-white text-black z-[9999] transform transition-transform duration-300 ease-in-out md:hidden ${
-              openScheduleMenu ? "translate-x-0" : "translate-x-full"
-            }`}
+            className={`fixed top-0 right-0 h-full w-64 bg-white text-black z-[9999] transform transition-transform duration-300 ease-in-out md:hidden ${openScheduleMenu ? "translate-x-0" : "translate-x-full"
+              }`}
           >
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="text-lg font-semibold">Thời khóa biểu</h3>
@@ -214,11 +207,10 @@ export default function SideBarLecture() {
 
         {/* Theo dõi tiến độ */}
         <li
-          className={`flex flex-col md:flex-row items-center md:items-start gap-1 md:gap-2 text-[17px] p-2 rounded cursor-pointer ${
-            isActive("/tien-do")
-              ? "bg-white/10 text-blue-200"
-              : "hover:bg-white/10"
-          }`}
+          className={`flex flex-col md:flex-row items-center md:items-start gap-1 md:gap-2 text-[17px] p-2 rounded cursor-pointer ${isActive("/tien-do")
+            ? "bg-white/10 text-blue-200"
+            : "hover:bg-white/10"
+            }`}
           onClick={() => navigate("/lecturer/progress")}
         >
           <FaKey size={20} />
