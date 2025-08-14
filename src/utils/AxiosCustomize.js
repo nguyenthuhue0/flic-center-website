@@ -7,9 +7,23 @@ const instance = axios.create({
 
 instance.interceptors.request.use(function (config) {
     const access_token = sessionStorage.getItem("access_token");
+    const skipAuth = config.skipAuth === true;
 
-    if (!config.url?.includes("/login") && access_token) {
+    if (!skipAuth && !config.url?.includes("/login") && access_token) {
         config.headers["Authorization"] = "Bearer " + access_token;
+    }
+    // Debug minimal info for news endpoints
+    if (config.url?.startsWith('/news')) {
+        console.debug('API Request', {
+            url: config.url,
+            skipAuth,
+            hasToken: Boolean(access_token),
+            attachingAuth: !skipAuth && Boolean(access_token)
+        });
+    }
+    // strip custom flag before sending
+    if ("skipAuth" in config) {
+        delete config.skipAuth;
     }
     return config;
 }, function (error) {

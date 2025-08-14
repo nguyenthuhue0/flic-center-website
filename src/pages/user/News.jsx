@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"
 import ieltsImg from "../../assets/images/IELTS.jpg";
 import vkuImg from "../../assets/images/vku.jpg";
 import mosImg from "../../assets/images/mos.webp";
-import viteImg from "../../assets/images/vku.jpg"; 
+import viteImg from "../../assets/images/vku.jpg";
 import vstepImg from "../../assets/images/VSTEP.jpg";
 import toeicImg from "../../assets/images/toeic.jpg";
 import { getNews } from "../../services/Student/News";
@@ -245,7 +245,9 @@ export default function News() {
                   >
                     <img src={news.avatarUrl || "/placeholder.svg"} alt={news.title} className="w-full h-48 object-cover" />
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm">{news.title}</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2 min-h-[40px]">
+                        {news.title}
+                      </h3>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />

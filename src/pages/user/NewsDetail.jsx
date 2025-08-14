@@ -20,6 +20,7 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
   const [loadingRelated, setLoadingRelated] = useState(false);
   const [error, setError] = useState(null);
+  const [permissionWarning, setPermissionWarning] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,6 +31,7 @@ export default function NewsDetail() {
     try {
       setLoading(true);
       setError(null);
+      setPermissionWarning(null);
       
       console.log(`Fetching news detail for ID: ${id}`);
       
@@ -81,7 +83,30 @@ export default function NewsDetail() {
         status: err.response?.status,
         data: err.response?.data
       });
-      
+      // Fallback khi bị 403: thử lấy danh sách và hiển thị thông tin cơ bản
+      if (err.response?.status === 403) {
+        try {
+          setLoadingRelated(true);
+          const allNews = await getNews();
+          if (Array.isArray(allNews)) {
+            const fallbackItem = allNews.find((n) => String(n.id) === String(id));
+            if (fallbackItem) {
+              setArticle(fallbackItem);
+              // setPermissionWarning(
+              //   "Bạn không có quyền xem toàn bộ nội dung. Đang hiển thị thông tin cơ bản."
+              // );
+              const related = allNews.filter((item) => item.id !== fallbackItem.id);
+              setRelatedNews(related.slice(0, 4));
+              return;
+            }
+          }
+        } catch (fallbackErr) {
+          console.warn("Fallback list fetch failed:", fallbackErr);
+        } finally {
+          setLoadingRelated(false);
+        }
+      }
+
       if (err.response?.status === 404) {
         setError("Không tìm thấy tin tức với ID này");
       } else if (err.response?.status >= 500) {
@@ -140,6 +165,11 @@ export default function NewsDetail() {
           <article className="bg-white rounded-lg shadow-sm overflow-hidden">
             {/* Article Header */}
             <div className="p-6 border-b">
+              {permissionWarning && (
+                <div className="mb-4 p-3 rounded bg-yellow-50 text-yellow-800 text-sm">
+                  {permissionWarning}
+                </div>
+              )}
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">
                 {article.title}
               </h1>
