@@ -30,8 +30,11 @@ const Login = () => {
     }
     //api
     let data = await postLogin(email, password);
+
     if (data) {
       toast.success("Đăng nhập thành công!");
+      console.log(data.token);
+      
       sessionStorage.setItem("access_token", data.token);
       navigate("/");
     }
@@ -39,7 +42,6 @@ const Login = () => {
     toast.error("Đăng nhập thất bại!");
     return;
          }
-    console.log("token", data);
   };
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">

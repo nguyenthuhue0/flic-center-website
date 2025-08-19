@@ -1,65 +1,213 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
+import { getUserDetail, updateUser, uploadAvatar } from "../../services/admin/users";
+
+// Helpers: format về giá trị phù hợp <input type="date"> / <input type="datetime-local">
+const toDateInput = (v) => {
+  if (!v) return "";
+  // nhận ISO/Date/string -> yyyy-MM-dd
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return "";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const toDatetimeLocalInput = (v) => {
+  if (!v) return "";
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return "";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+};
 
 export default function EditStudent() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+
+  // Nếu đi từ bảng: có thể đính kèm sẵn user trong state để đỡ gọi API
+  const stateUser = location.state?.student || location.state?.user || null;
+
+  const [loading, setLoading] = useState(!stateUser);
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState("");
+
+  // Avatar upload
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [preview, setPreview] = useState(stateUser?.avatarUrl || null);
+
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    course: "",
-    status: "Đang học",
-    level: "",
-    teacher: "",
-    parentEmail: "",
-    relationship: "",
-    favoriteColor: "",
-    dob: "",
-    address: "",
-    gender: "",
-    registrationTime: new Date().toISOString().slice(0, 16),
-    sessionsAttended: "",
-    tuitionStatus: "Đã đóng",
-    note: ""
+    // mapping theo backend bạn cung cấp
+    email: stateUser?.email || "",
+    fullName: stateUser?.fullName || "",
+    phone: stateUser?.phone || "",
+    role: stateUser?.role || "student",
+    status: stateUser?.status || "active", // active/inactive
+    studentId: stateUser?.studentId || "",
+    gender: stateUser?.gender || "",
+    job: stateUser?.job || "",
+    birthDate: toDateInput(stateUser?.birthDate) || "",
+    birthPlace: stateUser?.birthPlace || "",
+    ethnicity: stateUser?.ethnicity || "",
+    idNumber: stateUser?.idNumber || "",
+    idIssuedDate: toDateInput(stateUser?.idIssuedDate) || "",
+    idIssuedPlace: stateUser?.idIssuedPlace || "",
+    schoolName: stateUser?.schoolName || "",
+    createdAt: toDatetimeLocalInput(stateUser?.createdAt) || toDatetimeLocalInput(new Date()),
+    avatarUrl: stateUser?.avatarUrl || null,
   });
 
-  const [avatar, setAvatar] = useState(null);
-  const [preview, setPreview] = useState(null);
+  // Nếu không có state -> fetch theo id
+  useEffect(() => {
+    if (stateUser || !id) return;
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const data = await getUserDetail(id);
+        setFormData({
+          email: data?.email || "",
+          fullName: data?.fullName || "",
+          phone: data?.phone || "",
+          role: data?.role || "student",
+          status: data?.status || "active",
+          studentId: data?.studentId || "",
+          gender: data?.gender || "",
+          job: data?.job || "",
+          birthDate: toDateInput(data?.birthDate) || "",
+          birthPlace: data?.birthPlace || "",
+          ethnicity: data?.ethnicity || "",
+          idNumber: data?.idNumber || "",
+          idIssuedDate: toDateInput(data?.idIssuedDate) || "",
+          idIssuedPlace: data?.idIssuedPlace || "",
+          schoolName: data?.schoolName || "",
+          createdAt: toDatetimeLocalInput(data?.createdAt) || "",
+          avatarUrl: data?.avatarUrl || null,
+        });
+        setPreview(data?.avatarUrl || null);
+      } catch (e) {
+        const msg = e?.response?.data?.message || e?.message || "Không tải được chi tiết học viên.";
+        setErr(msg);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id, stateUser]);
+
+  const inputStyle =
+    "w-full border-gray-300 focus:border-pink-400 focus:ring focus:ring-pink-100 text-[16px] p-3 rounded-xl shadow-sm transition-all duration-200 outline-none";
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErr("");
+    const { name, value } = e.target;
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAvatar(file);
-      setPreview(URL.createObjectURL(file));
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // Chuẩn hoá payload đúng kiểu backend
+  const normalizePayload = (raw) => ({
+    email: raw.email?.trim() || null,
+    fullName: raw.fullName?.trim() || null,
+    phone: raw.phone?.trim() || null,
+    role: raw.role || "student",
+    status: raw.status || "active",
+    studentId: raw.studentId?.trim() || null,
+    gender: raw.gender?.trim() || null,
+    job: raw.job?.trim() || null,
+    birthDate: raw.birthDate || null, // yyyy-MM-dd
+    birthPlace: raw.birthPlace?.trim() || null,
+    ethnicity: raw.ethnicity?.trim() || null,
+    idNumber: raw.idNumber?.trim() || null,
+    idIssuedDate: raw.idIssuedDate || null, // yyyy-MM-dd
+    idIssuedPlace: raw.idIssuedPlace?.trim() || null,
+    schoolName: raw.schoolName?.trim() || null,
+    // createdAt thường readonly phía server, không gửi lên (tránh ghi đè)
+  });
+
+  const validate = (p) => {
+    if (!p.fullName) return "Vui lòng nhập Họ tên.";
+    if (!p.phone) return "Vui lòng nhập Số điện thoại.";
+    if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) return "Email không hợp lệ.";
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErr("");
+
+    const payload = normalizePayload(formData);
+    const v = validate(payload);
+    if (v) {
+      setErr(v);
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await updateUser(id, payload);
+
+      // Upload avatar nếu có chọn
+      if (avatarFile) {
+        await uploadAvatar(id, avatarFile);
+      }
+
+      alert("Cập nhật học viên thành công!");
+      navigate(-1);
+    } catch (error) {
+      console.error("Update student failed:", error);
+      const msg =
+        error?.response?.data?.message || error?.message || "Lỗi khi cập nhật học viên.";
+      setErr(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    console.log("Avatar file:", avatar);
-  };
-
-  const inputStyle =
-  "w-full  border-gray-300 focus:border-pink-400 focus:ring focus:ring-pink-100 text-[16px] p-3 rounded-xl shadow-sm transition-all duration-200 outline-none";
+  if (loading) {
+    return (
+      <div className="p-6 flex justify-center ml-[250px]">
+        <div className="w-full max-w-6xl bg-white shadow-md rounded-xl p-6 animate-pulse">
+          <div className="h-8 w-1/3 bg-gray-200 rounded mb-6" />
+          <div className="grid grid-cols-3 gap-4">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded" />
+            ))}
+            <div className="col-span-3 h-24 bg-gray-100 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 flex justify-center ml-[250px]">
       <div className="w-full max-w-6xl">
         <h2 className="text-3xl font-bold text-pink-600 mb-2 flex items-center">
-  <span className="mr-2">🌸</span> Chỉnh sửa thông tin học viên
-</h2>
+          <span className="mr-2">🌸</span> Chỉnh sửa thông tin học viên
+        </h2>
+        <p className="mb-4 text-gray-600">Nhập/chỉnh sửa thông tin học viên và lưu lại.</p>
 
-        <p className="mb-4 text-gray-600">Nhập lại thông tin học viên mới.</p>
+        {err && (
+          <div className="mb-4 p-3 rounded border border-red-200 bg-red-50 text-red-700">
+            {err}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-xl p-6 space-y-6">
-
-          {/* Tải ảnh đại diện */}
+          {/* Ảnh đại diện */}
           <div className="flex items-center space-x-6 mb-6">
             <div>
               <label htmlFor="avatarUpload" className="block font-medium mb-1 text-gray-700">
@@ -69,11 +217,10 @@ export default function EditStudent() {
             </div>
             {preview && (
               <img
-  src={preview}
-  alt="Preview"
-  className="w-24 h-24 object-cover rounded-full ring-4 ring-pink-300 shadow-md hover:scale-105 transition-transform duration-200"
-/>
-
+                src={preview}
+                alt="Preview"
+                className="w-24 h-24 object-cover rounded-full ring-4 ring-pink-300 shadow-md hover:scale-105 transition-transform duration-200"
+              />
             )}
           </div>
 
@@ -81,110 +228,194 @@ export default function EditStudent() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block font-medium mb-1">👤 Họ tên</label>
-              <input name="name" onChange={handleChange} value={formData.name} placeholder="Nhập họ tên" className={inputStyle} required />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">📞 Số điện thoại</label>
-              <input name="phone" onChange={handleChange} value={formData.phone} placeholder="VD: 0912345678" className={inputStyle} required />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">📧 Email</label>
-              <input name="email" onChange={handleChange} value={formData.email} placeholder="VD: ten@gmail.com" className={inputStyle} />
+              <input
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="Nhập họ tên"
+                className={inputStyle}
+                required
+              />
             </div>
 
             <div>
-              <label className="block font-medium mb-1">📘 Lớp học</label>
-              <input name="course" onChange={handleChange} value={formData.course} placeholder="VD: Lập trình C++" className={inputStyle} />
+              <label className="block font-medium mb-1">📞 Số điện thoại</label>
+              <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="VD: 0912345678"
+                className={inputStyle}
+                required
+              />
             </div>
+
             <div>
-              <label className="block font-medium mb-1">🎓 Trình độ đầu vào</label>
-              <input name="level" onChange={handleChange} value={formData.level} placeholder="VD: Lớp 1, Mẫu giáo..." className={inputStyle} />
+              <label className="block font-medium mb-1">📧 Email</label>
+              <input
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="VD: ten@gmail.com"
+                className={inputStyle}
+              />
             </div>
+
             <div>
-              <label className="block font-medium mb-1">👨‍🏫 Giáo viên phụ trách</label>
-              <input name="teacher" onChange={handleChange} value={formData.teacher} placeholder="VD: Cô Lan, Thầy Hùng..." className={inputStyle} />
+              <label className="block font-medium mb-1">🆔 Mã học viên</label>
+              <input
+                name="studentId"
+                value={formData.studentId}
+                onChange={handleChange}
+                placeholder="VD: STU001"
+                className={inputStyle}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">🚻 Giới tính</label>
+              <input
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                placeholder="VD: nam/nữ/khác"
+                className={inputStyle}
+              />
             </div>
 
             <div>
               <label className="block font-medium mb-1">📍 Trạng thái</label>
-              <select name="status" onChange={handleChange} value={formData.status} className={inputStyle}>
-                <option>Đang học</option>
-                <option>Đã nghỉ</option>
-                <option>Bảo lưu</option>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className={inputStyle}
+              >
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
               </select>
             </div>
+
             <div>
-              <label className="block font-medium mb-1">🎨 Màu yêu thích</label>
-              <input name="favoriteColor" onChange={handleChange} value={formData.favoriteColor} placeholder="VD: Xanh dương, Hồng..." className={inputStyle} />
+              <label className="block font-medium mb-1">💼 Nghề nghiệp</label>
+              <input
+                name="job"
+                value={formData.job}
+                onChange={handleChange}
+                placeholder="VD: sinh viên"
+                className={inputStyle}
+              />
             </div>
+
             <div>
               <label className="block font-medium mb-1">🎂 Ngày sinh</label>
-              <input name="dob" type="date" onChange={handleChange} value={formData.dob} className={inputStyle} />
+              <input
+                type="date"
+                name="birthDate"
+                value={formData.birthDate}
+                onChange={handleChange}
+                className={inputStyle}
+              />
             </div>
 
             <div>
-              <label className="block font-medium mb-1">🏠 Địa chỉ</label>
-              <input name="address" onChange={handleChange} value={formData.address} placeholder="VD: 123 Nguyễn Trãi..." className={inputStyle} />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">🚻 Giới tính</label>
-              <select name="gender" onChange={handleChange} value={formData.gender} className={inputStyle}>
-                <option value="">-- Chọn --</option>
-                <option value="Nam">Nam</option>
-                <option value="Nữ">Nữ</option>
-                <option value="Khác">Khác</option>
-              </select>
+              <label className="block font-medium mb-1">🏠 Nơi sinh</label>
+              <input
+                name="birthPlace"
+                value={formData.birthPlace}
+                onChange={handleChange}
+                placeholder="VD: Đà Nẵng"
+                className={inputStyle}
+              />
             </div>
 
             <div>
-              <label className="block font-medium mb-1">⏰ Thời gian đăng ký</label>
-              <input type="datetime-local" name="registrationTime" value={formData.registrationTime} onChange={handleChange} className={inputStyle} disabled />
+              <label className="block font-medium mb-1">🪪 Số CMND/CCCD</label>
+              <input
+                name="idNumber"
+                value={formData.idNumber}
+                onChange={handleChange}
+                placeholder="VD: 0123456789"
+                className={inputStyle}
+              />
             </div>
+
             <div>
-              <label className="block font-medium mb-1">🧮 Số buổi đã học</label>
-              <input name="sessionsAttended" onChange={handleChange} value={formData.sessionsAttended} placeholder="VD: 10" type="number" className={inputStyle} />
+              <label className="block font-medium mb-1">📅 Ngày cấp</label>
+              <input
+                type="date"
+                name="idIssuedDate"
+                value={formData.idIssuedDate}
+                onChange={handleChange}
+                className={inputStyle}
+              />
             </div>
+
             <div>
-              <label className="block font-medium mb-1">💰 Tình trạng học phí</label>
-              <select name="tuitionStatus" value={formData.tuitionStatus} onChange={handleChange} className={inputStyle}>
-                <option>Đã đóng</option>
-                <option>Còn nợ</option>
-                <option>Đang xem xét</option>
-              </select>
+              <label className="block font-medium mb-1">🏢 Nơi cấp</label>
+              <input
+                name="idIssuedPlace"
+                value={formData.idIssuedPlace}
+                onChange={handleChange}
+                placeholder="VD: CA TP. Đà Nẵng"
+                className={inputStyle}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">🏫 Trường</label>
+              <input
+                name="schoolName"
+                value={formData.schoolName}
+                onChange={handleChange}
+                placeholder="VD: VKU"
+                className={inputStyle}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">🕒 Tạo lúc</label>
+              <input
+                type="datetime-local"
+                name="createdAt"
+                value={formData.createdAt}
+                onChange={() => {}}
+                className={inputStyle}
+                disabled
+              />
             </div>
 
             <div className="col-span-3">
-              <label className="block font-medium mb-1">📝 Ghi chú</label>
-              <textarea name="note" onChange={handleChange} value={formData.note} placeholder="Ghi chú thêm (nếu có)" className={inputStyle}></textarea>
-            </div>
-          </div>
-
-          {/* Thông tin phụ huynh */}
-          <hr className="my-4" />
-          <h4 className="text-lg font-semibold text-gray-700">👨‍👩‍👧 Thông tin phụ huynh</h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium mb-1">📧 Email phụ huynh</label>
-              <input name="parentEmail" onChange={handleChange} value={formData.parentEmail} placeholder="VD: phuhuynh@gmail.com" className={inputStyle} />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">🤝 Mối quan hệ</label>
-              <input name="relationship" onChange={handleChange} value={formData.relationship} placeholder="VD: Cha, Mẹ, Anh/Chị..." className={inputStyle} />
+              <label className="block font-medium mb-1">🔗 Avatar URL (chỉ xem)</label>
+              <input
+                name="avatarUrl"
+                value={formData.avatarUrl || ""}
+                onChange={() => {}}
+                className={inputStyle}
+                disabled
+              />
             </div>
           </div>
 
           {/* Nút thao tác */}
           <div className="flex justify-between mt-6">
-            <button type="button" onClick={() => navigate(-1)} className="btn-outline">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="btn-outline"
+              disabled={submitting}
+            >
               <FaArrowLeft className="inline mr-1" /> Quay lại
             </button>
             <button
-  type="submit"
-  className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-all"
->
-  <FaSave className="inline mr-1" /> Lưu học viên
-</button>
-
+              type="submit"
+              disabled={submitting}
+              className={`${
+                submitting ? "opacity-70 cursor-not-allowed" : ""
+              } bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-all`}
+            >
+              <FaSave className="inline mr-1" /> {submitting ? "Đang lưu..." : "Lưu học viên"}
+            </button>
           </div>
         </form>
       </div>

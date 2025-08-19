@@ -8,15 +8,15 @@ const attendanceStates = [
 
 const initialStudents = [
   { id: 1, name: "Nguyễn Văn A", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 2, name: "Nguyễn Văn B", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 3, name: "Nguyễn Văn C", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 4, name: "Nguyễn Văn D", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 5, name: "Nguyễn Văn E", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 6, name: "Nguyễn Văn A", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 7, name: "Nguyễn Văn B", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 8, name: "Nguyễn Văn C", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 9, name: "Nguyễn Văn D", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 10, name: "Nguyễn Văn E", dob: "05/07/2004", stateIndex: 0, note: "" }
+  { id: 2, name: "Nguyễn Văn B", dob: "15/11/2004", stateIndex: 0, note: "" },
+  { id: 3, name: "Nguyễn Văn C", dob: "20/02/2004", stateIndex: 0, note: "" },
+  { id: 4, name: "Nguyễn Văn D", dob: "10/07/2004", stateIndex: 0, note: "" },
+  { id: 5, name: "Nguyễn Văn E", dob: "27/02/2004", stateIndex: 0, note: "" },
+  { id: 6, name: "Nguyễn Văn F", dob: "18/07/2004", stateIndex: 0, note: "" },
+  { id: 7, name: "Nguyễn Văn G", dob: "09/12/2004", stateIndex: 0, note: "" },
+  { id: 8, name: "Nguyễn Văn H", dob: "17/08/2004", stateIndex: 0, note: "" },
+  { id: 9, name: "Nguyễn Văn I", dob: "01/03/2004", stateIndex: 0, note: "" },
+  { id: 10, name: "Nguyễn Văn J", dob: "22/12/2004", stateIndex: 0, note: "" }
 ];
 
 export default function Attendance() {

@@ -1,74 +1,69 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const initialCourses = [
-  {
-    id: 1,
-    name: "Lập trình Java",
-    description: "Khóa học nhập môn Java",
-    studentCount: 25,
-    status: "Đang mở",
-  },
-  {
-    id: 2,
-    name: "HTML CSS JS",
-    description: "Thiết kế web cơ bản",
-    studentCount: 30,
-    status: "Đã đóng",
-  },
-  {
-    id: 3,
-    name: "ReactJS nâng cao",
-    description: "Xây dựng SPA bằng React",
-    studentCount: 18,
-    status: "Đang mở",
-  },
-  {
-    id: 4,
-    name: "ReactJS nâng cao",
-    description: "Xây dựng SPA bằng React",
-    studentCount: 18,
-    status: "Đang mở",
-  },
-  {
-    id: 5,
-    name: "ReactJS nâng cao",
-    description: "Xây dựng SPA bằng React",
-    studentCount: 18,
-    status: "Đang mở",
-  },
-  {
-    id: 6,
-    name: "ReactJS nâng cao",
-    description: "Xây dựng SPA bằng React",
-    studentCount: 18,
-    status: "Đang mở",
-  },
-  {
-    id: 7,
-    name: "HTML CSS JS",
-    description: "Thiết kế web cơ bản",
-    studentCount: 30,
-    status: "Đã đóng",
-  }
-];
+import { getAdminCourses, deleteCourse } from "../../services/admin/courses";
 
 const AdminCourse = () => {
-  const [courses, setCourses] = useState(initialCourses);
+  const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
-  const handleDelete = (id) => {
-    const confirm = window.confirm("Bạn có chắc muốn xóa khóa học này?");
-    if (confirm) {
-      setCourses((prev) => prev.filter((course) => course.id !== id));
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async (page = 0, size = 20) => {
+    try {
+      setLoading(true);
+      setErr("");
+      const res = await getAdminCourses(page, size);
+      const list = Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
+      setCourses(list);
+    } catch (e) {
+      setErr(e?.response?.data?.message || e?.message || "Không tải được danh sách khoá học");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredCourses = courses.filter((course) =>
-    course.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Bạn có chắc muốn xoá khoá học này?");
+    if (!ok) return;
+
+    // Lạc quan: xoá tạm trong UI
+    const prev = courses;
+    const next = prev.filter((c) => c.id !== id);
+    setCourses(next);
+    setDeletingId(id);
+
+    try {
+      await deleteCourse(id); // gọi API xoá
+      // thành công: giữ nguyên next
+    } catch (e) {
+      // thất bại: khôi phục danh sách cũ và báo lỗi
+      setCourses(prev);
+      alert(e?.response?.data?.message || e?.message || "Xoá khoá học thất bại");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const filteredCourses = useMemo(() => {
+    const q = searchTerm.toLowerCase().trim();
+    if (!q) return courses;
+    return courses.filter((c) => (c.title || "").toLowerCase().includes(q));
+  }, [courses, searchTerm]);
+
+  const getStatusBadge = (status) => {
+    const s = String(status || "").toLowerCase();
+    return s === "active" || s === "open" ? "bg-green-500" : "bg-gray-400";
+  };
+
+  const money = (n) =>
+    typeof n === "number" ? n.toLocaleString("vi-VN") + " đ" : "—";
 
   return (
     <div className="p-6 min-h-screen ml-[250px] bg-gray-50">
@@ -88,6 +83,7 @@ const AdminCourse = () => {
           className="w-1/2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && fetchCourses()}
         />
         <button
           className="bg-[#1F5DE2] text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition"
@@ -97,56 +93,94 @@ const AdminCourse = () => {
         </button>
       </div>
 
+      {/* Lỗi */}
+      {err && (
+        <div className="mb-3 p-3 rounded border border-red-200 bg-red-50 text-red-700">{err}</div>
+      )}
+
       {/* Bảng khóa học */}
       <div className="w-full overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow-md overflow-hidden">
-          <thead className="bg-[#D52929] text-white text-[15px] uppercase text-left">
-            <tr className="h-12">
-              <th className="px-5">STT</th>
-              <th className="px-5">Tên khóa học</th>
-              <th className="px-5">Mô tả</th>
-              <th className="px-5">Số học viên</th>
-              <th className="px-5">Trạng thái</th>
-              <th className="px-5 text-center">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody className="text-[15px] text-gray-700 font-semibold">
-            {filteredCourses.length > 0 ? (
-              filteredCourses.map((course, index) => (
-                <tr key={course.id} className="border-t hover:bg-gray-50 transition">
-                  <td className="px-5 py-3 font-semibold">{index + 1}</td>
-                  <td className="px-5 py-3">{course.name}</td>
-                  <td className="px-5 py-3">{course.description}</td>
-                  <td className="px-5 py-3">{course.studentCount}</td>
+  <table className="min-w-full bg-white rounded-xl shadow-md overflow-hidden table-fixed">
+    {/* Set tỉ lệ các cột cho dễ đọc */}
+    <colgroup>
+      <col className="w-16" />              {/* STT */}
+      <col className="w-[18%]" />           {/* Tên khóa học */}
+      <col className="w-[40%]" />           {/* Mô tả */}
+      <col className="w-[12%]" />           {/* Giá */}
+      <col className="w-[10%]" />           {/* Thời lượng */}
+      <col className="w-[10%]" />           {/* Trạng thái */}
+      <col className="w-[12%]" />           {/* Thao tác */}
+    </colgroup>
+
+    <thead className="bg-[#D52929] text-white text-[15px] uppercase text-left">
+      <tr className="h-12">
+        <th className="px-5">STT</th>
+        <th className="px-5">Tên khóa học</th>
+        <th className="px-5">Mô tả</th>
+        <th className="px-5">Giá</th>
+        <th className="px-5">Thời lượng</th>
+        <th className="px-5">Trạng thái</th>
+        <th className="px-5 text-center">Thao tác</th>
+      </tr>
+    </thead>
+
+    <tbody className="text-[15px] text-gray-700 divide-y font-semibold">
+      {loading ? (
+        /* skeleton giữ nguyên của bạn */
+        [...Array(6)].map((_, i) => (
+          <tr key={i} className="animate-pulse">
+            <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-8" /></td>
+            <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-40" /></td>
+            <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-72" /></td>
+            <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-24" /></td>
+            <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-20" /></td>
+            <td className="px-5 py-4"><div className="h-6 bg-gray-200 rounded w-20" /></td>
+            <td className="px-5 py-4"><div className="h-8 bg-gray-200 rounded w-28 ml-auto" /></td>
+          </tr>
+        ))
+      ) : filteredCourses.length > 0 ? (
+        filteredCourses.map((c, index) => (
+          <tr key={c.id} className="hover:bg-gray-50 transition align-top">
+            <td className="px-5 py-3 align-top">{index + 1}</td>
+            <td className="px-5 py-3 align-top">{c.title || "—"}</td>
+
+            {/* 👉 Bỏ line-clamp, cho xuống dòng & ngắt từ */}
+            <td className="px-5 py-3 align-top whitespace-normal break-words leading-relaxed">
+              {c.description || "—"}
+            </td>
+
+            <td className="px-5 py-3 align-top">{money(c.price)}</td>
+            <td className="px-5 py-3 align-top">{c.duration ? `${c.duration} giờ` : "—"}</td>
+            <td className="px-5 py-3 align-top">
+              <span className={`px-3 py-1 rounded-full text-white text-sm ${getStatusBadge(c.status)}`}>
+                {c.status || "—"}
+              </span>
+            </td>
                   <td className="px-5 py-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                        course.status === "Đang mở" ? "bg-green-500" : "bg-gray-400"
-                      }`}
-                    >
-                      {course.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-center">
                     <div className="flex justify-center gap-2">
                       <button
                         className="bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white"
                         title="Sửa"
-                        onClick={() => navigate("../EditCourse")}
+                        onClick={() => navigate(`/admin/courses/${c.id}/edit`, { state: { course: c } })}
                       >
                         <Pencil size={16} />
                       </button>
+
                       <button
-                        className="bg-red-500 hover:bg-red-600 p-2 rounded-md text-white"
-                        title="Xóa"
-                        onClick={() => handleDelete(course.id)}
+                        className={`${
+                          deletingId === c.id ? "opacity-70 cursor-not-allowed" : ""
+                        } bg-red-500 hover:bg-red-600 p-2 rounded-md text-white`}
+                        title={deletingId === c.id ? "Đang xoá..." : "Xoá"}
+                        onClick={() => handleDelete(c.id)}
+                        disabled={deletingId === c.id}
                       >
                         <Trash2 size={16} />
                       </button>
+
                       <button
                         className="bg-gray-500 hover:bg-gray-600 p-2 rounded-md text-white"
                         title="Xem"
-                         onClick={() => navigate("../CourseDetailAdmin")}
+                        onClick={() => navigate(`/admin/courses/${c.id}`, { state: { course: c } })}
                       >
                         <Eye size={16} />
                       </button>
@@ -156,7 +190,7 @@ const AdminCourse = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center py-6 text-gray-500 italic">
+                <td colSpan="7" className="text-center py-6 text-gray-500 italic">
                   Không tìm thấy khóa học nào phù hợp.
                 </td>
               </tr>
