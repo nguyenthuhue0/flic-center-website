@@ -2,9 +2,7 @@
 
 import { useParams } from "react-router-dom";
 import { Calendar, User, Tag, Facebook, Twitter, Link } from "lucide-react";
-// import { Card, CardContent } from "@/components/ui/card"
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ieltsImg from "../../assets/images/IELTS.jpg";
 import vkuImg from "../../assets/images/vku.jpg";
@@ -12,158 +10,154 @@ import mosImg from "../../assets/images/mos.webp";
 import viteImg from "../../assets/images/vku.jpg";
 import vstepImg from "../../assets/images/VSTEP.jpg";
 import toeicImg from "../../assets/images/toeic.jpg";
-
-const newsData = [
-  {
-    id: 1,
-    title:
-      "VKU: Bảo vệ khóa luận tốt nghiệp, khẳng định chất lượng và định hướng mạnh mẽ hội nhập toàn cầu",
-    content: `
-      <p>Từ ngày 30/6 đến ngày 5/7/2025, Trường Đại học Công nghệ Thông tin và Truyền thông Việt – Hàn (VKU), Đại học Đà Nẵng đã tổ chức thành công lễ bảo vệ khóa luận tốt nghiệp...</p>
-      <p>Điểm nhấn nổi bật của kỳ bảo vệ năm nay là 100% sinh viên thực hiện và trình bày khóa luận tốt nghiệp hoàn toàn bằng tiếng Anh...</p>
-    `,
-    image: vkuImg,
-    author: "Binh luận",
-    date: "09 - 07 - 2025",
-    category: "FLIC",
-    tags: ["VKU", "Tốt nghiệp", "2021-2025", "FLIC", "Bảo vệ khóa luận"],
-    views: 35,
-  },
-  {
-    id: 2,
-    title: "FLIC: Khai giảng khóa học Tin học ứng dụng mới",
-    content:
-      "<p>Khóa học Tin học ứng dụng tại FLIC thu hút đông đảo sinh viên tham gia.</p>",
-    image: vkuImg,
-    author: "FLIC Team",
-    date: "10 - 07 - 2025",
-    category: "FLIC",
-    tags: ["FLIC", "Tin học", "Khóa học"],
-    views: 20,
-  },
-  {
-    id: 3,
-    title: "TOEIC: Cập nhật lịch thi tháng 7/2025",
-    content:
-      "<p>Lịch thi TOEIC mới nhất đã được cập nhật, sinh viên chú ý đăng ký đúng hạn.</p>",
-    image: toeicImg,
-    author: "TOEIC Center",
-    date: "11 - 07 - 2025",
-    category: "TOEIC",
-    tags: ["TOEIC", "Lịch thi"],
-    views: 15,
-  },
-  {
-    id: 4,
-    title: "IELTS: Chia sẻ kinh nghiệm đạt 8.0+ từ sinh viên VKU",
-    content:
-      "<p>Sinh viên VKU chia sẻ bí quyết học IELTS hiệu quả, đạt điểm cao trong kỳ thi.</p>",
-    image: ieltsImg,
-    author: "IELTS Club",
-    date: "12 - 07 - 2025",
-    category: "IELTS",
-    tags: ["IELTS", "Kinh nghiệm"],
-    views: 10,
-  },
-  {
-    id: 5,
-    title: "VSTEP: Hướng dẫn đăng ký thi và ôn tập hiệu quả",
-    content:
-      "<p>Các bước đăng ký thi VSTEP và tài liệu ôn tập dành cho sinh viên.</p>",
-    image: vstepImg,
-    author: "VSTEP Team",
-    date: "13 - 07 - 2025",
-    category: "VSTEP",
-    tags: ["VSTEP", "Ôn tập"],
-    views: 8,
-  },
-  {
-    id: 6,
-    title: "MOS: Kết quả thi và trao chứng chỉ tháng 6/2025",
-    content:
-      "<p>Danh sách sinh viên đạt chứng chỉ MOS tháng 6/2025 đã được công bố.</p>",
-    image: mosImg,
-    author: "MOS Center",
-    date: "14 - 07 - 2025",
-    category: "MOS",
-    tags: ["MOS", "Chứng chỉ"],
-    views: 12,
-  },
-  {
-    id: 7,
-    title: "FLIC: Workshop kỹ năng mềm cho sinh viên năm nhất",
-    content:
-      "<p>Workshop giúp sinh viên năm nhất nâng cao kỹ năng mềm, chuẩn bị cho học kỳ mới.</p>",
-    image: vkuImg,
-    author: "FLIC Team",
-    date: "15 - 07 - 2025",
-    category: "FLIC",
-    tags: ["FLIC", "Kỹ năng mềm"],
-    views: 9,
-  },
-  {
-    id: 8,
-    title: "VKU: Đạt giải thưởng sáng tạo trẻ toàn quốc",
-    content:
-      "<p>Nhóm sinh viên VKU xuất sắc giành giải thưởng sáng tạo trẻ năm 2025.</p>",
-    image: vkuImg,
-    author: "Admin VKU",
-    date: "16 - 07 - 2025",
-    category: "VKU",
-    tags: ["VKU", "Sáng tạo trẻ"],
-    views: 14,
-  },
-];
+import { getNewsDetail, getNews } from "../../services/Student/News";
 
 export default function NewsDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const article = newsData.find((item) => String(item.id) === String(id));
+  const [article, setArticle] = useState(null);
+  const [relatedNews, setRelatedNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+  const [error, setError] = useState(null);
+  const [permissionWarning, setPermissionWarning] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchNewsDetail();
   }, [id]);
 
-  if (!article) {
+  const fetchNewsDetail = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setPermissionWarning(null);
+      
+      console.log(`Fetching news detail for ID: ${id}`);
+      
+      // Lấy chi tiết tin tức theo ID từ API
+      const newsDetail = await getNewsDetail(id);
+      
+      console.log('News detail response:', newsDetail);
+      
+      // Kiểm tra response và xử lý dữ liệu
+      if (newsDetail) {
+        setArticle(newsDetail);
+        
+        // Lấy danh sách tin tức để tìm bài liên quan
+        try {
+          setLoadingRelated(true);
+          console.log('Fetching related news...');
+          const allNews = await getNews();
+          console.log('All news response:', allNews);
+          
+          // Kiểm tra allNews có phải là array không
+          if (Array.isArray(allNews)) {
+            // Tìm bài liên quan (loại trừ bài hiện tại)
+            let related = allNews.filter(
+              (item) => item.id !== newsDetail.id
+            );
+            
+            // Chỉ lấy tối đa 4 bài
+            setRelatedNews(related.slice(0, 4));
+            console.log('Related news set:', related.slice(0, 4));
+          } else {
+            console.warn('All news is not an array:', allNews);
+            setRelatedNews([]);
+          }
+        } catch (relatedError) {
+          console.warn("Không thể tải tin tức liên quan:", relatedError);
+          setRelatedNews([]);
+        } finally {
+          setLoadingRelated(false);
+        }
+      } else {
+        throw new Error("Dữ liệu tin tức không hợp lệ");
+      }
+      
+    } catch (err) {
+      console.error("Error fetching news detail:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response,
+        status: err.response?.status,
+        data: err.response?.data
+      });
+      // Fallback khi bị 403: thử lấy danh sách và hiển thị thông tin cơ bản
+      if (err.response?.status === 403) {
+        try {
+          setLoadingRelated(true);
+          const allNews = await getNews();
+          if (Array.isArray(allNews)) {
+            const fallbackItem = allNews.find((n) => String(n.id) === String(id));
+            if (fallbackItem) {
+              setArticle(fallbackItem);
+              // setPermissionWarning(
+              //   "Bạn không có quyền xem toàn bộ nội dung. Đang hiển thị thông tin cơ bản."
+              // );
+              const related = allNews.filter((item) => item.id !== fallbackItem.id);
+              setRelatedNews(related.slice(0, 4));
+              return;
+            }
+          }
+        } catch (fallbackErr) {
+          console.warn("Fallback list fetch failed:", fallbackErr);
+        } finally {
+          setLoadingRelated(false);
+        }
+      }
+
+      if (err.response?.status === 404) {
+        setError("Không tìm thấy tin tức với ID này");
+      } else if (err.response?.status >= 500) {
+        setError("Lỗi server, vui lòng thử lại sau");
+      } else if (err.message.includes("Network Error") || err.message.includes("timeout")) {
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng");
+      } else {
+        setError(`Không thể tải chi tiết tin tức: ${err.message}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="text-center text-red-500 text-xl py-20">
-        404. Not found data
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải...</p>
+        </div>
       </div>
     );
   }
 
-  // Lấy các bài liên quan cùng category (trừ bài hiện tại)
-  let related = newsData.filter(
-    (item) => item.id !== article.id && item.category === article.category
-  );
-  // Nếu chưa đủ 4 bài, bổ sung theo tag
-  if (related.length < 4) {
-    const tagRelated = newsData.filter(
-      (item) =>
-        item.id !== article.id &&
-        item.category !== article.category &&
-        item.tags.some((tag) => article.tags.includes(tag))
+  if (error || !article) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-20">
+          <div className="text-red-500 text-xl mb-4">
+            {error || "404. Không tìm thấy tin tức"}
+          </div>
+          <button 
+            onClick={fetchNewsDetail}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
     );
-    related = [...related, ...tagRelated];
   }
-  // Nếu vẫn chưa đủ, bổ sung các bài khác (trừ bài hiện tại và đã có trong related)
-  if (related.length < 4) {
-    const others = newsData.filter(
-      (item) => item.id !== article.id && !related.some((r) => r.id === item.id)
-    );
-    related = [...related, ...others];
-  }
-  // Chỉ lấy tối đa 4 bài
-  related = related.slice(0, 4);
 
   return (
     <main className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
-      <div className="text-blue-600 text-sm mb-6">
+      {/* <div className="text-blue-600 text-sm mb-6">
         <span>Trang chủ</span>
         <span className="mx-2 text-gray-400">»</span>
         <span>Tin Tức</span>
-      </div>
+      </div> */}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Main Content */}
@@ -171,6 +165,11 @@ export default function NewsDetail() {
           <article className="bg-white rounded-lg shadow-sm overflow-hidden">
             {/* Article Header */}
             <div className="p-6 border-b">
+              {permissionWarning && (
+                <div className="mb-4 p-3 rounded bg-yellow-50 text-yellow-800 text-sm">
+                  {permissionWarning}
+                </div>
+              )}
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">
                 {article.title}
               </h1>
@@ -179,15 +178,11 @@ export default function NewsDetail() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  <span>{article.date}</span>
+                  <span>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <User className="w-4 h-4" />
-                  <span>Bình luận: {article.views}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Tag className="w-4 h-4" />
-                  <span>Tác giả: {article.category}</span>
+                  <span>ID: {article.id}</span>
                 </div>
               </div>
 
@@ -209,7 +204,7 @@ export default function NewsDetail() {
             {/* Article Image */}
             <div className="relative">
               <img
-                src={article.image || vkuImg}
+                src={article.avatarUrl || vkuImg}
                 alt={article.title}
                 className="w-full h-96 object-cover"
               />
@@ -219,25 +214,8 @@ export default function NewsDetail() {
             <div className="p-6">
               <div
                 className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={{ __html: article.content || '' }}
               />
-
-              {/* Tags */}
-              <div className="mt-8 pt-6 border-t">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Tags:
-                  </span>
-                  {article.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
 
               {/* Comment Section */}
               <div className="card mt-6">
@@ -334,80 +312,46 @@ export default function NewsDetail() {
 
         {/* Sidebar */}
         <div className="lg:w-80">
-          {/* Tags Widget */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <div className="w-2 h-5 rounded-full bg-red-500"></div>
-              Tags
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Featured News */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <div className="w-2 h-5 rounded-full bg-red-500"></div>
-              Tin tức nổi bật
-            </h3>
-            <div className="space-y-4">
-              {related.map((news) => (
-                <div
-                  key={news.id}
-                  className="flex gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-                  onClick={() => navigate(`/news/${news.id}`)}
-                >
-                  <img
-                    src={news.image || vkuImg}
-                    alt={news.title}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                      {news.title}
-                    </h4>
-                    <p className="text-xs text-gray-500">{news.date}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Related News */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <div className="w-2 h-5 rounded-full bg-red-500"></div>
               Tin tức liên quan
             </h3>
-            <div className="space-y-4">
-              {related.map((news) => (
-                <div
-                  key={news.id}
-                  className="flex gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-                  onClick={() => navigate(`/news/${news.id}`)}
-                >
-                  <img
-                    src={news.image || vkuImg}
-                    alt={news.title}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                      {news.title}
-                    </h4>
-                    <p className="text-xs text-gray-500">{news.date}</p>
+            {loadingRelated ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-2 text-sm text-gray-600">Đang tải...</p>
+              </div>
+            ) : relatedNews.length > 0 ? (
+              <div className="space-y-4">
+                {relatedNews.map((news) => (
+                  <div
+                    key={news.id}
+                    className="flex gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                    onClick={() => navigate(`/news/${news.id}`)}
+                  >
+                    <img
+                      src={news.avatarUrl || vkuImg}
+                      alt={news.title}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
+                        {news.title}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {new Date(news.publishedAt).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                <p className="text-sm">Không có tin tức liên quan</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

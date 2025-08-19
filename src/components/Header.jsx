@@ -86,7 +86,9 @@ const Header = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-6">
-            <button className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700">
+            <button className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
+            onClick={() => navigate("/registerForm")}
+            >
               Đăng ký học
             </button>
             {/* <a

@@ -35,7 +35,6 @@ const handleLogin = async (event) => {
 
   // Gọi API
   const data = await postLogin(email, password);
-
   if (!data || !data.token) {
     toast.error("Đăng nhập thất bại!");
     return;

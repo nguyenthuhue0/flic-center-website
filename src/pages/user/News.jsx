@@ -7,13 +7,18 @@ import { useNavigate } from "react-router-dom"
 import ieltsImg from "../../assets/images/IELTS.jpg";
 import vkuImg from "../../assets/images/vku.jpg";
 import mosImg from "../../assets/images/mos.webp";
-import viteImg from "../../assets/images/vku.jpg"; 
+import viteImg from "../../assets/images/vku.jpg";
 import vstepImg from "../../assets/images/VSTEP.jpg";
 import toeicImg from "../../assets/images/toeic.jpg";
+import { getNews } from "../../services/Student/News";
 
 
 export default function News() {
-  const [activeCategory, setActiveCategory] = useState("all")
+
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [newsList, setNewsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const categories = [
     { id: "all", name: "Tất cả", tag: "#ALL" },
@@ -23,59 +28,54 @@ export default function News() {
     { id: "ielts", name: "IELTS", tag: "#IELTS" },
     { id: "vstep", name: "VSTEP", tag: "#VSTEP" },
     { id: "mos", name: "MOS", tag: "#MOS" },
-  ]
+  ];
 
-  // Thêm nhiều tin nổi bật để có thể slide
-  const featuredNews = [
-    {
-      id: 1,
-      title: "VKU: Bảo vệ khóa luận tốt nghiệp, khẳng định chất lượng và định hướng mạnh mẽ hội nhập toàn cầu",
-      excerpt:
-        "Trung tâm Ngoại ngữ - Tin học là đơn vị trực thuộc Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn...",
-      image: vkuImg,
-      category: "VKU",
-      date: "09/07/2025",
-      author: "FLIC",
-      views: 35,
-    },
-    {
-      id: 2,
-      title: "FLIC: Khai giảng khóa học mới, mở rộng cơ hội cho sinh viên",
-      excerpt:
-        "Khóa học mới tại FLIC giúp sinh viên nâng cao kỹ năng ngoại ngữ và tin học, đáp ứng nhu cầu hội nhập...",
-      image: vkuImg,
-      category: "FLIC",
-      date: "10/07/2025",
-      author: "Admin",
-      views: 20,
-    },
-    {
-      id: 3,
-      title: "TOEIC: Cập nhật lịch thi và các lưu ý quan trọng cho thí sinh",
-      excerpt:
-        "Các thí sinh cần chú ý lịch thi TOEIC mới nhất và chuẩn bị đầy đủ giấy tờ cần thiết...",
-      image: vkuImg,
-      category: "TOEIC",
-      date: "11/07/2025",
-      author: "FLIC",
-      views: 15,
-    },
-  ]
+  useEffect(() => {
+    setLoading(true);
+    getNews()
+      .then((data) => {
+        console.log('News page - API response:', data);
+        setNewsList(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('News page - API error:', err);
+        setError("Lỗi khi tải tin tức");
+        setLoading(false);
+      });
+  }, []);
 
-  // Sắp xếp featuredNews theo lượt xem giảm dần
-  const sortedFeaturedNews = [...featuredNews].sort((a, b) => b.views - a.views);
-
-  // State cho index của tin nổi bật đang hiển thị
-  const [featuredIndex, setFeaturedIndex] = useState(1) // bắt đầu từ 1 vì slides sẽ được clone
-  const [isTransitioning, setIsTransitioning] = useState(true)
-  const [isPaused, setIsPaused] = useState(false)
-
-  // Tạo slides với clone đầu/cuối dựa trên sortedFeaturedNews
+  // Xử lý phân loại, phân trang, nổi bật dựa trên newsList
+  // featuredNews: top 3 bài mới nhất
+  const sortedNews = [...newsList].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  const featuredNews = sortedNews.slice(0, 3);
+  const sortedFeaturedNews = [...featuredNews].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  const [featuredIndex, setFeaturedIndex] = useState(1); // bắt đầu từ 1 vì slides sẽ được clone
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const slides = [
     sortedFeaturedNews[sortedFeaturedNews.length - 1],
     ...sortedFeaturedNews,
-    sortedFeaturedNews[0],  
-  ]
+    sortedFeaturedNews[0],
+  ];
+
+  // recentNews: tất cả tin, trừ featured
+  const recentNews = sortedNews.filter(n => !featuredNews.some(f => f.id === n.id));
+  // Sắp xếp recentNews theo ngày giảm dần
+  const sortedRecentNews = [...recentNews].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  const filteredRecentNews = activeCategory === "all"
+    ? sortedRecentNews
+    : sortedRecentNews.filter(news => (news.category || '').toLowerCase() === activeCategory.toLowerCase());
+  const [recentIndex, setRecentIndex] = useState(0);
+  const recentPerPage = 4;
+  const maxRecentIndex = Math.max(0, filteredRecentNews.length - recentPerPage);
+  const paginatedRecentNews = filteredRecentNews.slice(recentIndex, recentIndex + recentPerPage);
+
+  useEffect(() => {
+    if (recentIndex >= filteredRecentNews.length) {
+      setRecentIndex(0);
+    }
+  }, [activeCategory, filteredRecentNews.length]);
 
   // Hàm chuyển slide
   const handlePrev = () => {
@@ -121,131 +121,14 @@ export default function News() {
     setFeaturedIndex(idx + 1)
   }
 
-  // Đảm bảo recentNews có trường views
-  const recentNews = [
-    {
-      id: 1,
-      title: "VKU: Bảo vệ khóa luận tốt nghiệp, khẳng định chất lượng và hội nhập toàn cầu",
-      excerpt: "Lễ bảo vệ khóa luận tốt nghiệp diễn ra thành công, khẳng định chất lượng đào tạo của VKU.",
-      image: vkuImg,
-      category: "VKU",
-      date: "09 - 07 - 2025",
-      author: "Admin VKU",
-      views: 35,
-    },
-    {
-      id: 2,
-      title: "FLIC: Khai giảng khóa học Tin học ứng dụng mới",
-      excerpt: "Khóa học Tin học ứng dụng tại FLIC thu hút đông đảo sinh viên tham gia.",
-      image: vkuImg,
-      category: "FLIC",
-      date: "10 - 07 - 2025",
-      author: "FLIC Team",
-      views: 20,
-    },
-    {
-      id: 3,
-      title: "TOEIC: Cập nhật lịch thi tháng 7/2025",
-      excerpt: "Lịch thi TOEIC mới nhất đã được cập nhật, sinh viên chú ý đăng ký đúng hạn.",
-      image: toeicImg,
-      category: "TOEIC",
-      date: "11 - 07 - 2025",
-      author: "TOEIC Center",
-      views: 15,
-    },
-    {
-      id: 4,
-      title: "IELTS: Chia sẻ kinh nghiệm đạt 8.0+ từ sinh viên VKU",
-      excerpt: "Sinh viên VKU chia sẻ bí quyết học IELTS hiệu quả, đạt điểm cao trong kỳ thi.",
-      image: ieltsImg,
-      category: "IELTS",
-      date: "12 - 07 - 2025",
-      author: "IELTS Club",
-      views: 10,
-    },
-    {
-      id: 5,
-      title: "VSTEP: Hướng dẫn đăng ký thi và ôn tập hiệu quả",
-      excerpt: "Các bước đăng ký thi VSTEP và tài liệu ôn tập dành cho sinh viên.",
-      image: vstepImg,
-      category: "VSTEP",
-      date: "13 - 07 - 2025",
-      author: "VSTEP Team",
-      views: 8,
-    },
-    {
-      id: 6,
-      title: "MOS: Kết quả thi và trao chứng chỉ tháng 6/2025",
-      excerpt: "Danh sách sinh viên đạt chứng chỉ MOS tháng 6/2025 đã được công bố.",
-      image: mosImg,
-      category: "MOS",
-      date: "14 - 07 - 2025",
-      author: "MOS Center",
-      views: 12,
-    },
-    {
-      id: 7,
-      title: "FLIC: Workshop kỹ năng mềm cho sinh viên năm nhất",
-      excerpt: "Workshop giúp sinh viên năm nhất nâng cao kỹ năng mềm, chuẩn bị cho học kỳ mới.",
-      image: vkuImg,
-      category: "FLIC",
-      date: "15 - 07 - 2025",
-      author: "FLIC Team",
-      views: 9,
-    },
-    {
-      id: 8,
-      title: "VKU: Đạt giải thưởng sáng tạo trẻ toàn quốc",
-      excerpt: "Nhóm sinh viên VKU xuất sắc giành giải thưởng sáng tạo trẻ năm 2025.",
-      image: vkuImg,
-      category: "VKU",
-      date: "16 - 07 - 2025",
-      author: "Admin VKU",
-      views: 14,
-    },
-  ];
-
-  // Sắp xếp recentNews theo views giảm dần để lấy sidebarNews
-  const sidebarNews = [...recentNews].sort((a, b) => b.views - a.views).slice(0, 4);
-
-  // State cho index của nhóm recentNews đang hiển thị
-  const [recentIndex, setRecentIndex] = useState(0)
-  const recentPerPage = 4
-  const maxRecentIndex = Math.max(0, recentNews.length - recentPerPage)
-
-  const handleRecentPrev = () => {
-    setRecentIndex((prev) => Math.max(0, prev - 1))
-  }
-  const handleRecentNext = () => {
-    setRecentIndex((prev) => Math.min(maxRecentIndex, prev + 1))
-  }
-
   const navigate = useNavigate();
 
-  // Hàm chuyển đổi date string về dạng Date để so sánh
-  function parseDate(dateStr) {
-    // Hỗ trợ cả '09 - 07 - 2025' và '09/07/2025'
-    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split(' - ');
-    // parts: [day, month, year]
-    return new Date(parts[2], parts[1] - 1, parts[0]);
+  if (loading) {
+    return <div className="text-center py-20 text-blue-600 text-xl">Đang tải tin tức...</div>;
   }
-
-  // Sắp xếp recentNews theo ngày giảm dần
-  const sortedRecentNews = [...recentNews].sort((a, b) => parseDate(b.date) - parseDate(a.date));
-
-  // Lọc recentNews theo category
-  const filteredRecentNews = activeCategory === "all"
-    ? sortedRecentNews
-    : sortedRecentNews.filter(news => news.category.toLowerCase() === activeCategory.toLowerCase());
-
-  // Phân trang trên filteredRecentNews
-  const paginatedRecentNews = filteredRecentNews.slice(recentIndex, recentIndex + recentPerPage);
-
-  useEffect(() => {
-    if (recentIndex >= filteredRecentNews.length) {
-      setRecentIndex(0);
-    }
-  }, [activeCategory, filteredRecentNews.length]);
+  if (error) {
+    return <div className="text-center py-20 text-red-500 text-xl">{error}</div>;
+  }
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -322,13 +205,10 @@ export default function News() {
                   </button>
                   {/* Overlay info */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 pointer-events-none">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-                        {slides[featuredIndex].category}
-                      </span>
-                    </div>
                     <h2 className="text-white text-xl font-bold mb-2 line-clamp-2">{slides[featuredIndex].title}</h2>
-                    <p className="text-gray-200 text-sm line-clamp-2 mb-2">{slides[featuredIndex].excerpt}</p>
+                    <p className="text-gray-200 text-sm line-clamp-2 mb-2">
+                      {new Date(slides[featuredIndex].publishedAt).toLocaleDateString('vi-VN')}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -363,20 +243,15 @@ export default function News() {
                     className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => navigate(`/news/${news.id}`)}
                   >
-                    <img src={news.image || "/placeholder.svg"} alt={news.title} className="w-full h-48 object-cover" />
+                    <img src={news.avatarUrl || "/placeholder.svg"} alt={news.title} className="w-full h-48 object-cover" />
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm">{news.title}</h3>
-                      <p className="text-gray-600 text-xs mb-3 line-clamp-2">{news.excerpt}</p>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2 min-h-[40px]">
+                        {news.title}
+                      </h3>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
-                          <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-medium">{news.category.charAt(0)}</span>
-                          </div>
-                          <span>{news.category}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          <span>{news.date}</span>
+                          <span>{new Date(news.publishedAt).toLocaleDateString('vi-VN')}</span>
                         </div>
                       </div>
                     </div>
@@ -426,16 +301,18 @@ export default function News() {
                 Tin tức nổi bật
               </h3>
               <div className="space-y-4">
-                {sidebarNews.map((news) => (
+                {sortedFeaturedNews.map((news) => (
                   <div key={news.id} className="flex gap-3 cursor-pointer" onClick={() => navigate(`/news/${news.id}`)}>
                     <img
-                      src={news.image || "/placeholder.svg"}
+                      src={news.avatarUrl || "/placeholder.svg"}
                       alt={news.title}
                       className="w-16 h-16 object-cover rounded"
                     />
                     <div className="flex-1">
                       <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">{news.title}</h4>
-                      <p className="text-xs text-gray-500">{news.date}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(news.publishedAt).toLocaleDateString('vi-VN')}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -460,22 +337,15 @@ export default function News() {
                   className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex"
                   onClick={() => navigate(`/news/${news.id}`)}
                 >
-                  <img src={news.image || "/placeholder.svg"} alt={news.title} className="w-40 h-32 object-cover flex-shrink-0" />
+                  <img src={news.avatarUrl || "/placeholder.svg"} alt={news.title} className="w-40 h-32 object-cover flex-shrink-0" />
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-base">{news.title}</h3>
-                      <p className="text-gray-600 text-xs mb-3 line-clamp-2">{news.excerpt}</p>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
                       <div className="flex items-center gap-1">
-                        <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-medium">{news.category.charAt(0)}</span>
-                        </div>
-                        <span>{news.category}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{news.date}</span>
+                        <span>{new Date(news.publishedAt).toLocaleDateString('vi-VN')}</span>
                       </div>
                     </div>
                   </div>
