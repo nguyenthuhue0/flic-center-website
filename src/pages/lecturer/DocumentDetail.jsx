@@ -1,54 +1,140 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FileText, Download, Eye, Calendar, Pencil } from "lucide-react";
 import { Book, Presentation, ClipboardList } from "lucide-react";
-import { getLessonMaterials } from "../../services/lecturer/DocumentApi";
-import lessonApi from "../../services/lecturer/lessonApi";
-import DocumentUpload from "./DocumentUpload";
 
 const DocumentDetail = () => {
-  const location = useLocation();
-  const lessonId = location.state?.lessonId;
-  const [materials, setMaterials] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [activeSemester, setActiveSemester] = useState("01");
-  const [sortField, setSortField] = useState("title");
+  const [sortField, setSortField] = useState("updateDate");
   const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!lessonId) return;
-    const fetchMaterials = () => {
-      setLoading(true);
-      // Sử dụng DocumentApi trước (tương tự như News API)
-      getLessonMaterials(lessonId)
-        .then((data) => {
-          console.log("DocumentApi getLessonMaterials response:", data);
-          // API trả về data trực tiếp (không cần response.data)
-          setMaterials(data || []);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("DocumentApi error, trying lessonApi...", error);
-          // Fallback to lessonApi
-          lessonApi.getLessonMaterials(lessonId)
-            .then((data) => {
-              console.log("LessonApi getLessonMaterials response:", data);
-              setMaterials(data || []);
-              setLoading(false);
-            })
-            .catch((lessonError) => {
-              console.error("Error fetching materials:", lessonError);
-              console.error("Error response:", lessonError.response);
-              setMaterials([]);
-              setLoading(false);
-            });
-        });
-    };
-    fetchMaterials();
-  }, [lessonId]);
+  const semesterData = {
+    "01": [
+      {
+        id: 1,
+        type: "Giáo trình",
+        title: "Lập trình C++ cơ bản.pdf",
+        updateDate: "15/03/2023",
+        size: "25.4 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 2,
+        type: "Slide",
+        title: "Bài 1 - Giới thiệu C++.pptx",
+        updateDate: "10/03/2023",
+        size: "8.2 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 3,
+        type: "Đề cương",
+        title: "Đề cương môn Lập trình C++.pdf",
+        updateDate: "01/03/2023",
+        size: "2.1 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 4,
+        type: "Slide",
+        title: "Bài 2 - Biến và kiểu dữ liệu.pptx",
+        updateDate: "20/03/2023",
+        size: "12.6 MB",
+        status: "Đang cập nhật",
+      },
+      {
+        id: 5,
+        type: "Giáo trình",
+        title: "Bài tập thực hành C++.pdf",
+        updateDate: "25/03/2023",
+        size: "18.7 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 13,
+        type: "Bài tập khóa học",
+        title: "Bài tập tuần 1.docx",
+        updateDate: "18/03/2023",
+        size: "0.8 MB",
+        status: "Có sẵn",
+        link: "", // nếu có file
+      },
+      {
+        id: 14,
+        type: "Google Meet",
+        title: "Link lớp học Google Meet",
+        updateDate: "01/03/2023",
+        size: "-",
+        status: "Có sẵn",
+        link: "https://meet.google.com/your-meet-link",
+      },
+    ],
+    "02": [
+      {
+        id: 6,
+        type: "Giáo trình",
+        title: "Lập trình hướng đối tượng.pdf",
+        updateDate: "05/04/2023",
+        size: "32.1 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 7,
+        type: "Slide",
+        title: "OOP - Lớp và đối tượng.pptx",
+        updateDate: "10/04/2023",
+        size: "15.3 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 8,
+        type: "Đề cương",
+        title: "Đề cương OOP nâng cao.pdf",
+        updateDate: "01/04/2023",
+        size: "1.8 MB",
+        status: "Đang cập nhật",
+      },
+    ],
+    "03": [
+      {
+        id: 9,
+        type: "Giáo trình",
+        title: "Cấu trúc dữ liệu và giải thuật.pdf",
+        updateDate: "15/07/2023",
+        size: "28.9 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 10,
+        type: "Slide",
+        title: "Thuật toán sắp xếp.pptx",
+        updateDate: "20/07/2023",
+        size: "11.4 MB",
+        status: "Có sẵn",
+      },
+    ],
+    "04": [
+      {
+        id: 11,
+        type: "Đề cương",
+        title: "Đề cương đồ án tốt nghiệp.pdf",
+        updateDate: "01/10/2023",
+        size: "3.2 MB",
+        status: "Có sẵn",
+      },
+      {
+        id: 12,
+        type: "Giáo trình",
+        title: "Hướng dẫn làm đồ án.pdf",
+        updateDate: "15/10/2023",
+        size: "45.6 MB",
+        status: "Đang cập nhật",
+      },
+    ],
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -113,6 +199,40 @@ const DocumentDetail = () => {
     console.log("Previewing:", title);
     // Implement preview logic here
   };
+
+  const currentData = semesterData[activeSemester] || [];
+
+  // Sắp xếp dữ liệu
+  const sortedData = [...currentData].sort((a, b) => {
+    let valA = a[sortField];
+    let valB = b[sortField];
+
+    if (sortField === "updateDate") {
+      const [dA, mA, yA] = valA.split("/");
+      const [dB, mB, yB] = valB.split("/");
+      valA = new Date(`${yA}-${mA}-${dA}`);
+      valB = new Date(`${yB}-${mB}-${dB}`);
+      return sortOrder === "asc" ? valA - valB : valB - valA;
+    }
+
+    if (sortField === "size") {
+      valA = parseFloat(valA.replace(" MB", ""));
+      valB = parseFloat(valB.replace(" MB", ""));
+      return sortOrder === "asc" ? valA - valB : valB - valA;
+    }
+
+    if (
+      sortField === "title" ||
+      sortField === "type" ||
+      sortField === "status"
+    ) {
+      return sortOrder === "asc"
+        ? valA.localeCompare(valB, "vi", { sensitivity: "base" })
+        : valB.localeCompare(valA, "vi", { sensitivity: "base" });
+    }
+
+    return 0;
+  });
 
   // UI
   return (
@@ -280,116 +400,87 @@ const DocumentDetail = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {materials
-                      .filter((item) => item.semester === activeSemester)
-                      .sort((a, b) => {
-                        const isAsc = sortOrder === "asc";
-                        switch (sortField) {
-                          case "type":
-                            return isAsc
-                              ? a.type.localeCompare(b.type)
-                              : b.type.localeCompare(a.type);
-                          case "title":
-                            return isAsc
-                              ? a.title.localeCompare(b.title)
-                              : b.title.localeCompare(a.title);
-                          case "updateDate":
-                            return isAsc
-                              ? new Date(a.updateDate) - new Date(b.updateDate)
-                              : new Date(b.updateDate) - new Date(a.updateDate);
-                          case "size":
-                            return isAsc
-                              ? a.size - b.size
-                              : b.size - a.size;
-                          case "status":
-                            return isAsc
-                              ? a.status.localeCompare(b.status)
-                              : b.status.localeCompare(a.status);
-                          default:
-                            return 0;
-                        }
-                      })
-                      .map((item) => (
-                        <tr key={item.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center space-x-3">
-                              {getTypeIcon(item.type)}
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(
-                                  item.type
-                                )}`}
-                              >
-                                {item.type}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center space-x-2">
-                              {/* <FileText className="w-4 h-4 text-gray-400" /> */}
-                              <span className="text-sm font-medium text-gray-900">
-                                {item.title}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="px-4 flex items-center space-x-2 text-sm text-gray-500">
-                              {/* <Calendar className="w-4 h-4" /> */}
-                              <span>{item.updateDate}</span>
-                            </div>
-                          </td>
-                          <td className="px-9 py-0 text-sm text-gray-500">
-                            {item.size}
-                          </td>
-                          <td className="px-6 py-4">
+                    {sortedData.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            {getTypeIcon(item.type)}
                             <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                item.status
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(
+                                item.type
                               )}`}
                             >
-                              {item.status}
+                              {item.type}
                             </span>
-                          </td>
-                          {/* <td className="px-6 py-4">
-                            <div className="flex items-center space-x-2">
-                              {item.status === "Có sẵn" && (
-                                <>
-                                  <button
-                                    onClick={() =>
-                                      handlePreview(item.id, item.title)
-                                    }
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Xem trước"
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDownload(item.id, item.title)
-                                    }
-                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                    title="Tải xuống"
-                                  >
-                                    <Download className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      navigate(`/materials-edit/${item.id}`)
-                                    }
-                                    className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-                                    title="Chỉnh sửa"
-                                  >
-                                    <Pencil className="w-4 h-4" />
-                                  </button>
-                                </>
-                              )}
-                              {item.status === "Đang cập nhật" && (
-                                <span className="text-xs text-gray-400 italic">
-                                  Chưa có sẵn
-                                </span>
-                              )}
-                            </div>
-                          </td> */}
-                          <td className="px-6 py-4">
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-2">
+                            {/* <FileText className="w-4 h-4 text-gray-400" /> */}
+                            <span className="text-sm font-medium text-gray-900">
+                              {item.title}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="px-4 flex items-center space-x-2 text-sm text-gray-500">
+                            {/* <Calendar className="w-4 h-4" /> */}
+                            <span>{item.updateDate}</span>
+                          </div>
+                        </td>
+                        <td className="px-9 py-0 text-sm text-gray-500">
+                          {item.size}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                              item.status
+                            )}`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        {/* <td className="px-6 py-4">
+                          <div className="flex items-center space-x-2">
+                            {item.status === "Có sẵn" && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handlePreview(item.id, item.title)
+                                  }
+                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                  title="Xem trước"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDownload(item.id, item.title)
+                                  }
+                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                  title="Tải xuống"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    navigate(`/materials-edit/${item.id}`)
+                                  }
+                                  className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                                  title="Chỉnh sửa"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                            {item.status === "Đang cập nhật" && (
+                              <span className="text-xs text-gray-400 italic">
+                                Chưa có sẵn
+                              </span>
+                            )}
+                          </div>
+                        </td> */}
+                        <td className="px-6 py-4">
   <div className="flex items-center space-x-2">
     {item.type === "Google Meet" ? (
       <>
@@ -444,8 +535,8 @@ const DocumentDetail = () => {
   </div>
 </td>
 
-                        </tr>
-                      ))}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -454,13 +545,13 @@ const DocumentDetail = () => {
               <div className="flex justify-between items-center p-4 border-t bg-gray-50">
                 <div className="text-sm text-gray-600">
                   Tổng cộng:{" "}
-                  <span className="font-medium">{materials.length}</span> tài
+                  <span className="font-medium">{currentData.length}</span> tài
                   liệu
                   {" • "}
                   Có sẵn:{" "}
                   <span className="font-medium text-green-600">
                     {
-                      materials.filter((item) => item.status === "Có sẵn")
+                      currentData.filter((item) => item.status === "Có sẵn")
                         .length
                     }
                   </span>
@@ -468,7 +559,7 @@ const DocumentDetail = () => {
                   Đang cập nhật:{" "}
                   <span className="font-medium text-orange-600">
                     {
-                      materials.filter(
+                      currentData.filter(
                         (item) => item.status === "Đang cập nhật"
                       ).length
                     }
@@ -487,7 +578,7 @@ const DocumentDetail = () => {
             </div>
 
             {/* Empty State */}
-            {materials.length === 0 && (
+            {currentData.length === 0 && (
               <div className="bg-white rounded-lg shadow-sm border-2 border-blue-200 p-8">
                 <div className="text-center text-gray-500">
                   <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />

@@ -35,7 +35,19 @@ export default function News() {
     getNews()
       .then((data) => {
         console.log('News page - API response:', data);
-        setNewsList(Array.isArray(data) ? data : []);
+        // Handle different possible response structures
+        let newsData = [];
+        if (Array.isArray(data)) {
+          newsData = data;
+        } else if (data && Array.isArray(data.value)) {
+          // API trả về object với property 'value' chứa array
+          newsData = data.value;
+        } else if (data && Array.isArray(data.data)) {
+          newsData = data.data;
+        } else if (data && data.content && Array.isArray(data.content)) {
+          newsData = data.content;
+        }
+        setNewsList(newsData);
         setLoading(false);
       })
       .catch((err) => {
@@ -53,11 +65,13 @@ export default function News() {
   const [featuredIndex, setFeaturedIndex] = useState(1); // bắt đầu từ 1 vì slides sẽ được clone
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const slides = [
+  
+  // Safely create slides array with fallback for empty data
+  const slides = sortedFeaturedNews.length > 0 ? [
     sortedFeaturedNews[sortedFeaturedNews.length - 1],
     ...sortedFeaturedNews,
     sortedFeaturedNews[0],
-  ];
+  ] : [];
 
   // recentNews: tất cả tin, trừ featured
   const recentNews = sortedNews.filter(n => !featuredNews.some(f => f.id === n.id));
@@ -159,11 +173,12 @@ export default function News() {
             {/* Featured News Carousel */}
             <div className="relative mb-8">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div
-                  className="relative h-80"
-                  onMouseEnter={() => setIsPaused(true)}
-                  onMouseLeave={() => setIsPaused(false)}
-                >
+                {slides.length > 0 ? (
+                  <div
+                    className="relative h-80"
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
+                  >
                   {/* Slide wrapper */}
                   <div
                     className="w-full h-80 flex"
@@ -173,16 +188,20 @@ export default function News() {
                     }}
                     onTransitionEnd={handleTransitionEnd}
                   >
-                    {slides.map((item, idx) => (
-                      <img
-                        key={idx + '-' + item.id}
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.title}
-                        className="w-full h-80 object-cover flex-shrink-0 flex-grow-0 cursor-pointer"
-                        style={{ minWidth: "100%" }}
-                        onClick={() => navigate(`/news/${item.id}`)}
-                      />
-                    ))}
+                    {slides.map((item, idx) => {
+                      // Safety check for undefined items
+                      if (!item) return null;
+                      return (
+                        <img
+                          key={idx + '-' + (item.id || idx)}
+                          src={item.avatarUrl || item.image || "/placeholder.svg"}
+                          alt={item.title || "News image"}
+                          className="w-full h-80 object-cover flex-shrink-0 flex-grow-0 cursor-pointer"
+                          style={{ minWidth: "100%" }}
+                          onClick={() => navigate(`/news/${item.id}`)}
+                        />
+                      );
+                    })}
                   </div>
                   {/* Nút chuyển trái/phải */}
                   <button
@@ -204,26 +223,38 @@ export default function News() {
                     <ChevronRight className="w-5 h-5" />
                   </button>
                   {/* Overlay info */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 pointer-events-none">
-                    <h2 className="text-white text-xl font-bold mb-2 line-clamp-2">{slides[featuredIndex].title}</h2>
-                    <p className="text-gray-200 text-sm line-clamp-2 mb-2">
-                      {new Date(slides[featuredIndex].publishedAt).toLocaleDateString('vi-VN')}
-                    </p>
+                  {slides[featuredIndex] && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 pointer-events-none">
+                      <h2 className="text-white text-xl font-bold mb-2 line-clamp-2">{slides[featuredIndex].title}</h2>
+                      <p className="text-gray-200 text-sm line-clamp-2 mb-2">
+                        {new Date(slides[featuredIndex].publishedAt).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
+                  )}
                   </div>
-                </div>
+                ) : (
+                  <div className="h-80 flex items-center justify-center bg-gray-100">
+                    <div className="text-center text-gray-500">
+                      <p className="text-lg">Không có tin tức nổi bật</p>
+                      <p className="text-sm">Hãy thử lại sau</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Carousel Dots */}
-              <div className="flex justify-center gap-2 mt-4">
-                {sortedFeaturedNews.map((_, idx) => (
-                  <button
-                    key={idx}
-                    className={`w-2 h-2 rounded-full transition-colors ${featuredIndex === idx + 1 ? "bg-blue-600" : "bg-gray-300"}`}
-                    onClick={() => handleDotClick(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
+              {slides.length > 0 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  {sortedFeaturedNews.map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`w-2 h-2 rounded-full transition-colors ${featuredIndex === idx + 1 ? "bg-blue-600" : "bg-gray-300"}`}
+                      onClick={() => handleDotClick(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Recent News Section */}
@@ -301,7 +332,7 @@ export default function News() {
                 Tin tức nổi bật
               </h3>
               <div className="space-y-4">
-                {sortedFeaturedNews.map((news) => (
+                {sortedFeaturedNews.length > 0 ? sortedFeaturedNews.map((news) => (
                   <div key={news.id} className="flex gap-3 cursor-pointer" onClick={() => navigate(`/news/${news.id}`)}>
                     <img
                       src={news.avatarUrl || "/placeholder.svg"}
@@ -315,7 +346,11 @@ export default function News() {
                       </p>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center text-gray-500 py-4">
+                    <p className="text-sm">Không có tin tức nổi bật</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
