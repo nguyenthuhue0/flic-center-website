@@ -8,11 +8,10 @@ import FeedbackStudent from "./pages/user/FeedbackStudent";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Schedule from "./pages/user/Schedule";
 import Course from "./pages/user/Course";
-import CourseDetail from "./pages/user/Coursedetail";
+import CourseDetail from "./pages/user/Coursedetail"; // kiểm tra đúng tên file/thư mục
 import ScheduleGrid from "./pages/user/ScheduleGrid";
 import News from "./pages/user/News";
 import NewsDetail from "./pages/user/NewsDetail";
-// import MaterialsDashboard from "./pages/user/MaterialsDashboard";
 
 import Introduce from "./pages/user/Introduce";
 import RegisterForm from "./pages/user/RegisterForm";
@@ -26,7 +25,6 @@ import DashboardLecture from "./DashboardLecture";
 import LearningPathDetail from "./pages/lecturer/LearningPathDetail";
 import LearningPathList from "./pages/lecturer/LearningPathList";
 import Progress from "./pages/lecturer/Progress";
-// import Teachingschedule from "./pages/lecturer/Teachingschedule";
 
 import DocumentList from "./pages/lecturer/DocumentList";
 import DocumentDetail from "./pages/lecturer/DocumentDetail";
@@ -39,9 +37,7 @@ import StudentInformation from "./pages/student/StudentInformation";
 import StudentEditProfile from "./pages/student/StudentEditProfile";
 
 import DashboardAdmin from "./DashboardAdmin";
-// import Teachingschedule from "./pages/lecturer/Teachingschedule";
 import StudentManagement from "./pages/admin/StudentManagement";
-import AddStudent from "./pages/admin/AddStudent";
 import EditStudent from "./pages/admin/EditStudent";
 import LecturerManagement from "./pages/admin/LecturerManagement";
 import AddLecturer from "./pages/admin/AddLecturer";
@@ -67,9 +63,12 @@ const Layout = () => {
   return (
     <>
       <Routes>
+        {/* Auth */}
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="forgotPassword" element={<ForgotPassword />} />
+
+        {/* Public */}
         <Route path="/" element={<App />}>
           <Route index element={<Home />} />
           <Route path="introduce" element={<Introduce />} />
@@ -81,7 +80,7 @@ const Layout = () => {
           <Route path="coursedetail" element={<CourseDetail />} />
           <Route path="scheduleGrid" element={<ScheduleGrid />} />
           <Route path="news" element={<News />} />
-          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="news/:id" element={<NewsDetail />} />
         </Route>
 
         <Route element={<RequireAuth roles={["INSTRUCTOR", "ADMIN"]} />}>
@@ -114,18 +113,22 @@ const Layout = () => {
 
         <Route element={<RequireAuth roles={["ADMIN"]} />}>
           <Route path="admin" element={<DashboardAdmin />}>
+            <Route index element={<StudentManagement />} />
             <Route path="studentManagement" element={<StudentManagement />} />
-            <Route path="addStudent" element={<AddStudent />} />
-            <Route path="editStudent" element={<EditStudent />} />
+
             <Route path="lecturerManagement" element={<LecturerManagement />} />
             <Route path="addlecturer" element={<AddLecturer />} />
-            <Route path="editlecturer" element={<EditLecturer />} />
+            <Route path="lecturer/:id/edit" element={<EditLecturer />} />
+
             <Route path="courseManagement" element={<CourseManagement />} />
             <Route path="addcourse" element={<AddCourse />} />
-            <Route path="editcourse" element={<EditCourse />} />
-            <Route path="courseDetailAdmin" element={<CourseDetailAdmin />} />
-            <Route path="studentDetail" element={<StudentDetail />} />
-            <Route path="lecturerDetail" element={<LecturerDetail />} />
+            <Route path="courses/:id/edit" element={<EditCourse />} />
+            <Route path="courses/:id" element={<CourseDetailAdmin />} />
+
+            {/* Users */}
+            <Route path="users/:id" element={<StudentDetail />} />
+            <Route path="users/:id/edit" element={<EditStudent />} />
+            <Route path="lecturer/:id" element={<LecturerDetail />} />
           </Route>
         </Route>
 
@@ -147,6 +150,7 @@ const Layout = () => {
 
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
+
       <ToastContainer
         position="top-right"
         autoClose={1000}
@@ -161,4 +165,5 @@ const Layout = () => {
     </>
   );
 };
+
 export default Layout;

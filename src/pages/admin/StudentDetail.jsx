@@ -1,164 +1,203 @@
-import { useParams } from "react-router-dom";
-import {
-  FaUser,
-  FaPhone,
-  FaEnvelope,
-  FaChalkboardTeacher,
-  FaBirthdayCake,
-  FaMapMarkerAlt,
-  FaCheckCircle,
-} from "react-icons/fa";
-import { MdSchool, MdColorLens } from "react-icons/md";
-import { HiOutlineUserGroup } from "react-icons/hi";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getUserDetail } from "../../services/admin/users";
+import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
 
 export default function StudentDetail() {
   const { id } = useParams();
+  const location = useLocation();
+  const stateUser = location.state?.student || location.state?.user || null;
 
-  const student = {
-    id,
-    name: "Nguyễn Văn A",
-    phone: "0988123456",
-    email: "vana@gmail.com",
-    course: "Lập trình Java",
-    status: "Đang học",
-    level: "Trung cấp",
-    teacher: "Cô Mai",
-    parentEmail: "phuhuynh@gmail.com",
-    relationship: "Cha",
-    favoriteColor: "Xanh dương",
-    dob: "2000-01-01",
-    address: "123 Đường Lập Trình, Q1, TP.HCM",
-    gender: "Nam",
-    registrationTime: "2025-08-04T10:00",
-    sessionsAttended: "15",
-    tuitionStatus: "Đã đóng",
-    note: "Học viên chăm chỉ, thường xuyên đặt câu hỏi.",
-  };
+  const [user, setUser] = useState(stateUser);
+  const [loading, setLoading] = useState(!stateUser);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    if (!id || stateUser) return;
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const res = await getUserDetail(id);
+        const data = res?.data && typeof res.data === "object" ? res.data : res;
+        setUser(data || null);
+      } catch (e) {
+        setErr(e?.response?.data?.message || e?.message || "Không tải được chi tiết người dùng");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id, stateUser]);
+
+  // helper đọc cả snake_case & camelCase
+  const pick = (o, ...keys) => keys.find(k => o?.[k] !== undefined ? true : false) && o[keys.find(k => o?.[k] !== undefined)];
+  const fmtDate = (v) => (v ? new Date(v).toLocaleString("vi-VN") : "—");
+
+  const view = useMemo(() => {
+    const u = user || {};
+    return {
+      id:                u.id ?? "—",
+      email:             pick(u, "email"),
+      full_name:         pick(u, "full_name", "fullName"),
+      phone:             pick(u, "phone"),
+      avatar_url:        pick(u, "avatar_url", "avatarUrl"),
+      role:              pick(u, "role"),
+      status:            pick(u, "status"),
+      student_id:        pick(u, "student_id", "studentId"),
+      gender:            pick(u, "gender"),
+      job:               pick(u, "job"),
+      birth_date:        pick(u, "birth_date", "birthDate"),
+      birth_place:       pick(u, "birth_place", "birthPlace"),
+      ethnicity:         pick(u, "ethnicity"),
+      id_number:         pick(u, "id_number", "idNumber"),
+      id_issued_date:    pick(u, "id_issued_date", "idIssuedDate"),
+      id_issued_place:   pick(u, "id_issued_place", "idIssuedPlace"),
+      school_name:       pick(u, "school_name", "schoolName"),
+      created_at:        pick(u, "created_at", "createdAt"),
+      updated_at:        pick(u, "updated_at", "updatedAt"),
+    };
+  }, [user]);
+
+  const statusColor =
+    String(view.status || "").toLowerCase() === "active" ? "bg-green-500" : "bg-gray-400";
+
+  if (loading) return <Skeleton />;
+  if (err) return <ErrorBox err={err} />;
+  if (!user) return <EmptyBox id={id} />;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="ml-[250px] min-h-screen bg-gradient-to-br from-[#eef2fb] to-[#f6f9ff] p-10 text-[#2B3674] font-sans"
-    >
-      <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-3xl px-10 py-10 space-y-10 animate-fadeIn">
+    <div className="min-h-screen md:pl-[250px] p-4 md:p-10 bg-gradient-to-br from-[#eef2fb] to-[#f6f9ff] text-[#2B3674]">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl px-6 md:px-10 py-8 space-y-8"
+      >
         {/* Header */}
-        <div className="flex items-center gap-6 border-b pb-6">
+        <div className="flex items-center gap-5 border-b pb-6">
           <motion.img
-  animate={{ scale: [1, 1.1, 1] }}
-  transition={{ repeat: Infinity, duration: 1.5 }}
-  src={`https://api.dicebear.com/7.x/thumbs/svg?seed=${student.name}`}
-  alt="Avatar"
-  className="w-24 h-24 rounded-full border shadow-md"
-/>
-
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ repeat: Infinity, duration: 1.4 }}
+            src={
+              view.avatar_url ||
+              `https://api.dicebear.com/7.x/thumbs/svg?seed=${encodeURIComponent(
+                String(view.full_name || view.email || "user")
+              )}`
+            }
+            alt="Avatar"
+            className="w-20 h-20 rounded-full border shadow-md"
+          />
           <div>
-            <h2 className="text-4xl font-bold text-[#1E2B6A] flex items-center gap-2">
-              <FaUser /> Học viên #{student.id}
+            <h2 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+              <FaUser /> Người dùng #{view.id}
             </h2>
-            <p className="text-gray-500 mt-1">Thông tin chi tiết của học viên</p>
+            <p className="text-gray-500">Chi tiết người dùng theo bảng <code>users</code></p>
           </div>
         </div>
 
-        {/* Mini Stats */}
-        <div className="grid grid-cols-3 gap-6 text-center">
-          <div className="bg-blue-100 p-4 rounded-xl shadow-md">
-            <p className="text-xl font-bold text-blue-800">{student.sessionsAttended}</p>
-            <p className="text-sm text-blue-700">Buổi đã học</p>
-          </div>
-          <div className="bg-green-100 p-4 rounded-xl shadow-md">
-            <p className="text-xl font-bold text-green-800">{student.status}</p>
-            <p className="text-sm text-green-700">Tình trạng học</p>
-          </div>
-          <div className="bg-yellow-100 p-4 rounded-xl shadow-md">
-            <p className="text-xl font-bold text-yellow-800">{student.tuitionStatus}</p>
-            <p className="text-sm text-yellow-700">Học phí</p>
+        {/* Thông tin chính */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <Stat label="Email" value={view.email || "—"} />
+          <Stat label="SĐT" value={view.phone || "—"} />
+          <div className="p-4 rounded-xl shadow bg-gray-100">
+            <p className="text-sm text-gray-600 mb-1">Trạng thái</p>
+            <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${statusColor}`}>
+              {view.status || "—"}
+            </span>
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="border-l-4 border-[#CC2B2B] pl-4 ml-2 mt-10 space-y-4">
-          <p className="text-sm text-gray-500">📅 01/08/2025 - Đăng ký khoá học</p>
-          <p className="text-sm text-gray-500">📘 05/08/2025 - Buổi học đầu tiên</p>
-          <p className="text-sm text-gray-500">🏆 10/08/2025 - Đạt thành tích xuất sắc</p>
-        </div>
+        {/* 2 cột thông tin theo schema */}
+        <section className="grid md:grid-cols-2 gap-8">
+          <Card title="👤 Thông tin tài khoản">
+            <Field k="Họ tên" v={view.full_name} icon={<FaUser />} />
+            <Field k="Email" v={view.email} icon={<FaEnvelope />} />
+            <Field k="Số điện thoại" v={view.phone} icon={<FaPhone />} />
+            <Field k="Vai trò" v={view.role} />
+            <Field k="Mã SV" v={view.student_id} />
+            <Field k="Trường" v={view.school_name} />
+            <Field k="Tạo lúc" v={fmtDate(view.created_at)} />
+            <Field k="Cập nhật" v={fmtDate(view.updated_at)} />
+          </Card>
 
-        {/* Info sections */}
-        <section className="grid md:grid-cols-2 gap-10">
-          <CardGroup title="👤 Thông tin cá nhân">
-            <Info icon={<FaUser />} label="Họ tên" value={student.name} />
-            <Info icon={<FaPhone />} label="Số điện thoại" value={student.phone} />
-            <Info icon={<FaEnvelope />} label="Email" value={student.email} />
-            <Info icon={<FaBirthdayCake />} label="Ngày sinh" value={student.dob} />
-            <Info icon={<MdColorLens />} label="Màu yêu thích" value={student.favoriteColor} />
-            <Info icon={<FaMapMarkerAlt />} label="Địa chỉ" value={student.address} />
-            <Info label="Giới tính" value={student.gender} />
-          </CardGroup>
-
-          <CardGroup title="🎓 Thông tin học tập">
-            <Info icon={<MdSchool />} label="Khoá học" value={student.course} />
-            <Info label="Trình độ" value={student.level} />
-            <Info icon={<FaChalkboardTeacher />} label="Giáo viên" value={student.teacher} />
-            <Info label="Số buổi đã học" value={student.sessionsAttended} />
-            <Info label="Thời gian đăng ký" value={student.registrationTime.replace("T", " ")} />
-            <StatusPill label="Trạng thái" value={student.status} color="green" />
-            <StatusPill label="Học phí" value={student.tuitionStatus} color={student.tuitionStatus === "Đã đóng" ? "blue" : "red"} />
-          </CardGroup>
-
-          <CardGroup title="👨‍👩‍👧 Gia đình">
-            <Info icon={<HiOutlineUserGroup />} label="Email phụ huynh" value={student.parentEmail} />
-            <Info label="Quan hệ phụ huynh" value={student.relationship} />
-          </CardGroup>
+          <Card title="📝 Thông tin cá nhân">
+            <Field k="Giới tính" v={view.gender} />
+            <Field k="Nghề nghiệp" v={view.job} />
+            <Field k="Ngày sinh" v={view.birth_date} />
+            <Field k="Nơi sinh" v={view.birth_place} />
+            <Field k="Dân tộc" v={view.ethnicity} />
+            <Field k="Số CCCD" v={view.id_number} />
+            <Field k="Ngày cấp" v={view.id_issued_date} />
+            <Field k="Nơi cấp" v={view.id_issued_place} />
+          </Card>
         </section>
+      </motion.div>
+    </div>
+  );
+}
 
-        {/* Note */}
-        <section>
-          <h3 className="text-md font-semibold text-gray-500 mb-2">📝 Ghi chú</h3>
-          <p className="italic text-[#4B5585] bg-gray-50 rounded-xl p-4 border border-gray-200 shadow-inner">
-            {student.note}
-          </p>
-        </section>
+/* small UI helpers */
+function Card({ title, children }) {
+  return (
+    <div className="bg-[#F9FAFB] border border-gray-200 rounded-xl p-6 shadow-sm space-y-3">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
+    </div>
+  );
+}
+
+function Field({ k, v, icon }) {
+  return (
+    <div className="flex gap-2">
+      <span className="min-w-[120px] text-gray-500 flex items-center gap-1">{icon}{icon ? "" : null}{k}:</span>
+      <span className="font-medium break-words">{v ?? "—"}</span>
+    </div>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div className="p-4 rounded-xl shadow bg-blue-50">
+      <p className="text-sm text-blue-700">{label}</p>
+      <p className="text-xl font-bold text-blue-900 break-all">{value}</p>
+    </div>
+  );
+}
+
+function Skeleton() {
+  return (
+    <div className="min-h-screen md:pl-[250px] p-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-3xl p-10 shadow animate-pulse space-y-6">
+        <div className="h-8 w-1/3 bg-gray-200 rounded" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => <div key={i} className="h-24 bg-gray-100 rounded-xl" />)}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="h-48 bg-gray-100 rounded-xl" />
+          <div className="h-48 bg-gray-100 rounded-xl" />
+        </div>
       </div>
-    </motion.div>
-  );
-}
-
-function Info({ label, value, icon }) {
-  return (
-    <div className="space-y-1 hover:bg-gray-50 rounded-md p-2 transition">
-      <p className="text-xs font-semibold text-gray-500 flex items-center gap-1">
-        {icon} {label}
-      </p>
-      <p className="text-[#2B3674] font-medium">{value}</p>
     </div>
   );
 }
 
-function StatusPill({ label, value, color }) {
-  const colorClass = {
-    green: "bg-green-500",
-    blue: "bg-blue-500",
-    red: "bg-red-500",
-    gray: "bg-gray-400",
-  }[color];
-
+function ErrorBox({ err }) {
   return (
-    <div className="space-y-1">
-      <p className="text-xs font-semibold text-gray-500">{label}</p>
-      <p className={`inline-block px-4 py-1 rounded-full text-white text-sm font-medium ${colorClass}`}>
-        {value}
-      </p>
+    <div className="min-h-screen md:pl-[250px] p-6">
+      <div className="max-w-3xl mx-auto p-6 rounded-xl bg-red-50 border border-red-200 text-red-700">
+        {err}
+      </div>
     </div>
   );
 }
 
-function CardGroup({ title, children }) {
+function EmptyBox({ id }) {
   return (
-    <div className="bg-[#F9FAFB] border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-      <h3 className="text-lg font-semibold text-[#1E2B6A]">{title}</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+    <div className="min-h-screen md:pl-[250px] p-6">
+      <div className="max-w-3xl mx-auto p-6 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-700">
+        Không tìm thấy người dùng (id: {id}).
+      </div>
     </div>
   );
 }

@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
+import { createUser, uploadAvatar } from "../../services/admin/users";
+
+const mapStatus = (s) =>
+  String(s || "").toLowerCase().includes("đang") ? "active" : "inactive";
+
+const normGender = (g) => {
+  const v = String(g || "").trim().toLowerCase();
+  if (v === "nữ") return "nu";
+  if (v === "khác") return "khac";
+  if (v === "nam") return "nam";
+  return "";
+};
 
 export default function AddLecturer() {
   const navigate = useNavigate();
@@ -20,27 +32,85 @@ export default function AddLecturer() {
 
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState("");
+
+  const inputStyle =
+    "w-full border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 text-[16px] p-3 rounded-xl shadow-sm transition-all duration-200 outline-none";
 
   const handleChange = (e) => {
+    setErr("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setAvatar(file);
       setPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    console.log("Avatar file:", avatar);
+  // JSON payload cho backend
+  const normalizePayload = (raw) => {
+    const p = {
+      fullName: raw.name?.trim(),
+      email: raw.email?.trim(),
+      phone: raw.phone?.trim(),
+      role: "instructor",
+      status: mapStatus(raw.status),      // "active"/"inactive"
+      gender: normGender(raw.gender) || undefined, // "nam"/"nu"/"khac"
+      birthDate: raw.dob || undefined,    // yyyy-MM-dd
+      job: raw.level?.trim() || undefined
+    };
+    // bỏ field rỗng/undefined để tránh 400
+    Object.keys(p).forEach((k) => (p[k] === "" || p[k] === undefined) && delete p[k]);
+    return p;
   };
 
-  const inputStyle =
-    "w-full border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 text-[16px] p-3 rounded-xl shadow-sm transition-all duration-200 outline-none";
+  const validate = (p) => {
+    if (!p.fullName) return "Vui lòng nhập Họ tên.";
+    if (!p.phone) return "Vui lòng nhập Số điện thoại.";
+    if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) return "Email không hợp lệ.";
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErr("");
+
+    const payload = normalizePayload(formData);
+    const v = validate(payload);
+    if (v) {
+      setErr(v);
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // 1) Tạo user = JSON ONLY
+      const created = await createUser(payload);
+      const newId = created?.id ?? created?.data?.id;
+
+      // 2) (Tuỳ backend) Nếu KHÔNG muốn multipart luôn, có thể BỎ QUA avatar:
+      // nếu cho phép endpoint riêng upload avatar thì để lại dòng dưới, còn không thì comment nó.
+      if (newId && avatar) {
+        await uploadAvatar(newId, avatar); // <- có multipart ở bước riêng này; xoá nếu backend cấm hoàn toàn
+      }
+
+      alert("Thêm giảng viên thành công!");
+      navigate("../LecturerManagement");
+    } catch (error) {
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Lỗi khi tạo giảng viên.";
+      setErr(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="p-6 flex justify-center ml-[250px]">
@@ -50,6 +120,12 @@ export default function AddLecturer() {
         </h2>
 
         <p className="mb-4 text-gray-600">Nhập thông tin để thêm giảng viên mới vào hệ thống.</p>
+
+        {err && (
+          <div className="mb-4 p-3 rounded border border-red-200 bg-red-50 text-red-700">
+            {err}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-xl p-6 space-y-6">
           {/* Ảnh đại diện */}
@@ -128,14 +204,17 @@ export default function AddLecturer() {
 
           {/* Nút thao tác */}
           <div className="flex justify-between mt-6">
-            <button type="button" onClick={() => navigate("../LecturerManagement")} className="btn-outline">
+            <button type="button" onClick={() => navigate("../LecturerManagement")} className="btn-outline" disabled={submitting}>
               <FaArrowLeft className="inline mr-1" /> Quay lại
             </button>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-all"
+              disabled={submitting}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-all ${
+                submitting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              <FaSave className="inline mr-1" /> Lưu giảng viên
+              <FaSave className="inline mr-1" /> {submitting ? "Đang lưu..." : "Lưu giảng viên"}
             </button>
           </div>
         </form>
