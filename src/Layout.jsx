@@ -23,7 +23,8 @@ import RollcallDetail from "./pages/lecturer/RollcallDetail";
 import StudentSchedule from "./pages/student/StudentSchedule";
 import DashboardStudent from "./DashboardStudent";
 import DashboardLecture from "./DashboardLecture";
-import LearningPath from "./pages/lecturer/LearningPath";
+import LearningPathDetail from "./pages/lecturer/LearningPathDetail";
+import LearningPathList from "./pages/lecturer/LearningPathList";
 import Progress from "./pages/lecturer/Progress";
 // import Teachingschedule from "./pages/lecturer/Teachingschedule";
 
@@ -56,6 +57,7 @@ import CourseDetailAdmin from "./pages/admin/CourseDetailAdmin";
 import RequireAuth from "./pages/auth/RequireAuth";
 import LecturerInformation from "./pages/lecturer/LecturerInformation";
 import LecturerEditProfile from "./pages/lecturer/LecturerEditProfile";
+import SuccessPage from "./pages/user/SuccessPage";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -72,6 +74,7 @@ const Layout = () => {
           <Route index element={<Home />} />
           <Route path="introduce" element={<Introduce />} />
           <Route path="registerform" element={<RegisterForm />} />
+          <Route path="successpage" element={<SuccessPage />} />
           <Route path="feedback" element={<FeedbackStudent />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="course" element={<Course />} />
@@ -81,12 +84,18 @@ const Layout = () => {
           <Route path="/news/:id" element={<NewsDetail />} />
         </Route>
 
-        <Route element={<RequireAuth roles={["INSTRUCTOR", "STUDENT"]} />}>
+        <Route element={<RequireAuth roles={["INSTRUCTOR", "ADMIN"]} />}>
           <Route path="lecturer" element={<DashboardLecture />}>
             <Route index element={<MaterialsDashboard />} />
             <Route path="teachingschedule" element={<Teachingschedule />} />
-            <Route path="lecturerinformation" element={<LecturerInformation />} />
-            <Route path="lecturerinformationEdit" element={<LecturerEditProfile />} />
+            <Route
+              path="lecturerinformation"
+              element={<LecturerInformation />}
+            />
+            <Route
+              path="lecturerinformationEdit"
+              element={<LecturerEditProfile />}
+            />
             <Route path="rollcall" element={<Rollcall />} />
             <Route path="rollcalldetail" element={<RollcallDetail />} />
 
@@ -95,12 +104,15 @@ const Layout = () => {
             <Route path="documentdetail" element={<DocumentDetail />} />
             <Route path="documentupload" element={<DocumentUpload />} />
 
-            <Route path="learningpath" element={<LearningPath />} />
+            {/* Lộ trình học tập */}
+            <Route path="learningpathdetail" element={<LearningPathDetail />} />
+            <Route path="learningpathlist" element={<LearningPathList />} />
+            {/* Tiến độ học tập */}
             <Route path="progress" element={<Progress />} />
           </Route>
         </Route>
 
-        <Route element={<RequireAuth roles={["ADMIN", "STUDENT"]} />}>
+        <Route element={<RequireAuth roles={["ADMIN"]} />}>
           <Route path="admin" element={<DashboardAdmin />}>
             <Route path="studentManagement" element={<StudentManagement />} />
             <Route path="addStudent" element={<AddStudent />} />
@@ -117,7 +129,7 @@ const Layout = () => {
           </Route>
         </Route>
 
-        <Route element={<RequireAuth roles={["STUDENT"]} />}>
+        <Route element={<RequireAuth roles={["STUDENT", "ADMIN"]} />}>
           <Route path="student" element={<DashboardStudent />}>
             <Route index element={<StudentSchedule />} />
             <Route path="studentcourse" element={<StudentCourse />} />
