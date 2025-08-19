@@ -88,7 +88,7 @@ const Register = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold"
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold cursor-pointer"
               >
                 Đăng ký ngay
               </button>

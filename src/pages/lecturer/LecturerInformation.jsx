@@ -1,39 +1,22 @@
 import { FaInfoCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { getProfileLecturer } from "../../services/Lecturer/Profile";
+import { useEffect, useState } from "react";
 
-const Profile = ({
-  fullName,
-  role,
-  avatar_url,
-  studentId,
-  school,
-  gender,
-  birthday,
-  ethnicity,
-  idNumber,
-  idIssueDay,
-  idIssuePlace,
-  email,
-  phone,
-}) => {
+const LecturerInformation = () => {
+  const [dataProfile, setDataProfile] = useState({});
   const navigate = useNavigate();
-
-  const handleEditClick = () => {
-    navigate("/student/studentprofileEdit");
-  };
-  const getRoleName = (role) => {
-    switch (role) {
-      case "STUDENT":
-        return "Học viên";
-      case "LECTURER":
-        return "Giảng viên";
-      case "ADMIN":
-        return "Quản trị viên";
-      case "USER":
-        return "Người dùng";
-      default:
-        return "Không xác định";
+  useEffect(() => {
+    fetchDataProfileLecturer();
+  }, []);
+  const fetchDataProfileLecturer = async () => {
+    let data = await getProfileLecturer();
+    if (data) {
+      setDataProfile(data);
     }
+  };
+  const handleEditClick = () => {
+    navigate("/lecturer/lecturerinformationEdit");
   };
   return (
     <div className="min-h-screen p-5 font-sans">
@@ -43,16 +26,18 @@ const Profile = ({
           <div className="flex items-center gap-6">
             <div className="relative group">
               <img
-                src={avatar_url || null}
+                src={dataProfile.profileImage || null}
                 alt="Avatar"
                 className="w-28 h-28 rounded-full border border-gray-300 object-cover"
               />
             </div>
 
             <div>
-              <h1 className="text-3xl font-bold text-black-800">{fullName}</h1>
+              <h1 className="text-3xl font-bold text-black-800">
+                {dataProfile.fullName}
+              </h1>
               <p className="text-red-600 font-medium text-xl mt-2">
-                {getRoleName(role)}
+                Giảng viên
               </p>
             </div>
           </div>
@@ -69,14 +54,18 @@ const Profile = ({
         <div className="space-y-4">
           <SectionTitle title="Thông tin cá nhân" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <ReadOnlyInput label="Mã sinh viên" value={studentId} />
-            <ReadOnlyInput label="Trường" value={school} />
-            <ReadOnlyInput label="Giới tính" value={gender} />
-            <ReadOnlyInput label="Ngày sinh" value={birthday} />
-            <ReadOnlyInput label="Dân tộc" value={ethnicity} />
-            <ReadOnlyInput label="Số CCCD" value={idNumber} />
-            <ReadOnlyInput label="Ngày cấp" value={idIssueDay} />
-            <ReadOnlyInput label="Nơi cấp" value={idIssuePlace} />
+            <ReadOnlyInput label="Học vị" value={dataProfile.degree} />
+            <ReadOnlyInput
+              label="Chuyên ngành"
+              value={dataProfile.specialization}
+            />
+            <ReadOnlyInput label="Giới tính" value={dataProfile.gender} />
+            <ReadOnlyInput label="Ngày sinh" value={dataProfile.birthday} />
+            <ReadOnlyInput label="Nơi sinh" value={dataProfile.birthPlace} />
+            <ReadOnlyInput label="Số CCCD" value="" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-1 text-sm">
+            <ReadOnlyInput label="Kinh nghiệm" value={dataProfile.bio} />
           </div>
         </div>
 
@@ -84,8 +73,8 @@ const Profile = ({
         <div className="space-y-4 border-t border-gray-300 pt-4">
           <SectionTitle title="Thông tin liên hệ" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <ReadOnlyInput label="Email" value={email} />
-            <ReadOnlyInput label="Số điện thoại" value={phone} />
+            <ReadOnlyInput label="Email" value={dataProfile.email} />
+            <ReadOnlyInput label="Số điện thoại" value={dataProfile.phone} />
           </div>
         </div>
       </div>
@@ -98,7 +87,7 @@ const ReadOnlyInput = ({ label, value }) => (
     <label className="mb-1 text-gray-700 font-medium">{label}</label>
     <input
       type="text"
-      value={value}
+      value={value || ""}
       disabled
       className="border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed"
     />
@@ -116,4 +105,4 @@ const SectionTitle = ({ title }) => (
   </h2>
 );
 
-export default Profile;
+export default LecturerInformation;

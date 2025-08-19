@@ -1,27 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import zalo from "../../assets/images/zalo.png";
+import { getCourse } from "../../services/Auth/course";
 
 export default function App() {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("LẬP TRÌNH");
+  const [courses, setCourses] = useState([]);
 
-  const allCourses = {
-    "LẬP TRÌNH": Array(6).fill({
-      title: "Lập trình C++",
-      desc: "AI (trí tuệ nhân tạo) đã phát triển bùng nổ trong vài năm gần đây...",
-      date: "07/07/2025",
-    }),
-    TOEIC: Array(3).fill({
-      title: "Luyện thi TOEIC 600+",
-      desc: "Khóa học giúp bạn cải thiện kỹ năng Listening và Reading TOEIC...",
-      date: "15/08/2025",
-    }),
-    "TIN HỌC": Array(4).fill({
-      title: "Tin học văn phòng",
-      desc: "Nắm vững kỹ năng Word, Excel, PowerPoint chuẩn MOS quốc tế...",
-      date: "01/09/2025",
-    }),
+  useEffect(() => {
+    fetchCourse();
+  }, []);
+
+  const fetchCourse = async () => {
+    try {
+      const res = await getCourse();
+      if (res) {
+        setCourses(res);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy khóa học:", error);
+    }
+  };
+
+  const handleDetailClick = (course) => {
+    navigate("/coursedetail", { state: { course } });
   };
 
   const colors = [
@@ -32,10 +35,6 @@ export default function App() {
     "bg-pink-300",
     "bg-purple-300",
   ];
-
-  const handleDetailClick = (course) => {
-    navigate("/coursedetail", { state: { course } });
-  };
 
   return (
     <div className="min-h-screen bg-white z-0">
@@ -59,57 +58,60 @@ export default function App() {
       {/* Grid khóa học */}
       <div className="w-full flex justify-center">
         <div className="flex flex-wrap justify-center gap-x-10 gap-y-8 max-w-[1120px]">
-          {allCourses[selectedTab].map((course, idx) => (
-            <div
-              key={idx}
-              className={`shadow-md w-[345px] h-[411px] overflow-hidden flex flex-col`}
-            >
-              {/* Phần ảnh */}
+          {courses.length === 0 ? (
+            <p className="text-gray-500">Không có khóa học nào</p>
+          ) : (
+            courses.map((course, idx) => (
               <div
-                className={`w-full h-[200px] flex items-center justify-center text-white text-base font-semibold ${
-                  colors[idx % colors.length]
-                }`}
+                key={course.id || idx}
+                className={`shadow-md w-[345px] h-[430px] overflow-hidden flex flex-col rounded-xl`}
               >
-                Ảnh
-              </div>
-
-              {/* Nội dung card */}
-              <div className="bg-white p-4 flex-1 flex flex-col justify-between rounded-b-2xl">
-                <div>
-                  <h2
-                    style={{ fontSize: "24px" }}
-                    className="font-semibold text-gray-900 flex items-center gap-2"
-                  >
-                    <span className="text-blue-600">📘</span>
-                    {course.title}
-                  </h2>
-                  <p
-                    style={{ fontSize: "14px" }}
-                    className="text-blue-500 font-medium mb-2 pl-[42px]"
-                  >
-                    Đào tạo 3 tháng
-                  </p>
+                {/* Màu nền thay ảnh */}
+                <div
+                  className={`w-full h-[180px] flex items-center justify-center text-white text-base font-semibold ${colors[idx % colors.length]}`}
+                >
+                  {course.title}
                 </div>
-                <p className="text-xs text-gray-600 leading-snug mb-2 pl-[8px]">
-                  {course.desc}
-                </p>
-                <div className="text-sm text-gray-700 mt-auto">
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="font-bold pl-[8px]">
-                      Khai giảng :{" "}
-                      <span className="font-bold">{course.date}</span>
+
+                <div className="bg-white p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-[22px] font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="text-blue-600">📘</span>
+                      {course.title}
+                    </h2>
+                    <p className="text-blue-500 text-sm mb-2 pl-[42px] font-medium">
+                      Đào tạo {course.duration || "3 tháng"}
+                    </p>
+
+                    {/* Mô tả */}
+                    <div className="pl-[8px] mb-3">
+                      <p className="text-gray-800 text-sm font-medium mb-1">Mô tả:</p>
+                      <p className="text-gray-600 text-sm leading-snug line-clamp-3">
+                        {course.description || "Chưa có mô tả"}
+                      </p>
                     </div>
-                    <button
-                      onClick={() => handleDetailClick(course)}
-                      className="bg-yellow-300 text-xs text-blue-500 px-4 py-1 rounded-full hover:bg-yellow-400 transition-all font-bold"
-                    >
-                      Chi tiết →
-                    </button>
+                  </div>
+
+                  <div className="text-sm text-gray-700 mt-auto">
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="font-bold pl-[8px]">
+                        Khai giảng:{" "}
+                        <span className="font-bold">
+                          {course.start_month || "Đang cập nhật"}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDetailClick(course)}
+                        className="bg-yellow-300 text-xs text-blue-500 px-4 py-1 rounded-full hover:bg-yellow-400 transition-all font-bold"
+                      >
+                        Chi tiết →
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -146,7 +148,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination (giả lập) */}
       <div className="flex justify-center items-center gap-4 my-10 text-lg font-medium select-none">
         <button className="text-gray-700 hover:text-red-500">{"<"}</button>
         <button className="bg-red-500 text-white w-7 h-7 rounded hover:bg-red-600 transition-all">

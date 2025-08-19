@@ -18,10 +18,9 @@ const Sidebar = () => {
     { name: "Học viên", icon: <FaTachometerAlt /> },
     { name: "Giảng viên", icon: <FaUser /> },
     { name: "Khóa học", icon: <FaTable /> },
-    { name: "Bài học", icon: <FaFont /> },
-    { name: "Lịch thi", icon: <FaAtom /> },
-    { name: "Thống kê học tập", icon: <FaMapMarkerAlt /> },
-    { name: "Thống kê thi cử", icon: <FaBell /> },
+    { name: "Tin tức", icon: <FaFont /> },
+    { name: "Hóa đơn", icon: <FaAtom /> },
+    
   ];
 
   const handleClick = (name) => {

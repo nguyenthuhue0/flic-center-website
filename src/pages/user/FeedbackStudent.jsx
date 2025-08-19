@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import imageTest from "../../assets/images/demo.jpg";
 import Modal from "../../components/Modal";
 import { ImQuotesLeft } from "react-icons/im";
@@ -6,42 +6,53 @@ import { ImQuotesRight } from "react-icons/im";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaBell } from "react-icons/fa";
+import { getAllCourse } from "../../services/Student/Course";
+import Slider from "react-slick";
+import { CiStar } from "react-icons/ci";
 
 const FeedbackStudent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dataCourse, setDataCourse] = useState([]);
   const students = Array(6).fill({
     name: "NGUYỄN VĂN A",
     role: "HỌC VIÊN",
     image: "", // placeholder ảnh
     link: "#",
   });
-  const courses = [
-    {
-      title: "Lập trình C++",
-      duration: "Đào tạo 3 tháng",
-      desc: "msmsmsmsmsmsmansmansan fghbdgbdbbd",
-      startDate: "07/07/2025",
-    },
-    {
-      title: "Lập trình C++",
-      duration: "Đào tạo 3 tháng",
-      desc: "msmsmsmsmsmsmansmansan fghbdgbdbbd",
-      startDate: "07/07/2025",
-    },
-    {
-      title: "Lập trình C++",
-      duration: "Đào tạo 3 tháng",
-      desc: "msmsmsmsmsmsmansmansan fghbdgbdbbd",
-      startDate: "07/07/2025",
-    },
-    {
-      title: "Lập trình C++",
-      duration: "Đào tạo 3 tháng",
-      desc: "msmsmsmsmsmsmansmansan fghbdgbdbbd",
-      startDate: "07/07/2025",
-    },
-    // ... add thêm nếu cần
-  ];
+  useEffect(() => {
+    fetchDataCourse();
+  }, []);
+  const fetchDataCourse = async () => {
+    let data = await getAllCourse();
+    setDataCourse(data);
+  };
+  const sliderRef = useRef(null);
+
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: 3 },
+      },
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 1 },
+      },
+    ],
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 ">
@@ -160,39 +171,56 @@ const FeedbackStudent = () => {
       </h2>
 
       {/* Khóa học */}
-      <div className="flex flex-wrap justify-center gap-4 relative">
-        {courses.map((course, idx) => (
-          <div
-            key={idx}
-            className="w-64 bg-white rounded-xl shadow-md overflow-hidden "
-          >
-            <div className="h-40 bg-purple-200 flex items-center justify-center text-white font-semibold text-lg">
-              Ảnh
-            </div>
-            <div className="p-4 space-y-2">
-              <h3 className="text-md font-semibold flex items-center gap-2">
-                {/* <FaMobileAlt className="text-black" /> */}
-                {course.title}
-              </h3>
-              <p className="text-sm text-blue-500">{course.duration}</p>
-              <p className="text-sm text-gray-500">{course.desc}</p>
-              <div className="flex justify-between items-center pt-2">
-                <span className="text-sm text-gray-600">
-                  Khai giảng : {course.startDate}
-                </span>
-                <button className="bg-yellow-300 hover:bg-yellow-400 text-xs px-3 py-1 rounded-full font-semibold">
-                  Chi tiết →
-                </button>
+      <div className="relative px-10">
+        {/* Slider */}
+        <Slider ref={sliderRef} {...settings}>
+          {dataCourse.map((course, idx) => (
+            <div key={idx} className="p-2 cursor-pointer">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div className="h-40 bg-purple-200 flex items-center justify-center text-white font-semibold text-lg">
+                  Ảnh
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="text-md font-semibold">{course.title}</h3>
+                  <p className="text-sm text-blue-500">
+                    Đánh giá: {course.rating}{" "}
+                    <span className="inline-block text-yellow-500">
+                      <CiStar />
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-500">{course.desc}</p>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-sm text-gray-600">
+                      Khai giảng : {course.startMonth}
+                    </span>
+                    <button className="bg-yellow-300 hover:bg-yellow-400 text-xs px-3 py-1 rounded-full font-semibold">
+                      Chi tiết →
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        <IoIosArrowBack className="absolute top-1/2 left-[35px] text-5xl" />
-        <IoIosArrowForward className="absolute top-1/2 right-[35px] text-5xl" />
+          ))}
+        </Slider>
+
+        {/* Nút điều hướng */}
+        <button
+          onClick={() => sliderRef.current.slickPrev()}
+          className="absolute top-1/2 -left-2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 hover:bg-gray-200"
+        >
+          <IoIosArrowBack className="text-2xl" />
+        </button>
+
+        <button
+          onClick={() => sliderRef.current.slickNext()}
+          className="absolute top-1/2 -right-2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 hover:bg-gray-200"
+        >
+          <IoIosArrowForward className="text-2xl" />
+        </button>
       </div>
 
       {/* Form đăng ký */}
-      <div className="border border-blue-600 mt-16 p-10 rounded-xl mr-16 ml-16 text-center">
+      <div className="border border-blue-600 mt-16 p-10 rounded-xl mr-16 ml-16 text-center mb-16">
         <h3 className="text-center text-white font-bold text-2xl bg-red-500 py-2 rounded-md mr-45 ml-45">
           Đăng kí nhận thông tin khóa học
         </h3>

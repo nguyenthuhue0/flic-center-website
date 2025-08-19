@@ -8,15 +8,15 @@ const attendanceStates = [
 
 const initialStudents = [
   { id: 1, name: "Nguyễn Văn A", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 2, name: "Nguyễn Văn B", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 3, name: "Nguyễn Văn C", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 4, name: "Nguyễn Văn D", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 5, name: "Nguyễn Văn E", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 6, name: "Nguyễn Văn A", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 7, name: "Nguyễn Văn B", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 8, name: "Nguyễn Văn C", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 9, name: "Nguyễn Văn D", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 10, name: "Nguyễn Văn E", dob: "05/07/2004", stateIndex: 0, note: "" }
+  { id: 2, name: "Nguyễn Văn B", dob: "15/11/2004", stateIndex: 0, note: "" },
+  { id: 3, name: "Nguyễn Văn C", dob: "20/02/2004", stateIndex: 0, note: "" },
+  { id: 4, name: "Nguyễn Văn D", dob: "10/07/2004", stateIndex: 0, note: "" },
+  { id: 5, name: "Nguyễn Văn E", dob: "27/02/2004", stateIndex: 0, note: "" },
+  { id: 6, name: "Nguyễn Văn F", dob: "18/07/2004", stateIndex: 0, note: "" },
+  { id: 7, name: "Nguyễn Văn G", dob: "09/12/2004", stateIndex: 0, note: "" },
+  { id: 8, name: "Nguyễn Văn H", dob: "17/08/2004", stateIndex: 0, note: "" },
+  { id: 9, name: "Nguyễn Văn I", dob: "01/03/2004", stateIndex: 0, note: "" },
+  { id: 10, name: "Nguyễn Văn J", dob: "22/12/2004", stateIndex: 0, note: "" }
 ];
 
 export default function Attendance() {
@@ -84,21 +84,21 @@ export default function Attendance() {
                   <td className="p-2 font-semibold">{student.dob}</td>
                   <td className="p-2 font-semibold">
                     <button
-  onClick={() => toggleState(index)}
-  className={`transition-all duration-300 text-white px-4 py-1 rounded border-2 w-[90px] text-center font-semibold ${state.color} border-transparent hover:scale-105`}
->
-  {state.label}
-</button>
+                      onClick={() => toggleState(index)}
+                      className={`transition-all duration-300 text-white px-4 py-1 rounded border-2 w-[90px] text-center font-semibold ${state.color} border-transparent hover:scale-105`}
+                    >
+                      {state.label}
+                    </button>
 
                   </td>
                   <td className="p-2">
                     <input
-  type="text"
-  className="border border-gray-300 rounded-lg px-3 py-1 w-[120px] focus:outline-none focus:ring-2 focus:ring-red-400"
-  placeholder="Ghi chú"
-  value={student.note}
-  onChange={(e) => handleNoteChange(index, e.target.value)}
-/>
+                      type="text"
+                      className="border border-gray-300 rounded-lg px-3 py-1 w-[120px] focus:outline-none focus:ring-2 focus:ring-red-400"
+                      placeholder="Ghi chú"
+                      value={student.note}
+                      onChange={(e) => handleNoteChange(index, e.target.value)}
+                    />
 
                   </td>
                 </tr>
@@ -108,47 +108,47 @@ export default function Attendance() {
         </table>
       </div>
 
-<div className="mt-6 flex justify-center">
-  <button
-    onClick={confirmAttendance}
-    className="bg-[#E21F22] text-white px-6 py-2 rounded-xl text-base font-semibold shadow-md hover:bg-red-600 transition-all duration-200"
-  >
-    ✅ Xác nhận điểm danh
-  </button>
-</div>
-
-{/* Kết quả sau xác nhận */}
-{showSummary && (
-  <div className="mt-8 flex flex-col md:flex-row gap-6 items-start justify-center">
-
-    {/* BÊN TRÁI: THÔNG TIN BUỔI HỌC */}
-    <div className="bg-white p-6 border rounded-xl shadow-md max-w-md w-full">
-      <h2 className="text-lg font-bold text-[#E21F22] mb-2">📚 Nội dung buổi học</h2>
-      <p className="text-sm text-gray-700 leading-relaxed">
-        Buổi học hôm nay bao gồm phần ôn tập kiến thức lập trình hướng đối tượng và thực hành thao tác với mảng, hàm trong Java. Học viên cần chuẩn bị máy tính, tài liệu ghi chép và tham gia đầy đủ.
-      </p>
-    </div>
-
-    {/* BÊN PHẢI: THỐNG KÊ */}
-    <div className="p-6 border rounded-xl shadow-md bg-white max-w-md w-full">
-      <h2 className="font-bold text-lg mb-4 flex items-center gap-2 h-[75px] text-[#E21F22]">
-        📊 Thống kê điểm danh
-      </h2>
-      <div className="grid grid-cols-3 gap-4 text-center text-sm font-semibold">
-        <div className="bg-green-100 text-green-700 rounded p-2">
-          Có mặt: <span>{summary["Có mặt"]}</span>
-        </div>
-        <div className="bg-yellow-100 text-yellow-700 rounded p-2">
-          Đi trễ: <span>{summary["Đi trễ"]}</span>
-        </div>
-        <div className="bg-red-100 text-red-700 rounded p-2">
-          Vắng: <span>{summary["Vắng"]}</span>
-        </div>
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={confirmAttendance}
+          className="bg-[#E21F22] text-white px-6 py-2 rounded-xl text-base font-semibold shadow-md hover:bg-red-600 transition-all duration-200"
+        >
+          ✅ Xác nhận điểm danh
+        </button>
       </div>
-    </div>
 
-  </div>
-)}
+      {/* Kết quả sau xác nhận */}
+      {showSummary && (
+        <div className="mt-8 flex flex-col md:flex-row gap-6 items-start justify-center">
+
+          {/* BÊN TRÁI: THÔNG TIN BUỔI HỌC */}
+          <div className="bg-white p-6 border rounded-xl shadow-md max-w-md w-full">
+            <h2 className="text-lg font-bold text-[#E21F22] mb-2">📚 Nội dung buổi học</h2>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Buổi học hôm nay bao gồm phần ôn tập kiến thức lập trình hướng đối tượng và thực hành thao tác với mảng, hàm trong Java. Học viên cần chuẩn bị máy tính, tài liệu ghi chép và tham gia đầy đủ.
+            </p>
+          </div>
+
+          {/* BÊN PHẢI: THỐNG KÊ */}
+          <div className="p-6 border rounded-xl shadow-md bg-white max-w-md w-full">
+            <h2 className="font-bold text-lg mb-4 flex items-center gap-2 h-[75px] text-[#E21F22]">
+              📊 Thống kê điểm danh
+            </h2>
+            <div className="grid grid-cols-3 gap-4 text-center text-sm font-semibold">
+              <div className="bg-green-100 text-green-700 rounded p-2">
+                Có mặt: <span>{summary["Có mặt"]}</span>
+              </div>
+              <div className="bg-yellow-100 text-yellow-700 rounded p-2">
+                Đi trễ: <span>{summary["Đi trễ"]}</span>
+              </div>
+              <div className="bg-red-100 text-red-700 rounded p-2">
+                Vắng: <span>{summary["Vắng"]}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
 
 
     </div>

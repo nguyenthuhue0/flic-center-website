@@ -1,10 +1,13 @@
-import { Outlet } from 'react-router-dom'
-import './App.css'
-import Header from './components/Header'
-import Footer from './components/Footer'
+import { Outlet } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Breadcrumb from './components/Breadcrumb';
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Breadcrumb from './components/Breadcrumb';
+import 'nprogress/nprogress.css';
+
+import './App.css';
 
 
 function App() {

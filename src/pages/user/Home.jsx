@@ -2,8 +2,21 @@ import React from "react";
 import Slider from "react-slick";
 import banner01 from "../../assets/images/banner01.png";
 import banner02 from "../../assets/images/banner02.png";
+import { getCourse } from "../../services/Student/Home";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+   useEffect(() => {
+      fetchCourse()
+   }, []);
+   const [dataCourse, setDataCourse] = useState([]);
+   const fetchCourse = async () => {
+      let courses = await getCourse();
+      setDataCourse(courses);
+      console.log("courses", courses);
+   }
+   console.log("dataCourse", dataCourse);
+
    return (
       <div className="bg-white">
          {/* Section 1: Banner */}
@@ -101,7 +114,6 @@ const Home = () => {
          </div>
 
 
-
          {/* Section 3: Khóa học */}
          <div className="py-16 bg-white px-6 md:px-16">
             <div className="max-w-7xl mx-auto text-center">
@@ -109,30 +121,18 @@ const Home = () => {
                <p className="text-gray-700 mb-12 max-w-3xl mx-auto">
                   Các khóa học tại FLIC VKU được thiết kế nhằm nâng cao trình độ ngoại ngữ và tin học, đáp ứng nhu cầu học tập, thi chứng chỉ và ứng dụng thực tiễn trong học tập và công việc.
                </p>
-               <Slider dots={true} infinite={true} speed={500} slidesToShow={4} slidesToScroll={1} autoplay={true} autoplaySpeed={2000} className="-mx-2">
+               <Slider dots={false} infinite={true} speed={500} slidesToShow={4} slidesToScroll={1} autoplay={true} autoplaySpeed={2000} className="-mx-2">
                   {/* Course 1 */}
-                  <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                     <img src="path_to_image_1.jpg" alt="Khóa học 1" className="w-full h-40 object-cover rounded-t-lg" />
-                     <h3 className="text-lg font-semibold mt-2">Lập trình Java</h3>
-                     <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
-                  </div>
-                  {/* Course 2 */}
-                  <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                     <img src="path_to_image_2.jpg" alt="Khóa học 2" className="w-full h-40 object-cover rounded-t-lg" />
-                     <h3 className="text-lg font-semibold mt-2">Toeic 990</h3>
-                     <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
-                  </div>
-                  {/* Course 3 */}
-                  <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                     <img src="path_to_image_3.jpg" alt="Khóa học 3" className="w-full h-40 object-cover rounded-t-lg" />
-                     <h3 className="text-lg font-semibold mt-2">Lập trình C++</h3>
-                     <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
-                  </div>
-                  <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                     <img src="path_to_image_3.jpg" alt="Khóa học 3" className="w-full h-40 object-cover rounded-t-lg" />
-                     <h3 className="text-lg font-semibold mt-2">MOS cơ bản</h3>
-                     <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
-                  </div>
+                  {
+                     dataCourse.map((course, index) => (
+                        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+                           <img src="path_to_image_1.jpg" alt="Khóa học 1" className="w-full h-40 object-cover rounded-t-lg" />
+                           <h3 className="text-lg font-semibold mt-2">{course.title}</h3>
+                           <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
+                        </div>
+                     ))
+                  }
+
 
                </Slider>
             </div>
