@@ -1,12 +1,29 @@
 import axios from "../../utils/AxiosCustomize";
 
-const getRegisterForm = () => {
-    return axios.get(`/public/enroll`);
-}
-const updateForm = (email, fullName, phone, gender, birthDate, job, idStudent, schoolName, idNumber, idIssuedPlace, idIssuedDate, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt, note, paymentFor) => {
-    return axios.post(`/public/enroll`, {
-        fullName: fullName,
+const publicEnrollment = (
+    email,
+    fullName,
+    phone,
+    gender,
+    birthDate,
+    job,
+    idStudent,
+    schoolName,
+    idNumber,
+    idIssuedPlace,
+    idIssuedDate,
+    courseId,
+    paymentMethod,
+    amount,
+    billImage,
+    paymentStatus,
+    paidAt,
+    note,
+    paymentFor
+) => {
+    return axios.post(`public/enroll`, {
         email: email,
+        fullName: fullName,
         phone: phone,
         gender: gender,
         birthDate: birthDate,
@@ -23,18 +40,30 @@ const updateForm = (email, fullName, phone, gender, birthDate, job, idStudent, s
         paymentStatus: paymentStatus,
         paidAt: paidAt,
         note: note,
-        paymentFor: paymentFor
-    }
-    )
-}
+        paymentFor: paymentFor,
+    });
+};
 
-const getRegisterFormRequets = () => {
-    return axios.get(`/users/profile`);
-}
-const updateFormByLogin = (email, fullName, phone, gender, birthDate, job, idStudent, schoolName, idNumber, idIssuedPlace, idIssuedDate, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt, note, paymentFor) => {
+const privateEnrollment = (
+    fullName,
+    phone,
+    gender,
+    birthDate,
+    job,
+    idStudent,
+    schoolName,
+    idNumber,
+    courseId,
+    paymentMethod,
+    amount,
+    billImage,
+    paymentStatus,
+    paidAt,
+    note,
+    paymentFor
+) => {
     return axios.post(`/enrollments`, {
         fullName: fullName,
-        email: email,
         phone: phone,
         gender: gender,
         birthDate: birthDate,
@@ -42,8 +71,6 @@ const updateFormByLogin = (email, fullName, phone, gender, birthDate, job, idStu
         idStudent: idStudent,
         schoolName: schoolName,
         idNumber: idNumber,
-        idIssuedPlace: idIssuedPlace,
-        idIssuedDate: idIssuedDate,
         courseId: courseId,
         paymentMethod: paymentMethod,
         amount: amount,
@@ -52,12 +79,9 @@ const updateFormByLogin = (email, fullName, phone, gender, birthDate, job, idStu
         paidAt: paidAt,
         note: note,
         paymentFor: paymentFor
-    }
-    )
+    })
 }
 export {
-    getRegisterForm,
-    updateForm,
-    getRegisterFormRequets,
-    updateFormByLogin
+    privateEnrollment,
+    publicEnrollment
 }

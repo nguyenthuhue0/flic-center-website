@@ -23,7 +23,8 @@ import RollcallDetail from "./pages/lecturer/RollcallDetail";
 import StudentSchedule from "./pages/student/StudentSchedule";
 import DashboardStudent from "./DashboardStudent";
 import DashboardLecture from "./DashboardLecture";
-import LearningPath from "./pages/lecturer/LearningPath";
+import LearningPathDetail from "./pages/lecturer/LearningPathDetail";
+import LearningPathList from "./pages/lecturer/LearningPathList";
 import Progress from "./pages/lecturer/Progress";
 // import Teachingschedule from "./pages/lecturer/Teachingschedule";
 
@@ -91,8 +92,13 @@ const Layout = () => {
           <Route path="documentdetail" element={<DocumentDetail />} />
           <Route path="documentupload" element={<DocumentUpload />} />
 
-          <Route path="learningpath" element={<LearningPath />} />
+          {/* Lộ trình học tập */}
+          <Route path="learningpathdetail" element={<LearningPathDetail />} />
+          <Route path="learningpathlist" element={<LearningPathList />} />
+          {/* Tiến độ học tập */}
           <Route path="progress" element={<Progress />} />
+
+
         </Route>
         <Route path="admin" element={<DashboardAdmin />}>
           <Route path="studentManagement" element={<StudentManagement />} />

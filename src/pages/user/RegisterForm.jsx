@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import qrcode from "../../assets/images/qrcode.png"
-import { getRegisterFormRequets, updateForm, updateFormByLogin } from "../../services/Student/RegisterForm";
+import { privateEnrollment, publicEnrollment } from "../../services/Student/RegisterForm";
 import { useNavigate } from "react-router-dom";
 import { getCourse } from "../../services/Student/Home";
 import axios from "axios";
+import { getProfile } from "../../services/Student/Profie";
 
 export default function RegisterForm() {
 
@@ -39,13 +40,14 @@ export default function RegisterForm() {
     const [paidAt, setPaidAt] = useState("");
     const [note, setNote] = useState("");
     const [paymentFor, setPaymentFor] = useState("");
+
     useEffect(() => {
         const token = sessionStorage.getItem("access_token");
         if (token) {
             setIsLoggedIn(true);
             // Nếu getRegisterFormRequets() là async
             const fetchData = async () => {
-                const data = await getRegisterFormRequets();
+                const data = await getProfile();
                 if (data) {
                     setFullName(data.fullName || "");
                     setEmail(data.email || "");
@@ -56,75 +58,25 @@ export default function RegisterForm() {
     }, []);
 
 
-
-
-    const handleRegister = async (e) => {
-        e.preventDefault();
-
-        const payload = {
-            fullName,
-            email,
-            phone,
-            gender,
-            birthDate: birthDate || null,
-            job,
-            idStudent,
-            schoolName,
-            idNumber,
-            idIssuedPlace,
-            idIssuedDate: idIssuedDate || null,
-            courseId,
-            paymentMethod,
-            amount,
-            billImage,
-            paymentStatus,
-            paidAt: paidAt || null,
-            note,
-            paymentFor
-        };
-
-        // Log để kiểm tra giá trị trước khi gửi
-        console.log("📦 Payload chuẩn bị gửi lên API:", payload);
-
-        try {
-            const data = await updateFormByLogin(payload);
-            console.log("✅ API Response:", data);
-
-            if (data) {
-                toast.success("Đăng ký thành công!");
-                navigate("/courses");
-            } else {
-                toast.error("Đăng ký thất bại!");
-            }
-        } catch (err) {
-            console.error("❌ Lỗi khi gọi API:", err);
-            toast.error("Có lỗi khi đăng ký!");
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("access_token");
 
             if (token) {
                 // User đã đăng nhập
-                const res = await updateFormByLogin(email, fullName, phone, gender, birthDate, job, idStudent, schoolName, idNumber, idIssuedPlace, idIssuedDate, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt, note, paymentFor);
-                if (res.status === 200) {
-
+                const res = privateEnrollment(fullName, phone, gender, birthDate || null, job, idStudent, schoolName, idNumber, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt || null, note, paymentFor);
+                if (res) {
 
                     navigate("/SuccessPage");
 
                 }
             } else {
                 // User chưa đăng nhập
-                const res = await axios.post(
-                    "http://localhost:8080/api/enrollments",
-                    { email, fullName, phone, gender, birthDate, job, idStudent, schoolName, idNumber, idIssuedPlace, idIssuedDate, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt, note, paymentFor }
-                );
+                const res = await publicEnrollment(email, fullName, phone, gender, birthDate || null, job, idStudent, schoolName, idNumber, idIssuedPlace, idIssuedDate || null, courseId, paymentMethod, amount, billImage, paymentStatus, paidAt || null, note, paymentFor);
 
-                if (res.status === 200) {
+                if (res) {
                     navigate("/SuccessPage");
                 }
             }
@@ -133,9 +85,6 @@ export default function RegisterForm() {
             alert("Đăng ký thất bại, vui lòng thử lại!");
         }
     };
-
-
-
 
 
     return (
@@ -175,7 +124,7 @@ export default function RegisterForm() {
                 {/* FORM ĐĂNG KÝ */}
                 <section className="space-y-8 max-w-md mx-auto bg-white rounded-xl shadow-md p-6 border border-blue-400">
                     <h2 className="text-red-500 font-bold text-center text-lg mb-4">Form đăng ký</h2>
-                    <form className="space-y-4 max-w-md mx-auto" onSubmit={handleRegister}> {/* Adjusted width here */}
+                    <form className="space-y-4 max-w-md mx-auto" onSubmit={handleSubmit}> {/* Adjusted width here */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Họ và tên đệm <span className="text-red-500">*</span></label>
                             <input
@@ -225,7 +174,7 @@ export default function RegisterForm() {
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">CCCD (Nếu không phải là sinh viên)</label>
                             <input
-                                type="email"
+                                type="text"
                                 placeholder="CCCD"
                                 value={idNumber}
                                 onChange={(event) => setIdNumber(event.target.value)}
@@ -319,7 +268,7 @@ export default function RegisterForm() {
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Tên các thành viên (Nếu ĐK theo nhóm)</label>
                             <input
-                                type="email"
+                                type="text"
                                 value={note}
                                 onChange={(event) => setNote(event.target.value)}
                                 placeholder="Ví dụ: Nguyễn Văn A, Nguyễn Văn B, ..."
@@ -382,7 +331,6 @@ export default function RegisterForm() {
                         <div className="flex justify-center mt-4">
                             <button
                                 type="submit"
-                                onClick={handleSubmit}
                                 className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded shadow"
                             >
                                 Gửi đăng ký
