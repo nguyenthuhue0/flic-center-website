@@ -1,90 +1,77 @@
 import { useEffect, useState } from "react";
 import { FaCamera } from "react-icons/fa";
-import { getProfile, updateProfile, uploadAvatar } from "../../services/Student/Profie";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-const StudentEditProfile = () => {
-  const navigate = useNavigate()
-const [dataProfile, setDataProfile] = useState({});
-const [fullName, setFullName] = useState("");
-const [role, setRole] = useState("");
-const [studentId, setStudentId] = useState("");
-const [schoolName, setSchoolName] = useState("");
-const [gender, setGender] = useState("");
-const [birthday, setBirthday] = useState("");
-const [ethnicity, setEthnicity] = useState("");
-const [idNumber, setIdNumber] = useState("");
-const [idIssueDay, setIdIssueDay] = useState("");
-const [idIssuePlace, setIdIssuePlace] = useState("");
-const [email, setEmail] = useState("");
-const [phone, setPhone] = useState("");
-const [linkImage, setLinkImage] = useState("")
-// Lấy dataProfile từ API
-useEffect(() => {
-  fetchStudentProfile();
-}, []);
+import {
+  getProfileLecturer,
+  updateAvatarLecturer,
+  updateProfileLecturer,
+} from "../../services/Lecturer/Profile";
+const LecturerEditProfile = () => {
+  const navigate = useNavigate();
+  const [dataProfile, setDataProfile] = useState({});
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [birthPlace, setBirthPlace] = useState("");
+  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [linkImage, setLinkImage] = useState("");
+  const [degree, setDegree] = useState("");
+  const [specialization, setSpecialization] = useState("");
+  const [bio, setBio] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  useEffect(() => {
+    fetchLecturerProfile();
+  }, []);
 
-const fetchStudentProfile = async () => {
-  let data = await getProfile();
-  setDataProfile(data);
-};
-
-// Khi dataProfile thay đổi => cập nhật các state liên quan
-useEffect(() => {
-  if (dataProfile) {
-    setFullName(dataProfile.fullName || "");
-    setRole(getRoleName(dataProfile.role) || "");
-    setStudentId(dataProfile.studentId || "");
-    setSchoolName(dataProfile.schoolName || "");
-    setGender(dataProfile.gender || "");
-    setBirthday(dataProfile.birthDate || "");
-    setEthnicity(dataProfile.ethnicity || ""); 
-    setIdNumber(dataProfile.idNumber || "");
-    setIdIssueDay(dataProfile.idIssueDate || "");
-    setIdIssuePlace(dataProfile.idIssuePlace || "");
-    setEmail(dataProfile.email || "");
-    setPhone(dataProfile.phone || "");
-    setLinkImage(dataProfile.avatarUrl || "");
-  }
-}, [dataProfile]);
-
-  const getRoleName = (role) => {
-  switch (role) {
-    case "STUDENT":
-      return "Học viên";
-    case "LECTURER":
-      return "Giảng viên";
-    case "ADMIN":
-      return "Quản trị viên";
-    case "USER":
-      return "Người dùng";
-    default:
-      return "Không xác định";
-  }
-};
-
-  const handleSave = async() => {
-    console.log(birthday);
-    
-    let data = await updateProfile(fullName, phone, gender, birthday, schoolName, ethnicity)
-    console.log(data);
-    
-    if(data){
-      toast.success("Cập nhật thông tin học viên thành công!")
-      navigate('/student/studentprofile')
-    }
-
+  const fetchLecturerProfile = async () => {
+    let data = await getProfileLecturer();
+    setDataProfile(data);
   };
-const handleFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-      let data = await uploadAvatar(file);
-    if (data) {
-          toast.success("Cập nhật ảnh thành công!");
-      setLinkImage(data.imageUrl)
+  useEffect(() => {
+    if (dataProfile) {
+      setFullName(dataProfile.fullName || "");
+      setPhone(dataProfile.phone || "");
+      setBirthday(dataProfile.birthDate || "");
+      setBirthPlace(dataProfile.birthPlace || "");
+      setGender(dataProfile.gender || "");
+      setEmail(dataProfile.email || "");
+      setLinkImage(dataProfile.profileImage || "");
+      setDegree(dataProfile.degree || "");
+      setSpecialization(dataProfile.specialization || "");
+      setBio(dataProfile.bio || "");
     }
-};
+  }, [dataProfile]);
+
+  const handleSave = async () => {
+    let data = await updateProfileLecturer(
+      fullName,
+      phone,
+      birthday,
+      birthPlace,
+      gender,
+      email,
+      linkImage,
+      degree,
+      specialization,
+      bio
+    );
+    if (data) {
+      toast.success("Cập nhật thông tin thành công!");
+      navigate("/lecturer/lecturerinformation");
+    }
+  };
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    let data = await updateAvatarLecturer(file);
+    if (data) {
+      toast.success("Cập nhật ảnh thành công!");
+      setLinkImage(data.imageUrl);
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 font-sans">
@@ -98,7 +85,7 @@ const handleFileChange = async (e) => {
           {/* Avatar */}
           <div className="relative w-32 h-32 group">
             <img
-              src={linkImage ||null}
+              src={linkImage || null}
               alt="Avatar"
               className="w-full h-full rounded-full object-cover border border-gray-300"
             />
@@ -128,12 +115,7 @@ const handleFileChange = async (e) => {
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
             />
-            <EditableInput
-              label="Chức vụ"
-              name="role"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-            />
+            <EditableInput label="Chức vụ" name="role" value="Giảng viên" />
           </div>
         </div>
 
@@ -141,16 +123,16 @@ const handleFileChange = async (e) => {
         <Section title="Thông tin cá nhân">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <EditableInput
-              label="Mã sinh viên"
-              name="studentId"
-              value={studentId}
-              onChange={(event) => setStudentId(event.target.value)}
+              label="Học vị"
+              name="degree"
+              value={degree}
+              onChange={(event) => setDegree(event.target.value)}
             />
             <EditableInput
-              label="Trường"
-              name="school"
-              value={schoolName}
-              onChange={(event) => setSchoolName(event.target.value)}
+              label="Chuyên ngành"
+              name="specialization"
+              value={specialization}
+              onChange={(event) => setSpecialization(event.target.value)}
             />
             <EditableInput
               label="Giới tính"
@@ -166,10 +148,10 @@ const handleFileChange = async (e) => {
               onChange={(event) => setBirthday(event.target.value)}
             />
             <EditableInput
-              label="Dân tộc"
-              name="ethnicity"
-              value={ethnicity}
-              onChange={(event) => setEthnicity(event.target.value)}
+              label="Nơi sinh"
+              name="birthPlace"
+              value={birthPlace}
+              onChange={(event) => setBirthPlace(event.target.value)}
             />
             <EditableInput
               label="Số CCCD"
@@ -177,18 +159,13 @@ const handleFileChange = async (e) => {
               value={idNumber}
               onChange={(event) => setIdNumber(event.target.value)}
             />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-1">
             <EditableInput
-              label="Ngày cấp"
-              name="idIssueDate"
-              type="date"
-              value={idIssueDay}
-              onChange={(event) => setIdIssueDay(event.target.value)}
-            />
-            <EditableInput
-              label="Nơi cấp"
-              name="idIssuePlace"
-              value={idIssuePlace}
-              onChange={(event) => setIdIssuePlace(event.target.value)}
+              label="Kinh nghiệm"
+              name="bio"
+              value={bio}
+              onChange={(event) => setBio(event.target.value)}
             />
           </div>
         </Section>
@@ -213,8 +190,9 @@ const handleFileChange = async (e) => {
 
         {/* Nút điều khiển */}
         <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-          <button className="bg-gray-300 text-gray-800 px-5 py-2 rounded hover:bg-gray-400 cursor-pointer"
-          onClick={() => navigate('/student/studentprofile')}
+          <button
+            className="bg-gray-300 text-gray-800 px-5 py-2 rounded hover:bg-gray-400 cursor-pointer"
+            onClick={() => navigate("/student/studentprofile")}
           >
             Hủy bỏ
           </button>
@@ -237,7 +215,6 @@ const EditableInput = ({ label, name, value, onChange, type = "text" }) => (
       type={type}
       name={name}
       value={value}
-      disabled={name === "role"} // nếu name là role thì readonly
       onChange={onChange}
       className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
@@ -250,5 +227,4 @@ const Section = ({ title, children }) => (
     {children}
   </div>
 );
-
-export default StudentEditProfile;
+export default LecturerEditProfile;

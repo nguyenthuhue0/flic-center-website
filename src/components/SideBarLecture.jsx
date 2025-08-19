@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaUser,
   FaBook,
@@ -7,6 +7,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getProfileLecturer } from "../services/Lecturer/Profile";
 
 export default function SideBarLecture() {
   const [openCourseMenu, setOpenCourseMenu] = useState(true);
@@ -15,18 +16,27 @@ export default function SideBarLecture() {
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
-
+  const [avatar, setAvatar] = useState("");
+  const [fullName, setFullName] = useState("");
+  useEffect(() => {
+    fetchDataProfileLecturer();
+  });
+  const fetchDataProfileLecturer = async () => {
+    let data = await getProfileLecturer();
+    setFullName(data.fullName);
+    setAvatar(data.profileImage);
+  };
   return (
     <div className="w-[280px] bg-[#2A3F54] text-white flex flex-col items-center py-6 shadow-md">
       {/* Avatar */}
       <img
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlypGDTnDajs3DEzazfw-dKvApBOXODYXpLw&s"
+        src={avatar || null}
         alt="Avatar"
         className="w-24 h-24 rounded-full border-4 border-white mb-2"
       />
       <div className="text-sm text-center">
         <div className="font-bold mt-2 text-[15px]">GIẢNG VIÊN</div>
-        <div className="font-semibold text-[18px]">NGUYỄN VĂN B</div>
+        <div className="font-semibold text-[18px]">{fullName}</div>
       </div>
 
       {/* Menu */}
@@ -38,7 +48,7 @@ export default function SideBarLecture() {
               ? "bg-white/10 text-blue-200"
               : "hover:bg-white/10"
           }`}
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate("/lecturer/lecturerinformation")}
         >
           <FaUser size={20} />
           <span className="text-sm text-center md:text-left">

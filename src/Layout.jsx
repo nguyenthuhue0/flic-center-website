@@ -50,10 +50,12 @@ import CourseManagement from "./pages/admin/CourseManagement";
 import AddCourse from "./pages/admin/AddCourse";
 import EditCourse from "./pages/admin/EditCourse";
 
-
 import StudentDetail from "./pages/admin/StudentDetail";
 import LecturerDetail from "./pages/admin/LecturerDetail";
 import CourseDetailAdmin from "./pages/admin/CourseDetailAdmin";
+import RequireAuth from "./pages/auth/RequireAuth";
+import LecturerInformation from "./pages/lecturer/LecturerInformation";
+import LecturerEditProfile from "./pages/lecturer/LecturerEditProfile";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -78,49 +80,64 @@ const Layout = () => {
           <Route path="news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
         </Route>
-        <Route path="lecturer" element={<DashboardLecture />}>
-          <Route path="materialsdashboard" element={<MaterialsDashboard />} />
-          <Route path="teachingschedule" element={<Teachingschedule />} />
-          <Route path="rollcall" element={<Rollcall />} />
-          <Route path="rollcalldetail" element={<RollcallDetail />} />
 
-          {/* Tài liệu học tập */}
-          <Route path="documentlist" element={<DocumentList />} />
-          <Route path="documentdetail" element={<DocumentDetail />} />
-          <Route path="documentupload" element={<DocumentUpload />} />
+        <Route element={<RequireAuth roles={["INSTRUCTOR", "STUDENT"]} />}>
+          <Route path="lecturer" element={<DashboardLecture />}>
+            <Route index element={<MaterialsDashboard />} />
+            <Route path="teachingschedule" element={<Teachingschedule />} />
+            <Route path="lecturerinformation" element={<LecturerInformation />} />
+            <Route path="lecturerinformationEdit" element={<LecturerEditProfile />} />
+            <Route path="rollcall" element={<Rollcall />} />
+            <Route path="rollcalldetail" element={<RollcallDetail />} />
 
-          <Route path="learningpath" element={<LearningPath />} />
-          <Route path="progress" element={<Progress />} />
+            {/* Tài liệu học tập */}
+            <Route path="documentlist" element={<DocumentList />} />
+            <Route path="documentdetail" element={<DocumentDetail />} />
+            <Route path="documentupload" element={<DocumentUpload />} />
+
+            <Route path="learningpath" element={<LearningPath />} />
+            <Route path="progress" element={<Progress />} />
+          </Route>
         </Route>
-        <Route path="admin" element={<DashboardAdmin />}>
-          <Route path="studentManagement" element={<StudentManagement  />} />
-          <Route path="addStudent" element={<AddStudent />} />
-          <Route path="editStudent" element={<EditStudent />} />
-          <Route path="lecturerManagement" element={<LecturerManagement  />} />
-          <Route path="addlecturer" element={<AddLecturer />} />
-          <Route path="editlecturer" element={<EditLecturer />} />
-          <Route path="courseManagement" element={<CourseManagement  />} />
-          <Route path="addcourse" element={<AddCourse />} />
-          <Route path="editcourse" element={<EditCourse />} />
-          <Route path="courseDetailAdmin" element={<CourseDetailAdmin  />} />
-          <Route path="studentDetail" element={<StudentDetail />} />
-          <Route path="lecturerDetail" element={<LecturerDetail />} />
+
+        <Route element={<RequireAuth roles={["ADMIN", "STUDENT"]} />}>
+          <Route path="admin" element={<DashboardAdmin />}>
+            <Route path="studentManagement" element={<StudentManagement />} />
+            <Route path="addStudent" element={<AddStudent />} />
+            <Route path="editStudent" element={<EditStudent />} />
+            <Route path="lecturerManagement" element={<LecturerManagement />} />
+            <Route path="addlecturer" element={<AddLecturer />} />
+            <Route path="editlecturer" element={<EditLecturer />} />
+            <Route path="courseManagement" element={<CourseManagement />} />
+            <Route path="addcourse" element={<AddCourse />} />
+            <Route path="editcourse" element={<EditCourse />} />
+            <Route path="courseDetailAdmin" element={<CourseDetailAdmin />} />
+            <Route path="studentDetail" element={<StudentDetail />} />
+            <Route path="lecturerDetail" element={<LecturerDetail />} />
+          </Route>
         </Route>
-        <Route path="student" element={<DashboardStudent />}>
-          <Route index element={<StudentSchedule />} />
-          <Route path="studentcourse" element={<StudentCourse />} />
-          <Route path="studentprofile" element={<StudentInformation />} />
-          <Route path="studentprofile/:id" element={<StudentEditProfile />} />
-          <Route path="studentcourse/:id" element={<StudentCourseDetail />} />
-          <Route path="studentsubmission/:id" element={<StudentSubmission />} />
-          <Route path="studentschedule" element={<StudentSchedule />} />
-          <Route path="scheduledetail" element={<StudentScheduleDetail />} />
+
+        <Route element={<RequireAuth roles={["STUDENT"]} />}>
+          <Route path="student" element={<DashboardStudent />}>
+            <Route index element={<StudentSchedule />} />
+            <Route path="studentcourse" element={<StudentCourse />} />
+            <Route path="studentprofile" element={<StudentInformation />} />
+            <Route path="studentprofileEdit" element={<StudentEditProfile />} />
+            <Route path="studentcourse/:id" element={<StudentCourseDetail />} />
+            <Route
+              path="studentsubmission/:id"
+              element={<StudentSubmission />}
+            />
+            <Route path="studentschedule" element={<StudentSchedule />} />
+            <Route path="scheduledetail" element={<StudentScheduleDetail />} />
+          </Route>
         </Route>
+
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}

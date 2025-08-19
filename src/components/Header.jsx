@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TiArrowSortedUp } from "react-icons/ti";
 import { CgLogOut } from "react-icons/cg";
 import { Link, } from 'react-router-dom';
@@ -7,10 +7,30 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
 import Breadcrumb from "./Breadcrumb";
 import { navItemsLink } from "../utils/Constants";
+import { getProfile } from "../services/Student/Profie";
+import { FiLogOut } from "react-icons/fi";
 
 const Header = () => {
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+  const [fullName, setFullName] = useState("")
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("access_token");
+    if (token) {
+      fetchDataProfile()
+    }
+    setHasToken(!!token);
+  }, [navigate]);
+  const fetchDataProfile = async () => {
+    let data = await getProfile()
+    setFullName(data.fullName)
+  }
+    const handleLogout = () => {
+      sessionStorage.clear(); 
+      navigate('/login')
+  }
   return (
     <div className="sticky top-0 z-10 flex flex-col bg-white font-sans">
       {/* Header */}
@@ -69,7 +89,7 @@ const Header = () => {
             <button className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700">
               Đăng ký học
             </button>
-            <a
+            {/* <a
               onClick={() => navigate("/login")}
               className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
             >
@@ -77,7 +97,32 @@ const Header = () => {
               <div className="relative">
                 <CgLogOut className="absolute right-[-8px] top-[-5px]" />
               </div>
-            </a>
+            </a> */}
+            {hasToken ? (
+        <>
+          {/* Nếu bạn muốn hiển thị thêm tên học viên, cần fetch thêm info user */}
+          <div
+            className="flex items-center space-x-1 text-md font-bold "
+          >
+            <span className="text-red-600">Xin chào, {fullName}</span>
+            <button className="hover:text-red-800 ml-2" 
+                        onClick={handleLogout}
+            ><FiLogOut className="cursor-pointer text-lg text-blue-500 hover:text-red-600" /></button>
+          </div>
+        </>
+      ) : (
+        <>
+          <a
+            onClick={() => navigate("/login")}
+            className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
+          >
+            <span>Đăng nhập</span>
+            <div className="relative">
+              <CgLogOut className="absolute right-[-8px] top-[-5px]" />
+            </div>
+          </a>
+        </>
+      )}
           </div>
         </nav>
 

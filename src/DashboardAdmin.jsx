@@ -1,12 +1,11 @@
-import { Outlet } from 'react-router-dom'
-import './App.css'
+import { Outlet } from "react-router-dom";
+import "./App.css";
 
-import SideBarLecture from './components/SideBarAdmin'
+import SideBarLecture from "./components/SideBarAdmin";
 
 function DashboardAdmin() {
   return (
-   <>
-      
+    <>
       <div className="flex min-h-screen ">
         {/* Sidebar bên trái */}
         <SideBarLecture />
@@ -16,11 +15,8 @@ function DashboardAdmin() {
           <Outlet />
         </div>
       </div>
-      
     </>
-  )
+  );
 }
 
-export default DashboardAdmin
-
-
+export default DashboardAdmin;
