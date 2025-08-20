@@ -100,7 +100,7 @@ const Layout = () => {
 
             {/* Tài liệu học tập */}
             <Route path="documentlist" element={<DocumentList />} />
-            <Route path="documentdetail" element={<DocumentDetail />} />
+            <Route path="documentdetail/:courseId" element={<DocumentDetail />} />
             <Route path="documentupload" element={<DocumentUpload />} />
 
             {/* Lộ trình học tập */}
