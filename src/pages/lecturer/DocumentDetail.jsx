@@ -51,7 +51,7 @@ const DocumentDetail = () => {
           uploadedAt: item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString('vi-VN') : null,
           // Helper fields for UI
           size: item.size || "N/A",
-          status: item.fileUrl ? "Có sẵn" : "Chưa upload"
+          status: item.fileUrl ? "Có sẵn" : "Chưa upload" 
         }));
 
         setMaterials(transformedMaterials);

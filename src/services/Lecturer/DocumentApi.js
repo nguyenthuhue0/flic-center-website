@@ -1,7 +1,7 @@
 import axios from "../../utils/AxiosCustomize";
 
 const getLessonMaterials = (courseId) => {
-    return axios.get(`/lesson/materials?courseId=${courseId}`)
+    return axios.get(`/lesson/material?courseId=${courseId}`)
         .then((response) => {
             console.log('getLessonMaterials - Raw response:', response);
             return response;
