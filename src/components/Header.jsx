@@ -1,36 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { TiArrowSortedUp } from "react-icons/ti";
 import { CgLogOut } from "react-icons/cg";
-import { Link, } from 'react-router-dom';
-
 import { NavLink, useNavigate } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
-import Breadcrumb from "./Breadcrumb";
 import { navItemsLink } from "../utils/Constants";
 import { getProfile } from "../services/Student/Profie";
 import { FiLogOut } from "react-icons/fi";
+import logo from "../assets/images/logo.png";
 
 const Header = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
-  const [fullName, setFullName] = useState("")
+  const [fullName, setFullName] = useState("");
 
   useEffect(() => {
     const token = sessionStorage.getItem("access_token");
     if (token) {
-      fetchDataProfile()
+      fetchDataProfile();
+      setHasToken(true);
     }
-    setHasToken(!!token);
-  }, [navigate]);
+  }, []);
+
   const fetchDataProfile = async () => {
-    let data = await getProfile()
-    setFullName(data.fullName)
-  }
-    const handleLogout = () => {
-      sessionStorage.clear(); 
-      navigate('/login')
-  }
+    let data = await getProfile();
+    setFullName(data.fullName);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    setHasToken(false);
+    navigate("/login");
+  };
+
   return (
     <div className="sticky top-0 z-10 flex flex-col bg-white font-sans">
       {/* Header */}
@@ -48,13 +50,22 @@ const Header = () => {
 
         {/* Navigation Bar */}
         <nav className="mx-auto flex max-w-7xl items-center justify-between p-4">
-          {/* Logo Placeholder */}
-          <div>
-            {/* <img src="/logo.png" alt="Logo" className="h-10" /> */}
-            {/* Bạn có thể thay thế bằng logo của mình */}
+          {/* Logo */}
+          <div className="cursor-pointer">
+            <img
+              src={logo}
+              alt="Logo"
+              className="absolute h-20 w-30 top-3 left-35"
+              onClick={() => {
+                navigate("/");
+                sessionStorage.clear();
+
+                setHasToken(false);
+              }}
+            />
           </div>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Mobile Menu Toggle */}
           <div className="md:hidden w-full ">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -65,69 +76,65 @@ const Header = () => {
           </div>
 
           {/* Navigation Links */}
-          <ul className="hidden items-center space-x-8 md:flex">
-            {navItemsLink.map((item) => (
-              <li key={item.name}>
-                <NavLink
-                  to={item.href}
-                  className={({ isActive }) =>
-                    `block text-base font-bold p-2 ${
-                      isActive
-                        ? "text-red-600"
-                        : "text-blue-500 hover:text-red-600"
-                    }`
-                  }
-                >
-                  {item.name}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+          {!hasToken && (
+            <ul className="hidden items-center space-x-8 md:flex">
+              {navItemsLink.map((item) => (
+                <li key={item.name}>
+                  <NavLink
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `block text-base font-bold p-2 ${
+                        isActive
+                          ? "text-red-600"
+                          : "text-blue-500 hover:text-red-600"
+                      }`
+                    }
+                  >
+                    {item.name}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-6">
-            <button className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
-            onClick={() => navigate("/registerForm")}
-            >
-              Đăng ký học
-            </button>
-            {/* <a
-              onClick={() => navigate("/login")}
-              className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
-            >
-              <span>Đăng nhập</span>
-              <div className="relative">
-                <CgLogOut className="absolute right-[-8px] top-[-5px]" />
-              </div>
-            </a> */}
             {hasToken ? (
-        <>
-          {/* Nếu bạn muốn hiển thị thêm tên học viên, cần fetch thêm info user */}
-          <div
-            className="flex items-center space-x-1 text-md font-bold "
-          >
-            <span className="text-red-600">Xin chào, {fullName}</span>
-            <button className="hover:text-red-800 ml-2" 
-                        onClick={handleLogout}
-            ><FiLogOut className="cursor-pointer text-lg text-blue-500 hover:text-red-600" /></button>
-          </div>
-        </>
-      ) : (
-        <>
-          <a
-            onClick={() => navigate("/login")}
-            className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
-          >
-            <span>Đăng nhập</span>
-            <div className="relative">
-              <CgLogOut className="absolute right-[-8px] top-[-5px]" />
-            </div>
-          </a>
-        </>
-      )}
+              <>
+                <div className="flex items-center space-x-1 text-md font-bold py-2 ">
+                  <span className="text-red-600">Xin chào, {fullName}</span>
+                  <button
+                    className="hover:text-red-800 ml-2"
+                    onClick={handleLogout}
+                  >
+                    <FiLogOut className="cursor-pointer text-lg text-blue-500 hover:text-red-600" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
+                  onClick={() => navigate("/registerForm")}
+                >
+                  Đăng ký học
+                </button>
+
+                <a
+                  onClick={() => navigate("/login")}
+                  className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
+                >
+                  <span>Đăng nhập</span>
+                  <div className="relative">
+                    <CgLogOut className="absolute right-[-8px] top-[-5px]" />
+                  </div>
+                </a>
+              </>
+            )}
           </div>
         </nav>
 
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden px-4 pb-4 text-center ">
             <ul className="space-y-2">
@@ -150,9 +157,7 @@ const Header = () => {
               ))}
             </ul>
             <div className="mt-4 space-y-2">
-              <button 
-              className="w-full rounded-full bg-red-600 px-5 py-2 text-md font-bold text-white shadow-sm transition hover:bg-red-700"
-              >
+              <button className="w-full rounded-full bg-red-600 px-5 py-2 text-md font-bold text-white shadow-sm transition hover:bg-red-700">
                 Đăng ký học
               </button>
               <button

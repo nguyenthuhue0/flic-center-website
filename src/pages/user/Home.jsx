@@ -13,10 +13,7 @@ const Home = () => {
    const fetchCourse = async () => {
       let courses = await getCourse();
       setDataCourse(courses);
-      console.log("courses", courses);
    }
-   console.log("dataCourse", dataCourse);
-
    return (
       <div className="bg-white">
          {/* Section 1: Banner */}

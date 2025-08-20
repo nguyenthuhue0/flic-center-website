@@ -7,6 +7,7 @@ export const breadcrumbNameMap = {
   "/news": "Tin tức",
   "/course": "Các khoá học",
   "/coursedetail": "Chi tiết khóa học",
+  "/registerForm": "Đăng kí khóa học"
 };
 
 export const navItemsLink = [
