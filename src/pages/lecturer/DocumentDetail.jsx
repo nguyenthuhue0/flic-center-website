@@ -1,15 +1,71 @@
 "use client";
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FileText, Download, Eye, Calendar, Pencil } from "lucide-react";
 import { Book, Presentation, ClipboardList } from "lucide-react";
+import { getLessonMaterials } from "../../services/lecturer/DocumentApi";
 
 const DocumentDetail = () => {
-  const [activeSemester, setActiveSemester] = useState("01");
-  const [sortField, setSortField] = useState("updateDate");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortField, setSortField] = useState("uploadedAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [materials, setMaterials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { courseId } = useParams();
+  const location = useLocation();
+  const courseTitle = location.state?.courseTitle || "Khóa học";
+
+  // Fetch materials from API
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      if (!courseId) {
+        setError("Course ID không hợp lệ");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await getLessonMaterials(courseId);
+        console.log('DocumentDetail - API response:', response);
+        
+        // Xử lý response data
+        let materialsData = [];
+        if (Array.isArray(response)) {
+          materialsData = response;
+        } else if (response && Array.isArray(response.value)) {
+          materialsData = response.value;
+        } else if (response && Array.isArray(response.data)) {
+          materialsData = response.data;
+        }
+
+        // Transform API data to match actual response structure
+        const transformedMaterials = materialsData.map((item, index) => ({
+          id: item.id || index,
+          courseId: item.courseId || courseId,
+          title: item.title || `Tài liệu ${index + 1}`,
+          fileUrl: item.fileUrl || "",
+          type: item.type || "Tài liệu",
+          uploadedAt: item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString('vi-VN') : null,
+          // Helper fields for UI
+          size: item.size || "N/A",
+          status: item.fileUrl ? "Có sẵn" : "Chưa upload" 
+        }));
+
+        setMaterials(transformedMaterials);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching materials:', err);
+        setError("Không thể tải dữ liệu tài liệu");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMaterials();
+  }, [courseId]);
 
   const semesterData = {
     "01": [
@@ -200,14 +256,17 @@ const DocumentDetail = () => {
     // Implement preview logic here
   };
 
-  const currentData = semesterData[activeSemester] || [];
+  // Sử dụng tất cả dữ liệu từ API (không lọc theo semester)
+  const currentData = materials;
 
   // Sắp xếp dữ liệu
   const sortedData = [...currentData].sort((a, b) => {
     let valA = a[sortField];
     let valB = b[sortField];
 
-    if (sortField === "updateDate") {
+    // Xử lý date fields
+    if (sortField === "uploadedAt") {
+      if (!valA || !valB) return 0;
       const [dA, mA, yA] = valA.split("/");
       const [dB, mB, yB] = valB.split("/");
       valA = new Date(`${yA}-${mA}-${dA}`);
@@ -215,12 +274,23 @@ const DocumentDetail = () => {
       return sortOrder === "asc" ? valA - valB : valB - valA;
     }
 
+    // Xử lý size field
     if (sortField === "size") {
-      valA = parseFloat(valA.replace(" MB", ""));
-      valB = parseFloat(valB.replace(" MB", ""));
+      if (valA === "N/A") valA = 0;
+      if (valB === "N/A") valB = 0;
+      valA = parseFloat(valA.toString().replace(" MB", "")) || 0;
+      valB = parseFloat(valB.toString().replace(" MB", "")) || 0;
       return sortOrder === "asc" ? valA - valB : valB - valA;
     }
 
+    // Xử lý numeric fields
+    if (sortField === "id" || sortField === "courseId") {
+      valA = parseInt(valA) || 0;
+      valB = parseInt(valB) || 0;
+      return sortOrder === "asc" ? valA - valB : valB - valA;
+    }
+
+    // Xử lý text fields
     if (
       sortField === "title" ||
       sortField === "type" ||
@@ -234,6 +304,35 @@ const DocumentDetail = () => {
     return 0;
   });
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải tài liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-xl mb-4">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // UI
   return (
     <div className="min-h-screen bg-gray-50">
@@ -245,28 +344,11 @@ const DocumentDetail = () => {
             {/* Page Title */}
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-red-600 text-center mb-2">
-                LẬP TRÌNH C++ - TS. HUỲNH NGỌC THỌ
+                {courseTitle.toUpperCase()}
               </h1>
             </div>
 
-            {/* Semester Tabs */}
-            <div className="flex justify-center mb-8">
-              <div className="bg-slate-800 rounded-full p-2 inline-flex">
-                {["01", "02", "03", "04"].map((semester) => (
-                  <button
-                    key={semester}
-                    onClick={() => setActiveSemester(semester)}
-                    className={`px-6 py-3 rounded-full font-medium transition-colors ${
-                      activeSemester === semester
-                        ? "bg-orange-500 text-white"
-                        : "text-white hover:bg-slate-700"
-                    }`}
-                  >
-                    Khóa {semester}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             {/* Materials Table */}
             <div className="bg-white rounded-lg shadow-sm border-2 border-blue-200">
@@ -326,19 +408,19 @@ const DocumentDetail = () => {
                         <button
                           className="flex items-center gap-1"
                           onClick={() => {
-                            if (sortField === "updateDate") {
+                            if (sortField === "uploadedAt") {
                               setSortOrder(
                                 sortOrder === "asc" ? "desc" : "asc"
                               );
                             } else {
-                              setSortField("updateDate");
+                              setSortField("uploadedAt");
                               setSortOrder("asc");
                             }
                           }}
                         >
-                          Ngày cập nhật
+                          Ngày upload
                           <span>
-                            {sortField === "updateDate"
+                            {sortField === "uploadedAt"
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
@@ -350,19 +432,19 @@ const DocumentDetail = () => {
                         <button
                           className="flex items-center gap-1"
                           onClick={() => {
-                            if (sortField === "size") {
+                            if (sortField === "fileUrl") {
                               setSortOrder(
                                 sortOrder === "asc" ? "desc" : "asc"
                               );
                             } else {
-                              setSortField("size");
+                              setSortField("fileUrl");
                               setSortOrder("asc");
                             }
                           }}
                         >
-                          Kích thước
+                          File URL
                           <span>
-                            {sortField === "size"
+                            {sortField === "fileUrl"
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
@@ -416,20 +498,22 @@ const DocumentDetail = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
-                            {/* <FileText className="w-4 h-4 text-gray-400" /> */}
                             <span className="text-sm font-medium text-gray-900">
                               {item.title}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="px-4 flex items-center space-x-2 text-sm text-gray-500">
-                            {/* <Calendar className="w-4 h-4" /> */}
-                            <span>{item.updateDate}</span>
+                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <span>{item.uploadedAt || "Chưa upload"}</span>
                           </div>
                         </td>
-                        <td className="px-9 py-0 text-sm text-gray-500">
-                          {item.size}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-2 text-sm text-gray-500 max-w-xs">
+                            <span className="truncate" title={item.fileUrl}>
+                              {item.fileUrl || "Chưa có file"}
+                            </span>
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <span
@@ -482,43 +566,27 @@ const DocumentDetail = () => {
                         </td> */}
                         <td className="px-6 py-4">
   <div className="flex items-center space-x-2">
-    {item.type === "Google Meet" ? (
+    {item.fileUrl ? (
       <>
         <a
-          href={item.link}
+          href={item.fileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition-colors"
-          title="Tham gia Google Meet"
+          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          title="Xem tài liệu"
         >
           <Eye className="w-4 h-4" />
         </a>
-        <button
-          onClick={() => navigate(`/materials-edit/${item.id}`)}
-          className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-          title="Chỉnh sửa Google Meet"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-      </>
-    ) : item.status === "Có sẵn" ? (
-      <>
-        <button
-          onClick={() => handlePreview(item.id, item.title)}
-          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Xem trước"
-        >
-          <Eye className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => handleDownload(item.id, item.title)}
+        <a
+          href={item.fileUrl}
+          download
           className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
           title="Tải xuống"
         >
           <Download className="w-4 h-4" />
-        </button>
+        </a>
         <button
-          onClick={() => navigate(`/materials-edit/${item.id}`)}
+          onClick={() => navigate(`/lecturer/materials-edit/${item.id}`)}
           className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
           title="Chỉnh sửa"
         >
@@ -526,11 +594,9 @@ const DocumentDetail = () => {
         </button>
       </>
     ) : (
-      item.status === "Đang cập nhật" && (
-        <span className="text-xs text-gray-400 italic">
-          Chưa có sẵn
-        </span>
-      )
+      <span className="text-xs text-gray-400 italic">
+        Chưa upload file
+      </span>
     )}
   </div>
 </td>
@@ -548,20 +614,18 @@ const DocumentDetail = () => {
                   <span className="font-medium">{currentData.length}</span> tài
                   liệu
                   {" • "}
-                  Có sẵn:{" "}
+                  Có file:{" "}
                   <span className="font-medium text-green-600">
                     {
-                      currentData.filter((item) => item.status === "Có sẵn")
+                      currentData.filter((item) => item.fileUrl)
                         .length
                     }
                   </span>
                   {" • "}
-                  Đang cập nhật:{" "}
+                  Chưa upload:{" "}
                   <span className="font-medium text-orange-600">
                     {
-                      currentData.filter(
-                        (item) => item.status === "Đang cập nhật"
-                      ).length
+                      currentData.filter((item) => !item.fileUrl).length
                     }
                   </span>
                 </div>
@@ -583,7 +647,7 @@ const DocumentDetail = () => {
                 <div className="text-center text-gray-500">
                   <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                   <p className="text-lg font-medium mb-2">Chưa có tài liệu</p>
-                  <p>Không có tài liệu nào cho Semester {activeSemester}</p>
+                  <p>Chưa có tài liệu nào trong khóa học này</p>
                 </div>
               </div>
             )}
