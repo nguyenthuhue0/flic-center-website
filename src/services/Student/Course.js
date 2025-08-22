@@ -21,11 +21,15 @@ const getDocumentByCourseId = (courseId) => {
 const getAllCourse = () => {
     return axios.get(`/course`)
 }
+const getAllProgress = () => {
+    return axios.get(`/courses/progress`)
+}
 export {
     getCourseById,
     getLessonByCourseId,
     getAssignmentByLessonId,
     getCourseByUserRegistered,
     getDocumentByCourseId,
-    getAllCourse
+    getAllCourse,
+    getAllProgress
 }

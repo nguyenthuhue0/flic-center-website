@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import { IoBookmarksSharp } from "react-icons/io5";
 import { FaThLarge, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getCourseByUserRegistered } from "../../services/Student/Course";
+import {
+  getAllProgress,
+  getCourseByUserRegistered,
+} from "../../services/Student/Course";
 
 const CourseCard = ({ course, displayMode }) => {
   const navigate = useNavigate();
@@ -103,6 +106,7 @@ export default function StudentCourse() {
   const [courses, setCourses] = useState([]);
   const [tab, setTab] = useState("registered");
   const [displayMode, setDisplayMode] = useState("grid");
+  const [courseProgress, setCourseProgress] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -115,10 +119,40 @@ export default function StudentCourse() {
     })();
   }, []);
 
+  useEffect(() => {
+    getProgress();
+  }, []);
+
+  const getProgress = async () => {
+    try {
+      let data = await getAllProgress();
+      if (data) setCourseProgress(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // merge khi cả courses và courseProgress thay đổi
+  const mergedCourses = useMemo(() => {
+    return courses.map((course) => {
+      const enrollment = courseProgress.find(
+        (e) => e.courseId === course.courseDetail.id
+      );
+      return {
+        ...course,
+        progress: enrollment ? enrollment.progressPercent : course.progress,
+      };
+    });
+  }, [courses, courseProgress]);
+
+  useEffect(() => {
+    console.log("c", mergedCourses);
+  }, [mergedCourses]);
+
   const displayedCourses =
     tab === "registered"
-      ? courses.filter((c) => c.progress < 100)
-      : courses.filter((c) => c.progress === 100);
+      ? mergedCourses.filter((c) => c.progress < 100)
+      : mergedCourses.filter((c) => c.progress === 100);
 
   return (
     <div className="p-4 pr-6">
