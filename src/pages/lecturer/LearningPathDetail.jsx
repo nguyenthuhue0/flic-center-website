@@ -1,128 +1,177 @@
-import React, { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { PlusCircle, Trash2 } from "lucide-react";
+import { useParams } from "react-router-dom";
+import lessonAPI from "../../services/Lecturer/Lesson";
 
-const ToeicScheduleEditor = () => {
-    const [schedule, setSchedule] = useState([
-        {
-            sessions: [
-                "Hiện tại hoàn thành",
-                "Hiện tại hoàn thành tiếp diễn",
-                "Ôn tập – Làm bài tập tổng hợp buổi 1+2",
-                "Quá khứ hoàn thành",
-                "Quá khứ hoàn thành tiếp diễn",
-                "Ôn tập – Làm bài tập tổng hợp buổi 4+5"
-            ]
-        },
-        {
-            sessions: [
-                "Tương lai hoàn thành",
-                "Tương lai hoàn thành tiếp diễn",
-                "Ôn tập – Làm bài tập tổng hợp buổi 1+2",
-                "Tổng ôn 12 thì",
-                "Sự phối hợp các thì",
-                "Ôn tập – Làm bài tập tổng hợp buổi 4+5"
-            ]
+export default function StudyPlan() {
+    const { courseId } = useParams();
+    const [weeks, setWeeks] = useState([]);
+
+
+    const addSession = (weekId) => {
+        setWeeks((prevWeeks) =>
+            prevWeeks.map((week) =>
+                week.id === weekId
+                    ? {
+                        ...week,
+                        sessions: [
+                            ...week.sessions,
+                            {
+                                id: week.sessions.length + 1,
+                                title: "",
+                                description: "",
+                                startTime: "",
+                                weekIndex: "",
+                                plannedAt: "",
+                                endTime: "",
+                            },
+                        ],
+                    }
+                    : week
+            )
+        );
+    };
+
+
+    const addWeek = async () => {
+        const newWeekIndex = weeks.length > 0 ? weeks[weeks.length - 1].week_index + 1 : 1;
+
+        try {
+            const response = await lessonAPI.create({
+                course_id: courseId,
+                week_index: newWeekIndex,
+                title: `Week ${newWeekIndex}`,
+                description: "",
+                plannedAt: "",
+                endTime: "",
+            });
+
+            const newWeek = {
+                id: response.data.id, week_index: newWeekIndex, sessions: [],
+                title: `Tuần ${newWeekIndex}`, description: "", plannedAt: "", endTime: ""
+            };
+            setWeeks(prev => [...prev, newWeek]);
+        } catch (error) {
+            console.error("Error adding week:", error);
         }
-    ]);
-
-    const [editingCell, setEditingCell] = useState(null);
-    const [editValue, setEditValue] = useState("");
-
-    const handleEdit = (weekIndex, sessionIndex, currentValue) => {
-        setEditingCell({ week: weekIndex, session: sessionIndex });
-        setEditValue(currentValue);
     };
 
-    const handleSave = (weekIndex, sessionIndex) => {
-        const updated = [...schedule];
-        updated[weekIndex].sessions[sessionIndex] = editValue;
-        setSchedule(updated);
-        setEditingCell(null);
-    };
 
-    const handleDeleteWeek = (weekIndex) => {
-        const updated = [...schedule];
-        updated.splice(weekIndex, 1);
-        setSchedule(updated);
-    };
 
-    const handleAddWeek = () => {
-        const newWeek = {
-            sessions: ["", "", "", "", "", ""]
-        };
-        setSchedule([...schedule, newWeek]);
-    };
+    useEffect(() => {
+        if (!courseId) return;
+        const token = sessionStorage.getItem("access_token");
+        if (!token) {
+            console.error("❌ Không tìm thấy token trong localStorage");
+            return;
+        }
+
+        axios
+            .get(`http://localhost:8080/api/lesson?courseId=${courseId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+                const apiData = res.data;
+
+                // Nhóm theo weekIndex
+                const grouped = apiData.reduce((acc, item) => {
+                    const weekIndex = item.weekIndex || 1;
+                    if (!acc[weekIndex]) {
+                        acc[weekIndex] = {
+                            id: weekIndex,
+                            sessions: [],
+                        };
+                    }
+                    acc[weekIndex].sessions.push({
+                        id: acc[weekIndex].sessions.length + 1,
+                        title: item.title || "",
+                        detail: item.description || "",
+                        startTime: item.plannedAt || "",
+                        endTime: item.endTime || "",
+                    });
+                    return acc;
+                }, {});
+
+                setWeeks(Object.values(grouped));
+            })
+            .catch((err) => {
+                console.error("❌ Lỗi khi load lessons:", err);
+            });
+    }, [courseId]);
+
+    // giữ nguyên các hàm thêm/xóa/ghi đè tuần và session của bạn
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4 text-blue-600">LỘ TRÌNH HỌC TẬP - TOEIC 750+</h2>
-            <table className="w-full border-collapse">
+        <div className="p-6">
+            <h1 className="text-red-600 text-2xl font-bold">LẬP TRÌNH JAVA</h1>
+
+            <table className="w-full border border-gray-400 text-sm">
                 <thead>
-                    <tr className="bg-pink-200">
-                        <th className="border p-2">Tuần</th>
-                        <th className="border p-2">Buổi 1</th>
-                        <th className="border p-2">Buổi 2</th>
-                        <th className="border p-2">Buổi 3</th>
-                        <th className="border p-2">Buổi 4</th>
-                        <th className="border p-2">Buổi 5</th>
-                        <th className="border p-2">Buổi 6</th>
-                        <th className="border p-2">Thao tác</th>
+                    <tr className="bg-gray-100">
+                        <th className="border border-gray-400 p-2">Tuần</th>
+                        <th className="border border-gray-400 p-2">Buổi</th>
+                        <th className="border border-gray-400 p-2">Nội dung</th>
+                        <th className="border border-gray-400 p-2">Bắt đầu</th>
+                        <th className="border border-gray-400 p-2">Kết thúc</th>
+                        <th className="border border-gray-400 p-2">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {schedule.map((week, weekIndex) => (
-                        <tr key={weekIndex}>
-                            <td className="bg-pink-100 font-bold text-center">{weekIndex + 1}</td>
-                            {week.sessions.map((session, sessionIndex) => (
-                                <td key={sessionIndex} className="p-2 border">
-                                    {editingCell &&
-                                        editingCell.week === weekIndex &&
-                                        editingCell.session === sessionIndex ? (
-                                        <input
-                                            value={editValue}
-                                            onChange={(e) => setEditValue(e.target.value)}
-                                            onBlur={() => handleSave(weekIndex, sessionIndex)}
-                                            autoFocus
-                                            className="w-full p-1 border border-blue-300"
-                                        />
-                                    ) : (
-                                        <div
-                                            className="cursor-pointer hover:bg-yellow-100"
-                                            onClick={() => handleEdit(weekIndex, sessionIndex, session)}
-                                        >
-                                            {session || <span className="text-gray-400 italic">(trống)</span>}
-                                        </div>
-                                    )}
-                                </td>
-                            ))}
-                            <td className="text-center space-x-2">
-                                <button
-                                    onClick={() => handleEdit(weekIndex, 0, week.sessions[0])}
-                                    className="text-yellow-500 hover:text-yellow-700 text-lg"
-                                    title="Sửa buổi 1"
-                                >
-                                    <FaEdit />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteWeek(weekIndex)}
-                                    className="text-red-500 hover:text-red-700 text-lg"
-                                    title="Xoá tuần"
-                                >
-                                    <FaTrash />
-                                </button>
+                    {weeks.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" className="text-center p-4 text-gray-500">
+                                Chưa có dữ liệu
                             </td>
                         </tr>
-                    ))}
+                    ) : (
+                        weeks.map((week) =>
+                            week.sessions.map((session, idx) => (
+                                <tr key={`${week.id}-${session.id}`}>
+                                    {idx === 0 && (
+                                        <td
+                                            className="border border-gray-400 text-center align-middle"
+                                            rowSpan={week.sessions.length}
+                                        >
+                                            {week.id}
+                                        </td>
+                                    )}
+
+                                    <td className="border border-gray-400 text-center">{session.id}</td>
+
+                                    <td className="border border-gray-400 p-2">
+                                        {session.title} - {session.detail}
+                                    </td>
+
+                                    <td className="border border-gray-400 text-center">{session.startTime}</td>
+
+                                    <td className="border border-gray-400 text-center">{session.endTime}</td>
+
+                                    <td className="border border-gray-400 text-center">
+                                        <button className="text-green-600">
+                                            <PlusCircle size={18} />
+                                        </button>
+                                        <button className="text-red-600 ml-2">
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )
+                    )}
                 </tbody>
             </table>
             <button
-                onClick={handleAddWeek}
-                className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+                onClick={addWeek}
+                className="mt-4 bg-green-600 text-white px-4 py-2 rounded"
             >
                 Thêm tuần mới
             </button>
         </div>
     );
-};
+}
 
-export default ToeicScheduleEditor;
+
+
+
+
