@@ -77,7 +77,8 @@ const Layout = () => {
           <Route path="feedback" element={<FeedbackStudent />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="course" element={<Course />} />
-          <Route path="coursedetail" element={<CourseDetail />} />
+          <Route path="course/:id" element={<CourseDetail />} />
+
           <Route path="scheduleGrid" element={<ScheduleGrid />} />
           <Route path="news" element={<News />} />
           <Route path="news/:id" element={<NewsDetail />} />

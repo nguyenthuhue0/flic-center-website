@@ -23,9 +23,6 @@ export default function App() {
     }
   };
 
-  const handleDetailClick = (course) => {
-    navigate("/coursedetail", { state: { course } });
-  };
 
   const colors = [
     "bg-purple-300",
@@ -100,12 +97,12 @@ export default function App() {
                           {course.start_month || "Đang cập nhật"}
                         </span>
                       </div>
-                      <button
-                        onClick={() => handleDetailClick(course)}
-                        className="bg-yellow-300 text-xs text-blue-500 px-4 py-1 rounded-full hover:bg-yellow-400 transition-all font-bold"
-                      >
-                        Chi tiết →
-                      </button>
+                     <button
+        onClick={() => navigate(`/course/${course.id}`, { state: { course } })}
+        className="bg-yellow-300 text-xs text-blue-600 px-4 py-1 rounded-full hover:bg-yellow-400 transition font-bold mt-3"
+      >
+        Chi tiết →
+      </button>
                     </div>
                   </div>
                 </div>

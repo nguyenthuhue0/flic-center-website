@@ -1,68 +1,213 @@
-import React, { useState } from "react";
+// src/pages/lecturer/Attendance.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
+import { useLocation } from "react-router-dom";
+import { getLessonAttendance, saveLessonAttendance } from "../../services/lecturer/attendance.js";
+import { getLessonById } from "../../services/lecturer/lessons.js"; // <-- dùng để backfill meta
 
-const attendanceStates = [
-  { label: "Có mặt", color: "bg-green-500" },
-  { label: "Vắng", color: "bg-red-500" },
-  { label: "Đi trễ", color: "bg-yellow-500" },
+// Map trạng thái hiển thị <-> giá trị server
+const ATT_STATES = [
+  { ui: "Có mặt",  server: "present", color: "bg-green-500" },
+  { ui: "Vắng",    server: "absent",  color: "bg-red-500" },
+  { ui: "Đi trễ",  server: "late",    color: "bg-yellow-500" },
 ];
 
-const initialStudents = [
-  { id: 1, name: "Nguyễn Văn A", dob: "05/07/2004", stateIndex: 0, note: "" },
-  { id: 2, name: "Nguyễn Văn B", dob: "15/11/2004", stateIndex: 0, note: "" },
-  { id: 3, name: "Nguyễn Văn C", dob: "20/02/2004", stateIndex: 0, note: "" },
-  { id: 4, name: "Nguyễn Văn D", dob: "10/07/2004", stateIndex: 0, note: "" },
-  { id: 5, name: "Nguyễn Văn E", dob: "27/02/2004", stateIndex: 0, note: "" },
-  { id: 6, name: "Nguyễn Văn F", dob: "18/07/2004", stateIndex: 0, note: "" },
-  { id: 7, name: "Nguyễn Văn G", dob: "09/12/2004", stateIndex: 0, note: "" },
-  { id: 8, name: "Nguyễn Văn H", dob: "17/08/2004", stateIndex: 0, note: "" },
-  { id: 9, name: "Nguyễn Văn I", dob: "01/03/2004", stateIndex: 0, note: "" },
-  { id: 10, name: "Nguyễn Văn J", dob: "22/12/2004", stateIndex: 0, note: "" }
-];
+function stateIndexFromServer(val = "present") {
+  const i = ATT_STATES.findIndex((s) => s.server === val);
+  return i >= 0 ? i : 0;
+}
+function serverFromIndex(i = 0) {
+  return ATT_STATES[i]?.server ?? "present";
+}
+
+function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
+// format linh hoạt: HH:mm hoặc ISO -> "DD/MM/YYYY HH:mm"
+function fmtTime(raw) {
+  if (!raw) return "";
+  const s = String(raw);
+  if (s.length <= 5) return s; // "HH:mm" thì giữ nguyên
+  const iso = dayjs(s);
+  if (iso.isValid()) return iso.format("DD/MM/YYYY HH:mm");
+  const m2 = dayjs(s, "YYYY-MM-DD HH:mm:ss", true);
+  return m2.isValid() ? m2.format("DD/MM/YYYY HH:mm") : s;
+}
 
 export default function Attendance() {
-  const [students, setStudents] = useState(initialStudents);
+  const query = useQuery();
+
+  // URL params
+  const lessonId   = query.get("lessonId");
+  const queryTitle = query.get("title") || query.get("lessonTitle") || "";
+  const queryStart = query.get("start") || query.get("startTime") || query.get("plannedAt") || "";
+  const queryEnd   = query.get("end")   || query.get("endTime")   || "";
+
+  // Header info
+  const [lessonTitle, setLessonTitle] = useState(queryTitle);
+  const [startTime, setStartTime]     = useState(queryStart);
+  const [endTime, setEndTime]         = useState(queryEnd);
+
+  // Data
+  const [students, setStudents] = useState([]); // {id, name, dob, stateIndex, note}
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [savedMsg, setSavedMsg] = useState("");
   const [showSummary, setShowSummary] = useState(false);
 
+  // Tải danh sách điểm danh
+  useEffect(() => {
+    if (!lessonId) {
+      setErr("Thiếu lessonId trên URL.");
+      return;
+    }
+    (async () => {
+      try {
+        setLoading(true);
+        setErr(""); 
+        setSavedMsg("");
+
+        const payload = await getLessonAttendance(lessonId);
+
+        // Hậu thuẫn cả 2 kiểu trả về: mảng thuần hoặc { data: [...], ...meta }
+        let list = [];
+        if (Array.isArray(payload)) {
+          list = payload;
+        } else if (Array.isArray(payload?.data)) {
+          list = payload.data;
+
+          // Nếu BE có kèm meta thì lấy
+          if (payload.lessonTitle || payload.title) {
+            setLessonTitle((prev) => prev || payload.lessonTitle || payload.title);
+          }
+          if (payload.startTime || payload.plannedAt || payload.start) {
+            setStartTime((prev) => prev || payload.startTime || payload.plannedAt || payload.start);
+          }
+          if (payload.endTime || payload.end) {
+            setEndTime((prev) => prev || payload.endTime || payload.end);
+          }
+        }
+
+        const mapped = list.map((stu, idx) => ({
+          id: idx + 1,
+          name: stu.fullName || "—",
+          dob: stu.birthDate ? dayjs(stu.birthDate).format("DD/MM/YYYY") : "—",
+          rawDobISO: stu.birthDate || null,
+          stateIndex: stateIndexFromServer(stu.status),
+          note: "",
+        }));
+        setStudents(mapped);
+      } catch (e) {
+        setErr(e?.response?.data?.message || e?.message || "Không tải được danh sách điểm danh.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [lessonId]);
+
+  // Backfill meta (title/time) theo lessonId nếu chưa có trên URL/payload
+  useEffect(() => {
+    if (!lessonId) return;
+    if (lessonTitle && (startTime || endTime)) return; // đã đủ thông tin
+
+    (async () => {
+      try {
+        const meta = await getLessonById(lessonId); // { id, title, plannedAt, endTime, ... }
+        if (meta?.title)     setLessonTitle((prev) => prev || meta.title);
+        if (meta?.plannedAt) setStartTime((prev) => prev || meta.plannedAt);
+        if (meta?.startTime) setStartTime((prev) => prev || meta.startTime);
+        if (meta?.endTime)   setEndTime((prev) => prev || meta.endTime);
+      } catch {
+        // ignore nếu không có API
+      }
+    })();
+  }, [lessonId, lessonTitle, startTime, endTime]);
+
   const toggleState = (index) => {
-    const updated = [...students];
-    updated[index].stateIndex =
-      (updated[index].stateIndex + 1) % attendanceStates.length;
-    setStudents(updated);
+    setStudents((prev) => {
+      const next = [...prev];
+      next[index].stateIndex = (next[index].stateIndex + 1) % ATT_STATES.length;
+      return next;
+    });
   };
 
   const handleNoteChange = (index, value) => {
-    const updated = [...students];
-    updated[index].note = value;
-    setStudents(updated);
+    setStudents((prev) => {
+      const next = [...prev];
+      next[index].note = value;
+      return next;
+    });
   };
 
-  const confirmAttendance = () => {
-    setShowSummary(true);
+  const confirmAttendance = async () => {
+    try {
+      setSavedMsg("");
+      setErr("");
+      setLoading(true);
+
+      const updates = students.map((s) => ({
+        fullName: s.name,
+        birthDate: s.rawDobISO, // null hoặc 'YYYY-MM-DD'
+        status: serverFromIndex(s.stateIndex),
+        note: s.note || null,
+      }));
+
+      const res = await saveLessonAttendance(lessonId, updates);
+      setSavedMsg(res?.message || "Đã lưu điểm danh thành công ✅");
+      setShowSummary(true);
+    } catch (e) {
+      setErr(e?.response?.data?.message || e?.message || "Lưu điểm danh thất bại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Đếm số lượng theo từng trạng thái
-  const summary = students.reduce(
-    (acc, student) => {
-      const label = attendanceStates[student.stateIndex].label;
-      acc[label] = (acc[label] || 0) + 1;
+  // summary
+  const total = students.length || 1;
+  const counts = students.reduce(
+    (acc, s) => {
+      const key = ATT_STATES[s.stateIndex].ui;
+      acc[key] = (acc[key] || 0) + 1;
       return acc;
     },
-    {
-      "Có mặt": 0,
-      "Vắng": 0,
-      "Đi trễ": 0,
-    }
+    { "Có mặt": 0, "Vắng": 0, "Đi trễ": 0 }
   );
+  const pct = (n) => Math.round((n * 100) / total);
+
+  const timeLabel =
+    startTime || endTime
+      ? `${fmtTime(startTime)}${startTime && endTime ? " - " : ""}${fmtTime(endTime)}`
+      : "—";
 
   return (
     <div className="p-4 font-sans bg-white min-h-screen">
-      <div className="border border-[#EFE4E5]  p-4">
+      {/* HEADER: Tên buổi, ID, thời gian */}
+      <div className="border border-[#EFE4E5] p-4">
         <div className="font-bold text-[16px]">
-          Danh sách học viên khóa lập trình java - Giảng viên Nguyễn Văn A
+          Buổi học: {lessonTitle || "(chưa có tiêu đề)"}
         </div>
-        <div className="text-sm font-semibold text-gray-600 mt-1">Học viên: {students.length}</div>
+        <div className="text-sm font-semibold text-gray-600 mt-1 flex flex-wrap gap-x-6 gap-y-1">
+          <span>Lesson ID: <span className="font-bold text-gray-800">{lessonId}</span></span>
+          <span>Thời gian: <span className="font-bold text-gray-800">{timeLabel}</span></span>
+          <span>Học viên: <span className="font-bold text-gray-800">{students.length}</span></span>
+        </div>
       </div>
 
+      {loading && <div className="mt-4 bg-white border rounded p-3">Đang tải...</div>}
+      {err && (
+        <div className="mt-4 bg-red-50 text-red-700 border border-red-200 rounded p-3">
+          {err}
+        </div>
+      )}
+      {savedMsg && (
+        <div className="mt-4 bg-green-50 text-green-700 border border-green-200 rounded p-3">
+          {savedMsg}
+        </div>
+      )}
+
+      {/* Bảng học viên */}
       <div className="border border-[#EFE4E5] overflow-x-auto mt-4">
         <table className="w-full border-collapse">
           <thead>
@@ -75,31 +220,29 @@ export default function Attendance() {
             </tr>
           </thead>
           <tbody>
-            {students.map((student, index) => {
-              const state = attendanceStates[student.stateIndex];
+            {students.map((s, idx) => {
+              const state = ATT_STATES[s.stateIndex];
               return (
-                <tr key={student.id} className="border-b border-[#EFE4E5] hover:bg-gray-50 transition-colors">
-                  <td className="p-2 font-semibold">{index + 1}</td>
-                  <td className="p-2 font-semibold">{student.name}</td>
-                  <td className="p-2 font-semibold">{student.dob}</td>
+                <tr key={s.id} className="border-b border-[#EFE4E5] hover:bg-gray-50">
+                  <td className="p-2 font-semibold">{idx + 1}</td>
+                  <td className="p-2 font-semibold">{s.name}</td>
+                  <td className="p-2 font-semibold">{s.dob}</td>
                   <td className="p-2 font-semibold">
                     <button
-                      onClick={() => toggleState(index)}
-                      className={`transition-all duration-300 text-white px-4 py-1 rounded border-2 w-[90px] text-center font-semibold ${state.color} border-transparent hover:scale-105`}
+                      onClick={() => toggleState(idx)}
+                      className={`transition-all duration-200 text-white px-4 py-1 rounded border-2 w-[100px] text-center font-semibold ${state.color} border-transparent hover:scale-105`}
                     >
-                      {state.label}
+                      {state.ui}
                     </button>
-
                   </td>
                   <td className="p-2">
                     <input
                       type="text"
-                      className="border border-gray-300 rounded-lg px-3 py-1 w-[120px] focus:outline-none focus:ring-2 focus:ring-red-400"
+                      className="border border-gray-300 rounded-lg px-3 py-1 w-[160px] focus:outline-none focus:ring-2 focus:ring-red-400"
                       placeholder="Ghi chú"
-                      value={student.note}
-                      onChange={(e) => handleNoteChange(index, e.target.value)}
+                      value={s.note}
+                      onChange={(e) => handleNoteChange(idx, e.target.value)}
                     />
-
                   </td>
                 </tr>
               );
@@ -108,49 +251,50 @@ export default function Attendance() {
         </table>
       </div>
 
-      <div className="mt-6 flex justify-center">
+      {/* Nút xác nhận */}
+      <div className="mt-6 flex justify-center gap-3">
+        <button
+          onClick={() => setShowSummary(!showSummary)}
+          className="bg-gray-100 text-gray-700 px-5 py-2 rounded-xl font-semibold border hover:bg-gray-200"
+        >
+          {showSummary ? "Ẩn thống kê" : "Xem thống kê"}
+        </button>
         <button
           onClick={confirmAttendance}
-          className="bg-[#E21F22] text-white px-6 py-2 rounded-xl text-base font-semibold shadow-md hover:bg-red-600 transition-all duration-200"
+          className="bg-[#E21F22] text-white px-6 py-2 rounded-xl text-base font-semibold shadow-md hover:bg-red-600"
         >
           ✅ Xác nhận điểm danh
         </button>
       </div>
 
-      {/* Kết quả sau xác nhận */}
+      {/* Thống kê gọn */}
       {showSummary && (
-        <div className="mt-8 flex flex-col md:flex-row gap-6 items-start justify-center">
+        <div className="mt-6 flex justify-center">
+          <div className="p-6 border rounded-xl shadow-md bg-white max-w-xl w-full">
+            <h2 className="font-bold text-lg mb-4 text-[#E21F22]">📊 Thống kê điểm danh</h2>
 
-          {/* BÊN TRÁI: THÔNG TIN BUỔI HỌC */}
-          <div className="bg-white p-6 border rounded-xl shadow-md max-w-md w-full">
-            <h2 className="text-lg font-bold text-[#E21F22] mb-2">📚 Nội dung buổi học</h2>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Buổi học hôm nay bao gồm phần ôn tập kiến thức lập trình hướng đối tượng và thực hành thao tác với mảng, hàm trong Java. Học viên cần chuẩn bị máy tính, tài liệu ghi chép và tham gia đầy đủ.
-            </p>
-          </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-lg border p-3 bg-green-50 text-green-700 font-semibold">
+                Có mặt
+                <div className="text-xl">{counts["Có mặt"]}</div>
+                <div className="text-xs">{pct(counts["Có mặt"])}%</div>
+              </div>
 
-          {/* BÊN PHẢI: THỐNG KÊ */}
-          <div className="p-6 border rounded-xl shadow-md bg-white max-w-md w-full">
-            <h2 className="font-bold text-lg mb-4 flex items-center gap-2 h-[75px] text-[#E21F22]">
-              📊 Thống kê điểm danh
-            </h2>
-            <div className="grid grid-cols-3 gap-4 text-center text-sm font-semibold">
-              <div className="bg-green-100 text-green-700 rounded p-2">
-                Có mặt: <span>{summary["Có mặt"]}</span>
+              <div className="rounded-lg border p-3 bg-yellow-50 text-yellow-700 font-semibold">
+                Đi trễ
+                <div className="text-xl">{counts["Đi trễ"]}</div>
+                <div className="text-xs">{pct(counts["Đi trễ"])}%</div>
               </div>
-              <div className="bg-yellow-100 text-yellow-700 rounded p-2">
-                Đi trễ: <span>{summary["Đi trễ"]}</span>
-              </div>
-              <div className="bg-red-100 text-red-700 rounded p-2">
-                Vắng: <span>{summary["Vắng"]}</span>
+
+              <div className="rounded-lg border p-3 bg-red-50 text-red-700 font-semibold">
+                Vắng
+                <div className="text-xl">{counts["Vắng"]}</div>
+                <div className="text-xs">{pct(counts["Vắng"])}%</div>
               </div>
             </div>
           </div>
-
         </div>
       )}
-
-
     </div>
   );
 }
