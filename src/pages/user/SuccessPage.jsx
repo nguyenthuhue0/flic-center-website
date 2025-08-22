@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SuccessPage() {
+    const navigate = useNavigate()
     useEffect(() => {
         // Tạo canvas pháo bông
         const canvas = document.createElement("canvas");
@@ -80,7 +82,9 @@ export default function SuccessPage() {
                 <h1 className="text-red-600 text-4xl font-bold mb-6">
                     Đăng ký thành công
                 </h1>
-                <button className="bg-red-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition">
+                <button className="bg-red-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-red-700 transition"
+                onClick={() => navigate("/login")}
+                >
                     Tiếp tục
                 </button>
             </div>

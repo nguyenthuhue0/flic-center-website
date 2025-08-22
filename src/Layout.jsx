@@ -54,6 +54,12 @@ import RequireAuth from "./pages/auth/RequireAuth";
 import LecturerInformation from "./pages/lecturer/LecturerInformation";
 import LecturerEditProfile from "./pages/lecturer/LecturerEditProfile";
 import SuccessPage from "./pages/user/SuccessPage";
+import NewManagement from "./pages/admin/NewManagement";
+import AddNew from "./pages/admin/AddNew";
+import NewDetail from "./pages/admin/NewDetail";
+import EditNew from "./pages/admin/EditNew";
+import PaymentManagement from "./pages/admin/PaymentManagement";
+import EditPayment from "./pages/admin/EditPayment";
 const NotFound = () => {
   return (
     <div className="container mt-3 alert alert-danger">404.Not found data</div>
@@ -119,7 +125,7 @@ const Layout = () => {
             <Route path="lecturerManagement" element={<LecturerManagement />} />
             <Route path="addlecturer" element={<AddLecturer />} />
             <Route path="lecturer/:id/edit" element={<EditLecturer />} />
-
+            
             <Route path="courseManagement" element={<CourseManagement />} />
             <Route path="addcourse" element={<AddCourse />} />
             <Route path="courses/:id/edit" element={<EditCourse />} />
@@ -129,6 +135,14 @@ const Layout = () => {
             <Route path="users/:id" element={<StudentDetail />} />
             <Route path="users/:id/edit" element={<EditStudent />} />
             <Route path="lecturer/:id" element={<LecturerDetail />} />
+
+            <Route path="newManagement" element={<NewManagement />} />
+            <Route path="addnew" element={<AddNew />} />
+            <Route path="new/:id" element={<NewDetail />} />
+            <Route path="new/:id/edit" element={<EditNew />} />
+            <Route path="paymentManagement" element={<PaymentManagement />} />
+            <Route path="payment/:id" element={<EditPayment />} />
+
           </Route>
         </Route>
 

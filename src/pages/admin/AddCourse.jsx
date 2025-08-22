@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { createCourse } from "../../services/admin/courses";
 import confetti from "canvas-confetti";
+import { toast } from "react-toastify";
 
 export default function AddCourse() {
   const navigate = useNavigate();
@@ -24,11 +25,16 @@ export default function AddCourse() {
   const inputStyle =
     "w-full border-gray-300 focus:border-indigo-400 focus:ring focus:ring-indigo-100 text-[16px] p-3 rounded-xl shadow-sm transition-all duration-200 outline-none";
 
-  const handleChange = (e) => {
-    setErr("");
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+const handleChange = (e) => {
+  setErr("");
+  const { name, value, files, type } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: type === "file" ? files[0] : value, 
+  }));
+};
+
 
   const normalizePayload = (raw) => ({
     title: raw.title?.trim(),
@@ -37,7 +43,7 @@ export default function AddCourse() {
     price: raw.price === "" ? null : Number(raw.price),
     duration: raw.duration === "" ? null : Number(raw.duration),
     status: raw.status || "active",
-    image: raw.image?.trim() || null,
+       image: raw.image,
     startMonth: raw.startMonth?.trim() || null,
     type: raw.type?.trim() || null
   });
@@ -54,41 +60,6 @@ export default function AddCourse() {
     return "";
   };
 
-  // 🎉 2 “pháo” 2 bên + burst kết thúc
-  const fireConfetti = async () => {
-    const end = Date.now() + 1800; // ~1.8s
-    const defaults = { startVelocity: 28, spread: 360, ticks: 60, zIndex: 9999 };
-
-    const interval = setInterval(() => {
-      // trái
-      confetti({
-        ...defaults,
-        particleCount: 40,
-        origin: { x: 0, y: 0.7 }
-      });
-      // phải
-      confetti({
-        ...defaults,
-        particleCount: 40,
-        origin: { x: 1, y: 0.7 }
-      });
-
-      if (Date.now() > end) {
-        clearInterval(interval);
-        // phát cuối cùng ở giữa
-        confetti({
-          particleCount: 160,
-          spread: 90,
-          scalar: 0.9,
-          origin: { y: 0.4 }
-        });
-      }
-    }, 180);
-
-    // chờ hiệu ứng chạy xong
-    await new Promise((r) => setTimeout(r, 2000));
-  };
-
  const handleSubmit = async (e) => {
   e.preventDefault();
   setErr("");
@@ -102,34 +73,11 @@ export default function AddCourse() {
 
   try {
     setSubmitting(true);
-    await createCourse(payload);
-
-    // 🎉 Hiệu ứng pháo hoa cầu vồng mưa rơi
-    const end = Date.now() + 2 * 1000; // 2 giây
-    const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8b00ff'];
-
-    (function frame() {
-      confetti({
-        particleCount: 4,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: colors,
-      });
-      confetti({
-        particleCount: 4,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: colors,
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    })();
-
-    alert("Thêm khóa học thành công!");
+    
+    let res = await createCourse(payload);
+    if (res) {
+      toast.success("Tạo khóa học thành công!")
+    }
     navigate(-1);
   } catch (error) {
     console.error("Create course failed:", error);
@@ -242,8 +190,9 @@ export default function AddCourse() {
             <div className="col-span-3">
               <label className="block font-medium mb-1">🖼️ Ảnh (URL)</label>
               <input
+                type="file"
                 name="image"
-                value={formData.image}
+                accept="image/*"
                 onChange={handleChange}
                 placeholder="VD: courses/toeic_450.jpg"
                 className={inputStyle}

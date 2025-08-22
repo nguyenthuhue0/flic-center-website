@@ -9,7 +9,8 @@ import {
   FaAtom,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-
+import { CiLogout } from "react-icons/ci";
+import logo from "/logo.svg"
 const Sidebar = () => {
   const [active, setActive] = useState("Dashboard");
   const navigate = useNavigate();
@@ -20,7 +21,6 @@ const Sidebar = () => {
     { name: "Khóa học", icon: <FaTable /> },
     { name: "Tin tức", icon: <FaFont /> },
     { name: "Hóa đơn", icon: <FaAtom /> },
-    
   ];
 
   const handleClick = (name) => {
@@ -34,7 +34,19 @@ const Sidebar = () => {
     if (name === "Khóa học") {
       navigate("./CourseManagement");
     }
+    if (name === "Tin tức") {
+      navigate("./newManagement");
+    }
+    if (name === "Hóa đơn") {
+      navigate("./paymentManagement");
+    }
+
     // Các điều hướng khác bạn có thể thêm tại đây
+  };
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate("/login");
   };
 
   return (
@@ -42,9 +54,9 @@ const Sidebar = () => {
       {/* Logo */}
       <div className="flex items-center mb-6">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Vue.png"
-          alt="Vue Logo"
-          className="w-10 h-10 mr-3"
+          src={logo}
+          alt="flic Logo"
+          className="w-10 h-10 mr-3 rounded-full border border-white shadow-xl p-1 bg-white"
         />
         <span className="text-xl font-bold">FLIC ADMIN</span>
       </div>
@@ -65,6 +77,18 @@ const Sidebar = () => {
             <span className="text-sm font-semibold uppercase">{item.name}</span>
           </li>
         ))}
+      </ul>
+      <ul className="space-y-2">
+        <li
+          className={`flex items-center gap-3 px-4 py-3 rounded cursor-pointer transition duration-200 hover:bg-white/10 hover:text-red-300`}
+          onClick={() => handleLogout()}
+        >
+          {" "}
+          <span>
+            <CiLogout />
+          </span>{" "}
+          ĐĂNG XUẤT
+        </li>
       </ul>
     </div>
   );

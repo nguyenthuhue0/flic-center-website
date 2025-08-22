@@ -15,12 +15,12 @@ const updateUser = (id, payload) => {
 const uploadAvatar = (id, file) => {
   const form = new FormData();
   form.append("file", file);
-  return axios.post(`/admin/users/${id}/avatar`, form, {
+  return axios.post(`/lecturer/avatar/${id}`, form, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 const deleteUser = (id) => {
-  return axios.delete(`/admin/users/${id}`);
+  return axios.delete(`/admin/lecturer/${id}`);
 };
 const getLecturerDetail = (id) => {
   return axios.get(`/admin/lecturer/${id}`);

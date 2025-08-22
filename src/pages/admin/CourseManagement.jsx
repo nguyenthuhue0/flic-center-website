@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAdminCourses, deleteCourse } from "../../services/admin/courses";
+import { toast } from "react-toastify";
 
 const AdminCourse = () => {
   const [courses, setCourses] = useState([]);
@@ -40,7 +41,10 @@ const AdminCourse = () => {
     setDeletingId(id);
 
     try {
-      await deleteCourse(id); // gọi API xoá
+      let res = await deleteCourse(id); // gọi API xoá
+      if (res) {
+        toast.success("Xóa thành công!")
+      }
       // thành công: giữ nguyên next
     } catch (e) {
       // thất bại: khôi phục danh sách cũ và báo lỗi
