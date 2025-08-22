@@ -102,6 +102,12 @@ const Header = () => {
             {hasToken ? (
               <>
                 <div className="flex items-center space-x-1 text-md font-bold py-2 ">
+                  <button
+                  className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
+                  onClick={() => navigate("/registerForm")}
+                >
+                  Đăng ký học
+                </button>
                   <span className="text-red-600">Xin chào, {fullName}</span>
                   <button
                     className="hover:text-red-800 ml-2"

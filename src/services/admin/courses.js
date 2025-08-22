@@ -22,8 +22,20 @@ export const getCourseDetailPublic = (id) => {
   return axios.get(`/courses/${id}`);
 };
 export const createCourse = (payload) => {
-  // AxiosCustomize đã set baseURL = http://localhost:8080/api và gắn token
-  return axios.post("/admin/courses", payload);
+  console.log("Payload trước khi gửi:", payload);
+
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      formData.append(key, value);
+    }
+  });
+  return axios.post("/admin/courses", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
+
 export const updateCourse = (id, payload) =>
   axios.put(`/admin/courses/${id}`, payload);

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deleteUser, getUsers } from "../../services/admin/users";
+import { toast } from "react-toastify";
 
 const AdminLecturer = () => {
   const [rows, setRows] = useState([]);
@@ -68,9 +69,11 @@ const AdminLecturer = () => {
     if (!window.confirm("Bạn có chắc muốn xóa giảng viên này?")) return;
 
     try {
-      await deleteUser(id); // Gọi API xóa
+      let res = await deleteUser(id); // Gọi API xóa
       setRows((prev) => prev.filter((u) => u.id !== id)); // Cập nhật UI
-      alert("Xóa giảng viên thành công!");
+      if (res){
+      toast.success("Xóa giảng viên thành công!");
+      }
     } catch (e) {
       console.error("[deleteUser] error =", e);
       alert(e?.response?.data?.message || e?.message || "Xóa giảng viên thất bại!");

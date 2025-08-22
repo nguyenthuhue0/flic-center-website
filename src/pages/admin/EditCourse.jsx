@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { getCourseDetailAdmin, updateCourse } from "../../services/admin/courses";
+import { toast } from "react-toastify";
 
 export default function EditCourse() {
   const navigate = useNavigate();
@@ -99,8 +100,10 @@ export default function EditCourse() {
 
     try {
       setSubmitting(true);
-      await updateCourse(id, payload);
-      alert("Cập nhật khóa học thành công!");
+      let res = await updateCourse(id, payload);
+      if (res){
+        toast.success("Cập nhật khóa học thành công!")
+      }
       navigate(-1); // hoặc navigate("/admin/courses")
     } catch (error) {
       console.error("Update course failed:", error);
@@ -237,12 +240,7 @@ export default function EditCourse() {
             {/* Ảnh URL */}
             <div className="col-span-3">
               <label className="block font-medium mb-1">🖼️ Ảnh (URL)</label>
-              <input
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                className={inputStyle}
-              />
+              <img src={formData.image} alt="ảnh khóa học" className="h-100" />
             </div>
 
             {/* Mô tả */}

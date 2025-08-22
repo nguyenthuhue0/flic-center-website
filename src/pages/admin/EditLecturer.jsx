@@ -7,6 +7,7 @@ import {
   updateLecturer,
   uploadLecturerAvatar,
 } from "../../services/admin/users"; // hoặc từ lecturer.js
+import { toast } from "react-toastify";
 
 // Helpers: format cho input[type=date]/[type=datetime-local]
 const toDateInput = (v) => {
@@ -53,7 +54,7 @@ export default function EditLecturer() {
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
 
-  const [avatarFile, setAvatarFile] = useState(null);
+  // const [avatarFile, setAvatarFile] = useState(null);
   const [preview, setPreview] = useState(stateLecturer?.avatarUrl || null);
 
   const [formData, setFormData] = useState({
@@ -110,12 +111,12 @@ export default function EditLecturer() {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAvatarFile(file);
-    setPreview(URL.createObjectURL(file));
-  };
+  // const handleAvatarChange = (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   setAvatarFile(file);
+  //   setPreview(URL.createObjectURL(file));
+  // };
 
   // chuẩn hoá payload update JSON
   const normalizePayload = (raw) => {
@@ -153,12 +154,10 @@ export default function EditLecturer() {
 
     try {
       setSubmitting(true);
-      await updateLecturer(id, payload);
-      if (avatarFile) {
-        // nếu backend có endpoint upload avatar; nếu không có thì bỏ đoạn này
-        await uploadLecturerAvatar(id, avatarFile);
+      let res = await updateLecturer(id, payload);
+      if (res) {
+        toast.success("Cập nhật giảng viên thành công!")
       }
-      alert("Cập nhật giảng viên thành công!");
       navigate(-1); // hoặc navigate("/admin/lecturer")
     } catch (error) {
       const msg =
@@ -204,7 +203,7 @@ export default function EditLecturer() {
               <label htmlFor="avatarUpload" className="block font-medium mb-1 text-gray-700">
                 🖼️ Ảnh đại diện
               </label>
-              <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm" />
+              {/* <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm" /> */}
             </div>
             {preview && (
               <img

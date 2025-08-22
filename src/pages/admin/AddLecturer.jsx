@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { createUser, uploadAvatar } from "../../services/admin/users";
+import { toast } from "react-toastify";
 
 const mapStatus = (s) =>
   String(s || "").toLowerCase().includes("đang") ? "active" : "inactive";
@@ -30,7 +31,7 @@ export default function AddLecturer() {
     note: ""
   });
 
-  const [avatar, setAvatar] = useState(null);
+  // const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
@@ -43,13 +44,13 @@ export default function AddLecturer() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAvatar(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
+  // const handleAvatarChange = (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setAvatar(file);
+  //     setPreview(URL.createObjectURL(file));
+  //   }
+  // };
 
   // JSON payload cho backend
   const normalizePayload = (raw) => {
@@ -91,15 +92,10 @@ export default function AddLecturer() {
 
       // 1) Tạo user = JSON ONLY
       const created = await createUser(payload);
-      const newId = created?.id ?? created?.data?.id;
-
-      // 2) (Tuỳ backend) Nếu KHÔNG muốn multipart luôn, có thể BỎ QUA avatar:
-      // nếu cho phép endpoint riêng upload avatar thì để lại dòng dưới, còn không thì comment nó.
-      if (newId && avatar) {
-        await uploadAvatar(newId, avatar); // <- có multipart ở bước riêng này; xoá nếu backend cấm hoàn toàn
+      if(created) {
+        toast.success("Tạo giảng viên thành công!")
       }
 
-      alert("Thêm giảng viên thành công!");
       navigate("../LecturerManagement");
     } catch (error) {
       const msg =
@@ -134,7 +130,7 @@ export default function AddLecturer() {
               <label htmlFor="avatarUpload" className="block font-medium mb-1 text-gray-700">
                 🖼️ Ảnh đại diện
               </label>
-              <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm" />
+              {/* <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm" /> */}
             </div>
             {preview && (
               <img
