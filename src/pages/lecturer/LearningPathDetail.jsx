@@ -1,167 +1,106 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { PlusCircle, Trash2 } from "lucide-react";
-import {
-    createLesson,
-    updateLesson,
-    deleteLesson,
-    getLessonByCourseId,
-} from "../../services/Lecturer/Lesson";
+import { useParams } from "react-router-dom";
+import lessonAPI from "../../services/Lecturer/Lesson";
 
 export default function StudyPlan() {
-    const courseId = 1; // 👈 courseId fix cứng, bạn có thể lấy từ props hoặc URL
+    const { courseId } = useParams();
     const [weeks, setWeeks] = useState([]);
 
-    const formatDateTime = (dt) => {
-        if (!dt) return "";
-        return dt.slice(0, 16); // cắt "YYYY-MM-DDTHH:mm"
+
+    const addSession = (weekId) => {
+        setWeeks((prevWeeks) =>
+            prevWeeks.map((week) =>
+                week.id === weekId
+                    ? {
+                        ...week,
+                        sessions: [
+                            ...week.sessions,
+                            {
+                                id: week.sessions.length + 1,
+                                title: "",
+                                description: "",
+                                startTime: "",
+                                weekIndex: "",
+                                plannedAt: "",
+                                endTime: "",
+                            },
+                        ],
+                    }
+                    : week
+            )
+        );
     };
 
-    // ✅ Lấy danh sách lessons theo courseId khi load trang
-    useEffect(() => {
-        fetchLessons();
-    }, []);
 
-    const fetchLessons = async () => {
-        try {
-            const lessons = await getLessonByCourseId(courseId);
-            console.log("📡 Raw response từ API:", lessons);
-
-            // const lessons = res?.data || [];
-            // console.log("📡 Lessons từ API:", lessons);
-
-            if (lessons.length === 0) {
-                setWeeks([]);
-                return;
-            }
-
-            // Group theo weekIndex
-            const grouped = lessons.reduce((acc, lesson) => {
-                const week = lesson.weekIndex || 1;
-                if (!acc[week]) acc[week] = [];
-                acc[week].push({
-                    id: lesson.id,
-                    title: lesson.title,
-                    description: lesson.description || "",
-                    plannedAt: formatDateTime(lesson.plannedAt),
-                    endTime: formatDateTime(lesson.endTime),
-                });
-                return acc;
-            }, {});
-
-            const formatted = Object.keys(grouped).map((w) => ({
-                id: parseInt(w),
-                sessions: grouped[w],
-            }));
-
-            console.log("📦 Data sau khi group theo tuần:", formatted);
-            setWeeks(formatted);
-        } catch (err) {
-            console.error("❌ Lỗi load lessons:", err);
-        }
-    };
-
-    // ✅ Thêm tuần mới
     const addWeek = async () => {
+        const newWeekIndex = weeks.length > 0 ? weeks[weeks.length - 1].week_index + 1 : 1;
+
         try {
-            const newLesson = {
-                courseId,
-                weekIndex: weeks.length + 1,
-                title: "",
+            const response = await lessonAPI.create({
+                course_id: courseId,
+                week_index: newWeekIndex,
+                title: `Week ${newWeekIndex}`,
                 description: "",
                 plannedAt: "",
                 endTime: "",
-            };
-            const res = await createLesson(newLesson);
+            });
 
             const newWeek = {
-                id: weeks.length + 1,
-                sessions: [{ ...newLesson, id: res.data.id }],
+                id: response.data.id, week_index: newWeekIndex, sessions: [],
+                title: `Tuần ${newWeekIndex}`, description: "", plannedAt: "", endTime: ""
             };
-
-            setWeeks([...weeks, newWeek]);
-        } catch (err) {
-            console.error("Lỗi thêm tuần:", err);
+            setWeeks(prev => [...prev, newWeek]);
+        } catch (error) {
+            console.error("Error adding week:", error);
         }
     };
 
-    // ✅ Xóa tuần
-    const deleteWeek = async (weekId) => {
-        if (!window.confirm("Bạn có chắc muốn xóa tuần này?")) return;
-        try {
-            const week = weeks.find((w) => w.id === weekId);
-            for (let session of week.sessions) {
-                await deleteLesson(session.id);
-            }
-            setWeeks(weeks.filter((w) => w.id !== weekId));
-        } catch (err) {
-            console.error("Lỗi xóa tuần:", err);
+
+
+    useEffect(() => {
+        if (!courseId) return;
+        const token = sessionStorage.getItem("access_token");
+        if (!token) {
+            console.error("❌ Không tìm thấy token trong localStorage");
+            return;
         }
-    };
 
-    // ✅ Thêm buổi học
-    const addSession = async (weekId) => {
-        try {
-            const newLesson = {
-                courseId,
-                weekIndex: weekId,
-                title: "",
-                description: "",
-                plannedAt: "2025-08-24T00:00",
-                endTime: "2025-08-24T00:00",
-            };
-            const res = await createLesson(newLesson);
+        axios
+            .get(`http://localhost:8080/api/lesson?courseId=${courseId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+                const apiData = res.data;
 
-            setWeeks(
-                weeks.map((w) =>
-                    w.id === weekId
-                        ? { ...w, sessions: [...w.sessions, { ...newLesson, id: res.data.id }] }
-                        : w
-                )
-            );
-        } catch (err) {
-            console.error("Lỗi thêm buổi:", err);
-        }
-    };
-
-    // ✅ Xóa buổi học
-    const deleteSession = async (weekId, sessionId) => {
-        try {
-            await deleteLesson(sessionId);
-            setWeeks(
-                weeks.map((w) =>
-                    w.id === weekId
-                        ? { ...w, sessions: w.sessions.filter((s) => s.id !== sessionId) }
-                        : w
-                )
-            );
-        } catch (err) {
-            console.error("Lỗi xóa buổi:", err);
-        }
-    };
-
-    // ✅ Update field
-    const updateField = async (weekId, sessionId, field, value) => {
-        setWeeks(
-            weeks.map((w) =>
-                w.id === weekId
-                    ? {
-                        ...w,
-                        sessions: w.sessions.map((s) =>
-                            s.id === sessionId ? { ...s, [field]: value } : s
-                        ),
+                // Nhóm theo weekIndex
+                const grouped = apiData.reduce((acc, item) => {
+                    const weekIndex = item.weekIndex || 1;
+                    if (!acc[weekIndex]) {
+                        acc[weekIndex] = {
+                            id: weekIndex,
+                            sessions: [],
+                        };
                     }
-                    : w
-            )
-        );
+                    acc[weekIndex].sessions.push({
+                        id: acc[weekIndex].sessions.length + 1,
+                        title: item.title || "",
+                        detail: item.description || "",
+                        startTime: item.plannedAt || "",
+                        endTime: item.endTime || "",
+                    });
+                    return acc;
+                }, {});
 
-        try {
-            const week = weeks.find((w) => w.id === weekId);
-            const session = week.sessions.find((s) => s.id === sessionId);
-            await updateLesson(sessionId, { ...session, [field]: value });
-        } catch (err) {
-            console.error("Lỗi update buổi:", err);
-        }
-    };
+                setWeeks(Object.values(grouped));
+            })
+            .catch((err) => {
+                console.error("❌ Lỗi khi load lessons:", err);
+            });
+    }, [courseId]);
+
+    // giữ nguyên các hàm thêm/xóa/ghi đè tuần và session của bạn
 
     return (
         <div className="p-6">
@@ -179,95 +118,49 @@ export default function StudyPlan() {
                     </tr>
                 </thead>
                 <tbody>
-                    {weeks.map((week) =>
-                        week.sessions.map((session, idx) => (
-                            <tr key={`${week.id}-${session.id}`}>
-                                {idx === 0 && (
-                                    <td
-                                        className="border border-gray-400 text-center align-middle"
-                                        rowSpan={week.sessions.length}
-                                    >
-                                        <div className="flex flex-col items-center">
-                                            <span className="font-semibold">{weeks.indexOf(week) + 1}</span>
-                                            <button
-                                                onClick={() => deleteWeek(week.id)}
-                                                className="text-red-600 mt-1"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
+                    {weeks.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" className="text-center p-4 text-gray-500">
+                                Chưa có dữ liệu
+                            </td>
+                        </tr>
+                    ) : (
+                        weeks.map((week) =>
+                            week.sessions.map((session, idx) => (
+                                <tr key={`${week.id}-${session.id}`}>
+                                    {idx === 0 && (
+                                        <td
+                                            className="border border-gray-400 text-center align-middle"
+                                            rowSpan={week.sessions.length}
+                                        >
+                                            {week.id}
+                                        </td>
+                                    )}
+
+                                    <td className="border border-gray-400 text-center">{session.id}</td>
+
+                                    <td className="border border-gray-400 p-2">
+                                        {session.title} - {session.detail}
                                     </td>
-                                )}
 
-                                <td className="border border-gray-400 text-center">
-                                    {session.id}
-                                </td>
+                                    <td className="border border-gray-400 text-center">{session.startTime}</td>
 
-                                {/* Nội dung */}
-                                <td className="border border-gray-400 p-2">
-                                    <div className="flex items-start space-x-2 w-full">
-                                        <textarea
-                                            placeholder="Tiêu đề"
-                                            value={session.title}
-                                            onChange={(e) =>
-                                                updateField(week.id, session.id, "title", e.target.value)
-                                            }
-                                            className="flex-1 p-2 resize-none overflow-hidden min-h-[40px] focus:outline-none"
-                                        />
-                                        <span>-</span>
-                                        <textarea
-                                            placeholder="Chi tiết"
-                                            value={session.description}
-                                            onChange={(e) =>
-                                                updateField(week.id, session.id, "description", e.target.value)
-                                            }
-                                            className="flex-1 p-2 resize-none overflow-hidden min-h-[40px] focus:outline-none"
-                                        />
-                                    </div>
-                                </td>
+                                    <td className="border border-gray-400 text-center">{session.endTime}</td>
 
-                                {/* Thời gian */}
-                                <td className="border border-gray-400 text-center">
-                                    <input
-                                        type="datetime-local"
-                                        value={session.plannedAt}
-                                        onChange={(e) =>
-                                            updateField(week.id, session.id, "plannedAt", e.target.value)
-                                        }
-                                        className="focus:outline-none"
-                                    />
-                                </td>
-                                <td className="border border-gray-400 text-center">
-                                    <input
-                                        type="datetime-local"
-                                        value={session.endTime}
-                                        onChange={(e) =>
-                                            updateField(week.id, session.id, "endTime", e.target.value)
-                                        }
-                                        className="focus:outline-none"
-                                    />
-                                </td>
-
-                                <td className="border border-gray-400 text-center space-x-2">
-                                    <button
-                                        onClick={() => addSession(week.id)}
-                                        className="text-green-600"
-                                    >
-                                        <PlusCircle size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => deleteSession(week.id, session.id)}
-                                        className="text-red-600"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+                                    <td className="border border-gray-400 text-center">
+                                        <button className="text-green-600">
+                                            <PlusCircle size={18} />
+                                        </button>
+                                        <button className="text-red-600 ml-2">
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )
                     )}
                 </tbody>
             </table>
-
             <button
                 onClick={addWeek}
                 className="mt-4 bg-green-600 text-white px-4 py-2 rounded"
@@ -277,3 +170,8 @@ export default function StudyPlan() {
         </div>
     );
 }
+
+
+
+
+

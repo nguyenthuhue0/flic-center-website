@@ -1,26 +1,21 @@
 import axios from "../../utils/AxiosCustomize";
 
-const getLessonById = (id) => {
-    return axios.get(`/lesson/${id}`);
-}
-const updateLesson = (id, data) => {
-    return axios.put(`/lesson/${id}`, data);
-}
-const deleteLesson = (id) => {
-    return axios.delete(`/lesson/${id}`);
-}
-const createLesson = (data) => {
-    return axios.post(`/lesson/create`, data);
-}
-const getLessonByCourseId = (courseId) => {
-    return axios.get(`/lesson?courseId=${courseId}`);
-}
+const lessonAPI = {
+    // Lấy lesson theo id
+    getById: (id) => axios.get(`/lessons/${id}`),
 
-export {
-    getLessonById,
-    updateLesson,
-    deleteLesson,
-    createLesson,
-    getLessonByCourseId
-}
+    // Lấy danh sách lessons theo courseId (đúng endpoint backend của bạn)
+    getByCourseId: (courseId) =>
+        axios.get(`/lesson`, { params: { courseId } }),
 
+    // Tạo mới lesson
+    create: (data) => axios.post(`/lesson/create`, data),
+
+    // Cập nhật lesson
+    update: (id, data) => axios.put(`/lesson/${id}`, data),
+
+    // Xóa lesson
+    remove: (id) => axios.delete(`/lessons/${id}`),
+};
+
+export default lessonAPI;
