@@ -30,4 +30,4 @@ instance.interceptors.response.use(function (response) {
   }, function (error) {
     return Promise.reject(error);
   });
-export default instance;
+export default instance; 
