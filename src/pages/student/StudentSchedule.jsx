@@ -116,8 +116,10 @@ const StudentSchedule = () => {
 
   const getBlockStyle = (lesson) => {
     const dayIndex = days.indexOf(lesson.dayOfWeek);
-    const [startHour, startMin] = lesson.startTime.split(":").map(Number);
-    const [endHour, endMin] = lesson.endTime.split(":").map(Number);
+    // Nếu startTime hoặc endTime là null/undefined, fallback về "00:00"
+const [startHour, startMin] = (lesson.startTime || "00:00").split(":").map(Number);
+const [endHour, endMin] = (lesson.endTime || "00:00").split(":").map(Number);
+
 
     const startOffset = (startHour - 7) * 50 + (startMin / 60) * 50;
     const duration = (endHour - startHour) * 50 + ((endMin - startMin) / 60) * 50;
