@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { FileText, Download, Eye, Calendar, Pencil } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Eye,
+  Calendar,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { Book, Presentation, ClipboardList } from "lucide-react";
 import { getLessonMaterials } from "../../services/lecturer/DocumentApi";
 
@@ -12,6 +19,7 @@ const DocumentDetail = () => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
   const { courseId } = useParams();
   const location = useLocation();
@@ -29,8 +37,8 @@ const DocumentDetail = () => {
       try {
         setLoading(true);
         const response = await getLessonMaterials(courseId);
-        console.log('DocumentDetail - API response:', response);
-        
+        console.log("DocumentDetail - API response:", response);
+
         // Xử lý response data
         let materialsData = [];
         if (Array.isArray(response)) {
@@ -48,16 +56,18 @@ const DocumentDetail = () => {
           title: item.title || `Tài liệu ${index + 1}`,
           fileUrl: item.fileUrl || "",
           type: item.type || "Tài liệu",
-          uploadedAt: item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString('vi-VN') : null,
+          uploadedAt: item.uploadedAt
+            ? new Date(item.uploadedAt).toLocaleDateString("vi-VN")
+            : null,
           // Helper fields for UI
           size: item.size || "N/A",
-          status: item.fileUrl ? "Có sẵn" : "Chưa upload" 
+          status: item.fileUrl ? "Có sẵn" : "Chưa upload",
         }));
 
         setMaterials(transformedMaterials);
         setError(null);
       } catch (err) {
-        console.error('Error fetching materials:', err);
+        console.error("Error fetching materials:", err);
         setError("Không thể tải dữ liệu tài liệu");
       } finally {
         setLoading(false);
@@ -66,131 +76,6 @@ const DocumentDetail = () => {
 
     fetchMaterials();
   }, [courseId]);
-
-  const semesterData = {
-    "01": [
-      {
-        id: 1,
-        type: "Giáo trình",
-        title: "Lập trình C++ cơ bản.pdf",
-        updateDate: "15/03/2023",
-        size: "25.4 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 2,
-        type: "Slide",
-        title: "Bài 1 - Giới thiệu C++.pptx",
-        updateDate: "10/03/2023",
-        size: "8.2 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 3,
-        type: "Đề cương",
-        title: "Đề cương môn Lập trình C++.pdf",
-        updateDate: "01/03/2023",
-        size: "2.1 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 4,
-        type: "Slide",
-        title: "Bài 2 - Biến và kiểu dữ liệu.pptx",
-        updateDate: "20/03/2023",
-        size: "12.6 MB",
-        status: "Đang cập nhật",
-      },
-      {
-        id: 5,
-        type: "Giáo trình",
-        title: "Bài tập thực hành C++.pdf",
-        updateDate: "25/03/2023",
-        size: "18.7 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 13,
-        type: "Bài tập khóa học",
-        title: "Bài tập tuần 1.docx",
-        updateDate: "18/03/2023",
-        size: "0.8 MB",
-        status: "Có sẵn",
-        link: "", // nếu có file
-      },
-      {
-        id: 14,
-        type: "Google Meet",
-        title: "Link lớp học Google Meet",
-        updateDate: "01/03/2023",
-        size: "-",
-        status: "Có sẵn",
-        link: "https://meet.google.com/your-meet-link",
-      },
-    ],
-    "02": [
-      {
-        id: 6,
-        type: "Giáo trình",
-        title: "Lập trình hướng đối tượng.pdf",
-        updateDate: "05/04/2023",
-        size: "32.1 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 7,
-        type: "Slide",
-        title: "OOP - Lớp và đối tượng.pptx",
-        updateDate: "10/04/2023",
-        size: "15.3 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 8,
-        type: "Đề cương",
-        title: "Đề cương OOP nâng cao.pdf",
-        updateDate: "01/04/2023",
-        size: "1.8 MB",
-        status: "Đang cập nhật",
-      },
-    ],
-    "03": [
-      {
-        id: 9,
-        type: "Giáo trình",
-        title: "Cấu trúc dữ liệu và giải thuật.pdf",
-        updateDate: "15/07/2023",
-        size: "28.9 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 10,
-        type: "Slide",
-        title: "Thuật toán sắp xếp.pptx",
-        updateDate: "20/07/2023",
-        size: "11.4 MB",
-        status: "Có sẵn",
-      },
-    ],
-    "04": [
-      {
-        id: 11,
-        type: "Đề cương",
-        title: "Đề cương đồ án tốt nghiệp.pdf",
-        updateDate: "01/10/2023",
-        size: "3.2 MB",
-        status: "Có sẵn",
-      },
-      {
-        id: 12,
-        type: "Giáo trình",
-        title: "Hướng dẫn làm đồ án.pdf",
-        updateDate: "15/10/2023",
-        size: "45.6 MB",
-        status: "Đang cập nhật",
-      },
-    ],
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -251,9 +136,35 @@ const DocumentDetail = () => {
     // Implement download logic here
   };
 
-  const handlePreview = (materialId, title) => {
-    console.log("Previewing:", title);
-    // Implement preview logic here
+  const handlePreview = (materialId, title, fileUrl) => {
+    if (!fileUrl) {
+      alert("Tài liệu chưa có file để xem trước.");
+      return;
+    }
+    // Mở fileUrl trong tab mới
+    window.open(fileUrl, "_blank");
+  };
+
+  const handleDeleteMaterial = async (materialId, title) => {
+    if (
+      window.confirm(`Bạn có chắc chắn muốn xóa tài liệu "${title}" không?`)
+    ) {
+      try {
+        setDeletingId(materialId);
+        // Assuming you have an API endpoint for deleting materials
+        // For now, we'll just remove it from the state
+        setMaterials(
+          materials.filter((material) => material.id !== materialId)
+        );
+        setError(null);
+        console.log(`Material with ID ${materialId} deleted.`);
+      } catch (err) {
+        console.error("Error deleting material:", err);
+        setError("Không thể xóa tài liệu");
+      } finally {
+        setDeletingId(null);
+      }
+    }
   };
 
   // Sử dụng tất cả dữ liệu từ API (không lọc theo semester)
@@ -267,11 +178,30 @@ const DocumentDetail = () => {
     // Xử lý date fields
     if (sortField === "uploadedAt") {
       if (!valA || !valB) return 0;
-      const [dA, mA, yA] = valA.split("/");
-      const [dB, mB, yB] = valB.split("/");
-      valA = new Date(`${yA}-${mA}-${dA}`);
-      valB = new Date(`${yB}-${mB}-${dB}`);
-      return sortOrder === "asc" ? valA - valB : valB - valA;
+      try {
+        // Xử lý format dd/mm/yyyy
+        if (valA.includes("/") && valB.includes("/")) {
+          const [dA, mA, yA] = valA.split("/");
+          const [dB, mB, yB] = valB.split("/");
+          valA = new Date(
+            `${yA}-${mA.padStart(2, "0")}-${dA.padStart(2, "0")}`
+          );
+          valB = new Date(
+            `${yB}-${mB.padStart(2, "0")}-${dB.padStart(2, "0")}`
+          );
+        } else {
+          // Xử lý format ISO string hoặc format khác
+          valA = new Date(valA);
+          valB = new Date(valB);
+        }
+
+        if (isNaN(valA.getTime()) || isNaN(valB.getTime())) return 0;
+
+        return sortOrder === "asc" ? valA - valB : valB - valA;
+      } catch (error) {
+        console.error("Error sorting dates:", error);
+        return 0;
+      }
     }
 
     // Xử lý size field
@@ -322,8 +252,8 @@ const DocumentDetail = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-xl mb-4">{error}</div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Thử lại
@@ -337,7 +267,6 @@ const DocumentDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
-    
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
@@ -347,8 +276,6 @@ const DocumentDetail = () => {
                 {courseTitle.toUpperCase()}
               </h1>
             </div>
-
-
 
             {/* Materials Table */}
             <div className="bg-white rounded-lg shadow-sm border-2 border-blue-200">
@@ -376,7 +303,7 @@ const DocumentDetail = () => {
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
-                              : "↓"}
+                              : ""}
                           </span>
                         </button>
                       </th>
@@ -400,7 +327,7 @@ const DocumentDetail = () => {
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
-                              : "↓"}
+                              : ""}
                           </span>
                         </button>
                       </th>
@@ -414,7 +341,7 @@ const DocumentDetail = () => {
                               );
                             } else {
                               setSortField("uploadedAt");
-                              setSortOrder("asc");
+                              setSortOrder("desc");
                             }
                           }}
                         >
@@ -424,7 +351,7 @@ const DocumentDetail = () => {
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
-                              : "↓"}
+                              : ""}
                           </span>
                         </button>
                       </th>
@@ -448,7 +375,7 @@ const DocumentDetail = () => {
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
-                              : "↓"}
+                              : ""}
                           </span>
                         </button>
                       </th>
@@ -472,7 +399,7 @@ const DocumentDetail = () => {
                               ? sortOrder === "asc"
                                 ? "↑"
                                 : "↓"
-                              : "↓"}
+                              : ""}
                           </span>
                         </button>
                       </th>
@@ -524,31 +451,40 @@ const DocumentDetail = () => {
                             {item.status}
                           </span>
                         </td>
-                        {/* <td className="px-6 py-4">
+
+                        <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
-                            {item.status === "Có sẵn" && (
+                            {item.fileUrl ? (
                               <>
                                 <button
                                   onClick={() =>
-                                    handlePreview(item.id, item.title)
+                                    handlePreview(
+                                      item.id,
+                                      item.title,
+                                      item.fileUrl
+                                    )
                                   }
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                   title="Xem trước"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
+
                                 <button
                                   onClick={() =>
-                                    handleDownload(item.id, item.title)
+                                    handleDeleteMaterial(item.id, item.title)
                                   }
-                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="Tải xuống"
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Xóa tài liệu"
+                                  disabled={deletingId === item.id}
                                 >
-                                  <Download className="w-4 h-4" />
+                                  <Trash2 className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() =>
-                                    navigate(`/materials-edit/${item.id}`)
+                                    navigate(
+                                      `/lecturer/documentedit/${item.id}`
+                                    )
                                   }
                                   className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
                                   title="Chỉnh sửa"
@@ -556,51 +492,13 @@ const DocumentDetail = () => {
                                   <Pencil className="w-4 h-4" />
                                 </button>
                               </>
-                            )}
-                            {item.status === "Đang cập nhật" && (
+                            ) : (
                               <span className="text-xs text-gray-400 italic">
-                                Chưa có sẵn
+                                Chưa upload file
                               </span>
                             )}
                           </div>
-                        </td> */}
-                        <td className="px-6 py-4">
-  <div className="flex items-center space-x-2">
-    {item.fileUrl ? (
-      <>
-        <a
-          href={item.fileUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Xem tài liệu"
-        >
-          <Eye className="w-4 h-4" />
-        </a>
-        <a
-          href={item.fileUrl}
-          download
-          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-          title="Tải xuống"
-        >
-          <Download className="w-4 h-4" />
-        </a>
-        <button
-          onClick={() => navigate(`/lecturer/materials-edit/${item.id}`)}
-          className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-          title="Chỉnh sửa"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-      </>
-    ) : (
-      <span className="text-xs text-gray-400 italic">
-        Chưa upload file
-      </span>
-    )}
-  </div>
-</td>
-
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -613,28 +511,15 @@ const DocumentDetail = () => {
                   Tổng cộng:{" "}
                   <span className="font-medium">{currentData.length}</span> tài
                   liệu
-                  {" • "}
-                  Có file:{" "}
-                  <span className="font-medium text-green-600">
-                    {
-                      currentData.filter((item) => item.fileUrl)
-                        .length
-                    }
-                  </span>
-                  {" • "}
-                  Chưa upload:{" "}
-                  <span className="font-medium text-orange-600">
-                    {
-                      currentData.filter((item) => !item.fileUrl).length
-                    }
-                  </span>
                 </div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                  Tải tất cả
-                </button>
+
                 <button
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  onClick={() => navigate("/lecturer/documentupload")}
+                  onClick={() =>
+                    navigate(`/lecturer/documentupload/${courseId}`, {
+                      state: { courseTitle },
+                    })
+                  }
                 >
                   Upload tài liệu
                 </button>
