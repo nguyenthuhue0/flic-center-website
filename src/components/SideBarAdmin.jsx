@@ -10,6 +10,8 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
+import { MdOutlineManageAccounts } from "react-icons/md";
+
 import logo from "/logo.svg"
 const Sidebar = () => {
   const [active, setActive] = useState("Dashboard");
@@ -21,6 +23,7 @@ const Sidebar = () => {
     { name: "Khóa học", icon: <FaTable /> },
     { name: "Tin tức", icon: <FaFont /> },
     { name: "Hóa đơn", icon: <FaAtom /> },
+    { name: "Thêm tài khoản", icon: <MdOutlineManageAccounts /> },
   ];
 
   const handleClick = (name) => {
@@ -39,6 +42,9 @@ const Sidebar = () => {
     }
     if (name === "Hóa đơn") {
       navigate("./paymentManagement");
+    }
+    if (name === "Thêm tài khoản") {
+      navigate("./newAccount");
     }
 
     // Các điều hướng khác bạn có thể thêm tại đây

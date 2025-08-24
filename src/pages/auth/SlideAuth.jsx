@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import imageTest_2 from "../../assets/images/Bia-flic3.png";
+import imageTest_2 from "../../assets/images/demo.jpg";
 import imageTest_3 from "../../assets/images/FLIC-CBGV.jpg";
 
 const images = [imageTest_2, imageTest_3];

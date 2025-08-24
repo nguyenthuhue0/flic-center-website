@@ -4,8 +4,10 @@ import banner01 from "../../assets/images/banner01.png";
 import banner02 from "../../assets/images/banner02.png";
 import { getCourse } from "../../services/Student/Home";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+   const navigate = useNavigate()
    useEffect(() => {
       fetchCourse()
    }, []);
@@ -31,10 +33,14 @@ const Home = () => {
                   </p>
 
                   <div className="mt-6 flex gap-4">
-                     <button className="bg-yellow-400 text-black font-semibold px-5 py-2 rounded hover:bg-yellow-300">
+                     <button className="bg-yellow-400 text-black font-semibold px-5 py-2 rounded hover:bg-yellow-300"
+                     onClick={() => navigate("/course")}
+                     >
                         Các khoá học
                      </button>
-                     <button className="border border-white px-5 py-2 rounded hover:bg-white hover:text-blue-600 transition">
+                     <button className="border border-white px-5 py-2 rounded hover:bg-white hover:text-blue-600 transition"
+                     onClick={() => navigate("/schedule")}
+                     >
                         Lịch thi
                      </button>
                   </div>
@@ -121,7 +127,7 @@ const Home = () => {
                <Slider dots={false} infinite={true} speed={500} slidesToShow={4} slidesToScroll={1} autoplay={true} autoplaySpeed={2000} className="-mx-2">
                   {/* Course 1 */}
                   {
-                     dataCourse.map((course, index) => (
+                     dataCourse.map((course) => (
                         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
                            <img src={course.imageUrl} alt="Khóa học 1" className="w-full h-40 object-cover rounded-t-lg" />
                            <h3 className="text-lg font-semibold mt-2">{course.title}</h3>

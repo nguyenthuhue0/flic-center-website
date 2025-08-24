@@ -142,7 +142,7 @@ const StudentSubmission = () => {
               Tệp đính kèm:{" "}
             </span>
             <a
-              href="/files/Lab03-DeBai.pdf"
+              href={tagTopic}
               target="_blank"
               rel="noopener noreferrer"
               className="text-red-600 underline hover:text-blue-800 inline-block"

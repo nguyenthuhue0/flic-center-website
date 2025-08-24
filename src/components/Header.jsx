@@ -7,18 +7,40 @@ import { navItemsLink } from "../utils/Constants";
 import { getProfile } from "../services/Student/Profie";
 import { FiLogOut } from "react-icons/fi";
 import logo from "../assets/images/logo.png";
+import { jwtDecode } from "jwt-decode";
 
 const Header = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
+  const [role, setRole] = useState("");
   const [fullName, setFullName] = useState("");
 
   useEffect(() => {
-    const token = sessionStorage.getItem("access_token");
-    if (token) {
-      fetchDataProfile();
-      setHasToken(true);
+    const data = sessionStorage.getItem("access_token");
+    if (!data) {
+      setHasToken(false);
+      return;
+    }
+    let decoded;
+    try {
+      decoded = jwtDecode(data);
+    } catch (err) {
+      console.error("Token không hợp lệ:", err);
+      return;
+    }
+    fetchDataProfile();
+    setRole(decoded.role);
+    switch (decoded.role) {
+      case "USER":
+        setHasToken(false);
+        break;
+      case "STUDENT":
+      case "INSTRUCTOR":
+        setHasToken(true);
+        break;
+      default:
+        break;
     }
   }, []);
 
@@ -29,7 +51,7 @@ const Header = () => {
 
   const handleLogout = () => {
     sessionStorage.clear();
-    setHasToken(false);
+    setHasToken(!hasToken);
     navigate("/login");
   };
 
@@ -102,12 +124,16 @@ const Header = () => {
             {hasToken ? (
               <>
                 <div className="flex items-center space-x-1 text-md font-bold py-2 ">
-                  <button
-                  className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
-                  onClick={() => navigate("/registerForm")}
-                >
-                  Đăng ký học
-                </button>
+                  {role === "INSTRUCTOR" ? (
+                    ""
+                  ) : (
+                    <button
+                      className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
+                      onClick={() => navigate("/registerForm")}
+                    >
+                      Đăng ký học
+                    </button>
+                  )}
                   <span className="text-red-600">Xin chào, {fullName}</span>
                   <button
                     className="hover:text-red-800 ml-2"
@@ -130,10 +156,24 @@ const Header = () => {
                   onClick={() => navigate("/login")}
                   className="flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-red-600 cursor-pointer"
                 >
-                  <span>Đăng nhập</span>
-                  <div className="relative">
-                    <CgLogOut className="absolute right-[-8px] top-[-5px]" />
-                  </div>
+                  {role === "" ? (
+                    <>
+                      <span>Đăng nhập</span>
+                      <div className="relative">
+                        <CgLogOut className="absolute right-[-8px] top-[-5px]" />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-red-600">Xin chào, {fullName}</span>
+                      <button
+                        className="hover:text-red-800 ml-2"
+                        onClick={handleLogout}
+                      >
+                        <FiLogOut className="cursor-pointer text-lg text-blue-500 hover:text-red-600" />
+                      </button>
+                    </>
+                  )}
                 </a>
               </>
             )}

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import App from "./App";
@@ -60,9 +60,27 @@ import NewDetail from "./pages/admin/NewDetail";
 import EditNew from "./pages/admin/EditNew";
 import PaymentManagement from "./pages/admin/PaymentManagement";
 import EditPayment from "./pages/admin/EditPayment";
+import AddAccount from "./pages/admin/AddAccount";
+import AddAssignment from "./pages/lecturer/AddAssignment";
+import AssignmentManage from "./pages/lecturer/AssignmentManage";
 const NotFound = () => {
-  return (
-    <div className="container mt-3 alert alert-danger">404.Not found data</div>
+  const navigate = useNavigate()
+return (
+    <div className="flex flex-col items-center justify-center h-screen bg-white">
+      <h1 className="text-9xl font-extrabold text-red-600 tracking-widest">
+        404
+      </h1>
+      <h2 className="mt-6 text-2xl font-bold text-red-600">Page Not Found</h2>
+      <p className="mt-4 text-gray-600 text-center max-w-md">
+        Trang web không tồn tại !! Vui lòng quay trở lại trang chủ.
+      </p>
+      <button
+        onClick={() => navigate("/")}
+        className="mt-6 px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition shadow-lg"
+      >
+        GO HOME
+      </button>
+    </div>
   );
 };
 const Layout = () => {
@@ -116,6 +134,9 @@ const Layout = () => {
             <Route path="learningpathlist" element={<LearningPathList />} />
             {/* Tiến độ học tập */}
             <Route path="progress" element={<Progress />} />
+
+            <Route path="lesson/:id" element={<AssignmentManage />} />
+            <Route path="lesson/:id/assign" element={<AddAssignment />} />
           </Route>
         </Route>
 
@@ -145,6 +166,7 @@ const Layout = () => {
             <Route path="paymentManagement" element={<PaymentManagement />} />
             <Route path="payment/:id" element={<EditPayment />} />
 
+            <Route path="newAccount" element={<AddAccount />} />
           </Route>
         </Route>
 

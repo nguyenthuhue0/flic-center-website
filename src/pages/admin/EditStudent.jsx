@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { getUserDetail, updateUser, uploadAvatar } from "../../services/admin/users";
+import { toast } from "react-toastify";
 
 // Helpers: format về giá trị phù hợp <input type="date"> / <input type="datetime-local">
 const toDateInput = (v) => {
@@ -157,14 +158,16 @@ export default function EditStudent() {
 
     try {
       setSubmitting(true);
-      await updateUser(id, payload);
-
-      // Upload avatar nếu có chọn
-      if (avatarFile) {
-        await uploadAvatar(id, avatarFile);
+      let data = await updateUser(id, payload);
+      console.log(data);
+      
+      if (data){
+        toast.success("Cập nhật học viên thành công!")
       }
-
-      alert("Cập nhật học viên thành công!");
+      // // Upload avatar nếu có chọn
+      // if (avatarFile) {
+      //   await uploadAvatar(id, avatarFile);
+      // }
       navigate(-1);
     } catch (error) {
       console.error("Update student failed:", error);
@@ -207,23 +210,6 @@ export default function EditStudent() {
         )}
 
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-xl p-6 space-y-6">
-          {/* Ảnh đại diện */}
-          <div className="flex items-center space-x-6 mb-6">
-            <div>
-              <label htmlFor="avatarUpload" className="block font-medium mb-1 text-gray-700">
-                🖼️ Ảnh đại diện
-              </label>
-              <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm" />
-            </div>
-            {preview && (
-              <img
-                src={preview}
-                alt="Preview"
-                className="w-24 h-24 object-cover rounded-full ring-4 ring-pink-300 shadow-md hover:scale-105 transition-transform duration-200"
-              />
-            )}
-          </div>
-
           {/* Thông tin học viên */}
           <div className="grid grid-cols-3 gap-4">
             <div>
@@ -379,17 +365,6 @@ export default function EditStudent() {
                 type="datetime-local"
                 name="createdAt"
                 value={formData.createdAt}
-                onChange={() => {}}
-                className={inputStyle}
-                disabled
-              />
-            </div>
-
-            <div className="col-span-3">
-              <label className="block font-medium mb-1">🔗 Avatar URL (chỉ xem)</label>
-              <input
-                name="avatarUrl"
-                value={formData.avatarUrl || ""}
                 onChange={() => {}}
                 className={inputStyle}
                 disabled

@@ -177,8 +177,8 @@ const FeedbackStudent = () => {
           {dataCourse.map((course, idx) => (
             <div key={idx} className="p-2 cursor-pointer">
               <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                <div className="h-40 bg-purple-200 flex items-center justify-center text-white font-semibold text-lg">
-                  Ảnh
+                <div className="h-40 flex items-center justify-center text-white font-semibold text-lg">
+                  <img src={course.imageUrl} alt="" />
                 </div>
                 <div className="p-4 space-y-2">
                   <h3 className="text-md font-semibold">{course.title}</h3>

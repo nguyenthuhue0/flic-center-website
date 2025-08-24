@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import demo from "../../assets/images/demo.jpg"
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { changeStatus, getPaymentById } from "../../services/admin/payment";
 import { toast } from "react-toastify";

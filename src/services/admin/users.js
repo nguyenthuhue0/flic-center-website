@@ -40,4 +40,12 @@ const uploadLecturerAvatar = (id, file) => {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
-export { getUsers, getUserDetail, updateUser, uploadAvatar, deleteUser, createUser, updateLecturer, getLecturerDetail, uploadLecturerAvatar };
+const createNewAccountRole = (email, fullName, password, role) => {
+  return axios.post(`/admin/registerAccount`, {
+    email :email,
+    fullName: fullName,
+    password: password,
+    role: role
+  })
+}
+export { getUsers, getUserDetail, updateUser, uploadAvatar, deleteUser, createUser, updateLecturer, getLecturerDetail, uploadLecturerAvatar, createNewAccountRole };
