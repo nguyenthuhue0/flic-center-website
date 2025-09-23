@@ -1,112 +1,141 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/AxiosCustomize";
-import ieltsImg from "../../assets/images/IELTS.jpg"; // ảnh mặc định nếu backend không có
+import ieltsImg from "../../assets/images/IELTS.jpg";
+
+// Ảnh: chuẩn hoá nếu BE trả đường dẫn tương đối
+const resolveImage = (img) => {
+  const raw = img || "";
+  if (!raw) return ieltsImg;
+  return /^https?:\/\//i.test(raw)
+    ? raw
+    : `http://localhost:8080/${String(raw).replace(/^\/+/, "")}`;
+};
+
+// Lấy courseId đúng: cover nhiều biến thể + trường lồng
+const getCourseId = (c) =>
+  c?.id ??
+  c?.courseId ??
+  c?.course_id ??
+  c?.course?.id ??
+  c?.course?.courseId ??
+  c?.course?.course_id ??
+  c?.idCourse ??
+  c?.courseID ??
+  null;
 
 const LearningPathList = () => {
-    const [courses, setCourses] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [errorMsg, setErrorMsg] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get("/lecturer/course");
+        const payload = res?.data ?? res;
 
-    useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                const data = await api.get("/lecturer/course");
-                console.log('DocumentList - API response:', data);
+        // Chuẩn hoá mảng từ nhiều dạng response khác nhau
+        const raw =
+          Array.isArray(payload) ? payload :
+          Array.isArray(payload?.data) ? payload.data :
+          Array.isArray(payload?.value) ? payload.value :
+          Array.isArray(payload?.content) ? payload.content :
+          Array.isArray(payload?.items) ? payload.items : [];
 
-                // Xử lý response data
-                let coursesData = [];
-                if (Array.isArray(data)) {
-                    coursesData = data;
-                } else if (data && Array.isArray(data.value)) {
-                    coursesData = data.value;
-                } else if (data && Array.isArray(data.data)) {
-                    coursesData = data.data;
-                }
+        const mapped = raw.map((c, i) => {
+          const courseId = getCourseId(c);
+          return {
+            key: courseId ?? `tmp-${i}`,                // key cho React
+            courseId,                                   // id dùng để điều hướng
+            title: c.title ?? c.courseName ?? c.name ?? `Khóa học ${i + 1}`,
+            instructor:
+              c.lecturerInCharge ?? c.instructor ?? c.lecturerName ?? "Chưa có giảng viên",
+            description: c.description ?? "Chưa có mô tả",
+            price: Number(c.price ?? 0),
+            image: resolveImage(c.imageUrl ?? c.image),
+          };
+        });
 
-                const mappedCourses = coursesData.map((c, index) => ({
-                    id: c.id || c.courseId || (index + 1), // Sử dụng index + 1 thay vì Math.random()
-                    title: c.title || c.courseName || `Khóa học ${index + 1}`,
-                    instructor: c.lecturerInCharge || c.instructor || c.lecturerName || "Chưa có giảng viên",
-                    description: c.description || "Chưa có mô tả",
-                    price: c.price || 0,
-                    image: c.image || c.imageUrl || ieltsImg,
-                }));
+        setCourses(mapped);
+      } catch (err) {
+        console.error("Fetch courses failed:", err?.response || err);
+        setErrorMsg(
+          err?.response?.status === 403
+            ? "Bạn không có quyền truy cập khóa học này."
+            : "Đã có lỗi xảy ra khi tải dữ liệu."
+        );
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-                console.log('DocumentList - Mapped courses:', mappedCourses);
-                setCourses(mappedCourses);
-            } catch (error) {
-                console.error("Fetch courses failed:", error.response?.status, error.response?.data);
-                if (error.response?.status === 403) {
-                    setErrorMsg("Bạn không có quyền truy cập khóa học này.");
-                } else {
-                    setErrorMsg("Đã có lỗi xảy ra khi tải dữ liệu.");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
+  if (loading) return <p className="text-center mt-10">Đang tải khóa học...</p>;
+  if (errorMsg) return <p className="text-center mt-10 text-red-600">{errorMsg}</p>;
+  if (courses.length === 0) return <p className="text-center mt-10 text-gray-600">Không có khóa học nào.</p>;
 
-        fetchCourses();
-    }, []);
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {courses.map((course) => {
+          const canGo = !!course.courseId; // chỉ điều hướng khi có ID thật
+          return (
+            <div
+              key={course.key}
+              className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+            >
+              {/* Ảnh */}
+              <div className="aspect-video bg-purple-200 flex items-center justify-center overflow-hidden">
+                <img
+                  src={course.image}
+                  alt={course.title}
+                  className="object-cover w-full h-full"
+                  onError={(e) => (e.currentTarget.src = ieltsImg)}
+                />
+              </div>
 
-    if (loading) return <p className="text-center mt-10">Đang tải khóa học...</p>;
-    if (errorMsg) return <p className="text-center mt-10 text-red-600">{errorMsg}</p>;
+              {/* Nội dung */}
+              <div className="p-4 flex flex-col flex-grow">
+                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                <p className="text-gray-600 mb-2">{course.instructor}</p>
+                <p className="text-gray-700 mb-4 flex-grow">{course.description}</p>
 
-    return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {courses.map((course) => (
-                    <div
-                        key={course.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
-                    >
-                        {/* Ảnh */}
-                        <div className="aspect-video bg-purple-200 flex items-center justify-center overflow-hidden">
-                            <img
-                                src={course.image}
-                                alt={course.title}
-                                className="object-cover w-full h-full"
-                            />
-                        </div>
+                <div className="mt-auto">
+                  <p className="text-green-600 font-medium mb-4">
+                    {course.price.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </p>
 
-                        {/* Nội dung */}
-                        <div className="p-4 flex flex-col flex-grow">
-                            <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-                            <p className="text-gray-600 mb-2">{course.instructor}</p>
-                            <p className="text-gray-700 mb-4 flex-grow">{course.description}</p>
-
-                            {/* Nút và giá luôn nằm dưới */}
-                            <div className="mt-auto">
-                                <p className="text-green-600 font-medium mb-4">
-                                    {course.price.toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    })}
-                                </p>
-                                <button
-                                    onClick={() =>
-                                        navigate(`/lecturer/learningpathdetail/${course.id}`, {
-                                            state: {
-                                                courseId: course.id,
-                                                courseTitle: course.title
-                                            },
-                                        })
-                                    }
-                                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 px-4 rounded"
-                                >
-                                    Chi tiết →
-                                </button>
-
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                  <button
+                    onClick={() =>
+                      canGo &&
+                      navigate(`/lecturer/learningpathlist/${course.courseId}`, {
+                        state: { courseId: course.courseId, courseTitle: course.title },
+                      })
+                    }
+                    disabled={!canGo}
+                    title={canGo ? "" : "Thiếu courseId từ API – không thể vào chi tiết"}
+                    className={
+                      "w-full font-medium py-2 px-4 rounded " +
+                      (canGo
+                        ? "bg-yellow-400 hover:bg-yellow-500 text-black"
+                        : "bg-gray-300 text-gray-600 cursor-not-allowed")
+                    }
+                  >
+                    Chi tiết →
+                  </button>
+                </div>
+              </div>
             </div>
-        </div>
-    );
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default LearningPathList;

@@ -16,6 +16,7 @@ const lessonAPI = {
 
     // Xóa lesson
     remove: (id) => axios.delete(`/lessons/${id}`),
+      updateV2: (dto) => axios.post(`/lesson/update`, dto)
 };
 
 export default lessonAPI;
