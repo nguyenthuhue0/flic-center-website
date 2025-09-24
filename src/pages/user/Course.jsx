@@ -24,14 +24,7 @@ export default function App() {
   };
 
 
-  const colors = [
-    "bg-purple-300",
-    "bg-yellow-200",
-    "bg-green-300",
-    "bg-red-300",
-    "bg-pink-300",
-    "bg-purple-300",
-  ];
+ 
 
   return (
     <div className="min-h-screen bg-white z-0">
@@ -65,8 +58,9 @@ export default function App() {
               >
                 {/* Màu nền thay ảnh */}
                 <div
-                  className={`w-full h-[180px] flex items-center justify-center text-white text-base font-semibold ${colors[idx % colors.length]}`}
+                  className={`w-full h-[180px] flex items-center  text-white text-base font-semibold }`}
                 >
+                  <img src={course.imageUrl} alt="" />
                   {course.title}
                 </div>
 
