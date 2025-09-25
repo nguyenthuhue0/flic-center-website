@@ -85,28 +85,30 @@ const StudentSubmission = () => {
     return dayjs().isAfter(dayjs(dueDate)); // so sánh bằng dayjs
   };
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen font-sans">
+    <div className="p-6 space-y-6 bg-gray-50 dark:bg-[#18181b] min-h-screen font-sans transition-colors duration-300">
       {/* Header */}
-      <div className="border p-6">
-        <h1 className="text-5xl font-bold text-red-600 uppercase">{title}</h1>
-        <div className="flex items-center gap-2 mt-2 text-black-700 text-2xl">
+      <div className="border p-6 bg-white dark:bg-[#232326] rounded-lg shadow transition-colors">
+        <h1 className="text-5xl font-bold text-red-600 dark:text-red-400 uppercase">
+          {title}
+        </h1>
+        <div className="flex items-center gap-2 mt-2 text-black-700 dark:text-gray-200 text-2xl">
           <FaChalkboardTeacher />
           <p>Giảng viên: {lecturerName}</p>
         </div>
-        <p className="mt-1 text-md text-gray-600">
+        <p className="mt-1 text-md text-gray-600 dark:text-gray-400">
           Học viên &gt; Khóa học &gt; <span className="">{title}</span> &gt;{" "}
-          <span className="text-blue-600 cursor-pointer">
+          <span className="text-blue-600 dark:text-blue-300 cursor-pointer">
             {titleAssignment}
           </span>
         </p>
       </div>
-      <div className=" bg-white rounded-xl shadow-md p-6 space-y-6">
-        <h1 className="text-4xl font-semibold text-blue-700">
+      <div className="bg-white dark:bg-[#232326] rounded-xl shadow-md p-6 space-y-6 transition-colors">
+        <h1 className="text-4xl font-semibold text-blue-700 dark:text-blue-300">
           {titleAssignment}
         </h1>
 
         {/* Đề bài */}
-        <div className="space-y-2 border-b border-gray-200 pb-4 text-lg">
+        <div className="space-y-2 border-b border-gray-200 dark:border-gray-700 pb-4 text-lg">
           <p>
             <span className="font-semibold">
               <span className="inline-block">
@@ -145,7 +147,7 @@ const StudentSubmission = () => {
               href={tagTopic}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-red-600 underline hover:text-blue-800 inline-block"
+              className="text-red-600 dark:text-red-400 underline hover:text-blue-800 dark:hover:text-blue-400 inline-block"
             >
               {tagTopic}
             </a>
@@ -156,19 +158,19 @@ const StudentSubmission = () => {
         <div
           className={`p-4 rounded border-l-4 ${
             submitted === "true"
-              ? "bg-green-50 border-green-600"
-              : "bg-red-50 border-red-500"
+              ? "bg-green-50 dark:bg-green-900 border-green-600 dark:border-green-400"
+              : "bg-red-50 dark:bg-red-900 border-red-500 dark:border-red-400"
           }`}
         >
           {submitted === "true" ? (
-            <p className="text-green-700 font-medium flex items-center">
+            <p className="text-green-700 dark:text-green-300 font-medium flex items-center">
               <span className="inline-block mr-2">
                 <GiConfirmed />
               </span>{" "}
               Đã nộp {submissionTime}{" "}
             </p>
           ) : (
-            <p className="text-red-700 font-medium flex items-center">
+            <p className="text-red-700 dark:text-red-400 font-medium flex items-center">
               <span className="inline-block mr-2">
                 <TbXboxX />
               </span>
@@ -179,21 +181,23 @@ const StudentSubmission = () => {
 
         {/* Form nộp bài */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm font-medium">Chọn file để nộp:</label>
+          <label className="block text-sm font-medium dark:text-gray-200">
+            Chọn file để nộp:
+          </label>
           <input
             type="file"
             onChange={(e) => setFile(e.target.files[0])}
-            className="block w-full border rounded px-3 py-2 cursor-pointer hover:border-yellow-400"
+            className="block w-full border rounded px-3 py-2 cursor-pointer hover:border-yellow-400 dark:bg-[#232326] dark:text-gray-100 dark:border-gray-600"
           />
           {dataSubmit && Object.keys(dataSubmit).length > 0 && (
-            <div className="mt-2 p-2 rounded bg-green-50">
-              <p className="text-md">
+            <div className="mt-2 p-2 rounded bg-green-50 dark:bg-green-900">
+              <p className="text-md dark:text-green-200">
                 ✅ Đã nộp:
                 <a
                   href={fileSubmit}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline ml-1"
+                  className="text-blue-600 dark:text-blue-300 hover:underline ml-1"
                 >
                   Xem file
                 </a>
@@ -204,7 +208,7 @@ const StudentSubmission = () => {
             <button
               type="button"
               onClick={() => navigate("/student/studentcourse")}
-              className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 flex items-center cursor-pointer"
+              className="bg-orange-500 dark:bg-orange-700 text-white px-6 py-2 rounded hover:bg-orange-600 dark:hover:bg-orange-800 flex items-center cursor-pointer transition-colors"
             >
               <FaArrowLeft className="mr-2" />
               Quay về
@@ -213,11 +217,11 @@ const StudentSubmission = () => {
             <button
               type="submit"
               disabled={submitted === "true" || isOverdue()}
-              className={`px-8 py-2 rounded 
+              className={`px-8 py-2 rounded transition-colors
               ${
                 submitted === "true" || isOverdue()
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer "
+                  ? "bg-gray-400 dark:bg-gray-700 cursor-not-allowed"
+                  : "bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 cursor-pointer "
               }`}
             >
               {submitted === "true"

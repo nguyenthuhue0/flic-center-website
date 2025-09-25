@@ -52,13 +52,14 @@ const Header = () => {
   const handleLogout = () => {
     sessionStorage.clear();
     setHasToken(!hasToken);
+    localStorage.setItem("theme", "light");
     navigate("/login");
   };
 
   return (
     <div className="sticky top-0 z-10 flex flex-col bg-white font-sans">
       {/* Header */}
-      <header className=" bg-white shadow-sm">
+      <header className=" bg-white dark:bg-[#1c1e21] shadow-sm">
         {/* Top color bar */}
         <div className="flex h-[10px] ">
           <div className="relative w-2/5 bg-red-500">
@@ -77,11 +78,12 @@ const Header = () => {
             <img
               src={logo}
               alt="Logo"
-              className="absolute h-20 w-30 top-3 left-35"
+              className="absolute h-20 w-30 top-3 left-35 rounded-full"
               onClick={() => {
                 navigate("/");
                 sessionStorage.clear();
-
+                localStorage.setItem("theme", "light");
+                document.documentElement.classList.remove("dark");
                 setHasToken(false);
               }}
             />
@@ -129,7 +131,11 @@ const Header = () => {
                   ) : (
                     <button
                       className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 cursor-pointer"
-                      onClick={() => navigate("/registerForm")}
+                      onClick={() => {
+                        navigate("/registerForm");
+                        localStorage.setItem("theme", "light");
+                        document.documentElement.classList.remove("dark");
+                      }}
                     >
                       Đăng ký học
                     </button>

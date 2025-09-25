@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../../services/admin/users";
+import { getAllStudents } from "../../services/admin/users";
 import { deleteUser } from "../../services/admin/users";
 
 const AdminStudent = () => {
@@ -20,7 +20,7 @@ const AdminStudent = () => {
         setLoading(true);
         setErr("");
 
-        const res = await getUsers(); // AxiosCustomize đang trả THẲNG data (mảng)
+        const res = await getAllStudents(); // AxiosCustomize đang trả THẲNG data (mảng)
         console.log("[getUsers] axios response =", res);
 
         // Nhận đúng dữ liệu bất kể interceptor trả kiểu gì
@@ -47,8 +47,8 @@ const AdminStudent = () => {
 
     // Lọc: chỉ giữ USER (hoa/thường) hoặc student (hoa/thường)
     const allowed = rows.filter((u) => {
-      const role = String(u.role || "").trim().toLowerCase();
-      return role === "user" || role === "student";
+      // const role = String(u.role || "").trim().toLowerCase();
+      return u.role === "STUDENT";
     });
 
     // Log debug

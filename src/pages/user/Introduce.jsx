@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaStar, FaShieldAlt, FaCheckCircle } from 'react-icons/fa';
-
+import AOS from "aos";
+import image from "../../assets/images/demo.jpg"
 
 const visionItems = [
     {
@@ -52,10 +53,13 @@ const trainingFields = [
 
 
 const Introduce = () => {
+       useEffect(() => {
+        AOS.init({ duration: 2000, once: true }); // once: true => chỉ chạy 1 lần
+      }, []);
     return (
         <div className="container">
-            <h1 className="section-title-h1" style={{ textAlign: 'center' }}>ĐÔI NÉT VỀ TRUNG TÂM NGOẠI NGỮ TIN HỌC FLIC</h1>
-            <section className="intro">
+            <h1 data-aos="fade-up" className="section-title-h1" style={{ textAlign: 'center' }}>ĐÔI NÉT VỀ TRUNG TÂM NGOẠI NGỮ TIN HỌC FLIC</h1>
+            <section data-aos="zoom-in-up" className="intro">
                 <div className="intro-left">
                     <p>
                         Được thành lập theo Quyết định của Giám đốc Đại học Đà Nẵng về việc thành lập các đơn vị thuộc, trực thuộc Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn.
@@ -65,15 +69,15 @@ const Introduce = () => {
                     </p>
                 </div>
                 <div className="intro-right">
-                    <div className="placeholder">ẢNH</div>
+                    <div className="placeholder"><img src={image} alt="" /></div>
                 </div>
             </section>
 
             {/* TẦM NHÌN SỨ MỆNH */}
-            <h2 className="section-title">TẦM NHÌN - SỨ MỆNH</h2>
+            <h2 data-aos="fade-up" className="section-title">TẦM NHÌN - SỨ MỆNH</h2>
             <div className="vision-list">
                 {visionItems.map((item, i) => (
-                    <div className="vision-card" key={i} style={{ borderColor: item.border }}>
+                    <div data-aos="fade-up" className="vision-card" key={i} style={{ borderColor: item.border }}>
                         <div className="vision-icon">{item.icon}</div>
                         <div className="vision-content">
                             <h3>{item.title}</h3>
@@ -84,8 +88,8 @@ const Introduce = () => {
             </div>
 
             {/* CÁN BỘ VIÊN CHỨC */}
-            <h2 className="section-title" style={{ color: '#EF4444' }}>CÁC LĨNH VỰC ĐÀO TẠO</h2>
-            <div className="field-list">
+            <h2 data-aos="fade-up" className="section-title" style={{ color: '#EF4444' }}>CÁC LĨNH VỰC ĐÀO TẠO</h2>
+            <div data-aos="fade-up" className="field-list">
                 {trainingFields.map((field, i) => (
                     <div className="field-card" key={i}>
                         <div className="field-icon">🔴</div>
@@ -95,8 +99,8 @@ const Introduce = () => {
                 ))}
             </div>
 
-            <h2 className="section-title" style={{ color: '#EF4444' }}>DANH SÁCH CÁN BỘ VIÊN CHỨC</h2>
-            <div className="bg-white rounded-[2rem] shadow-xl text-center px-4 py-6 max-w-xs mx-auto mb-8">
+            <h2 data-aos="fade-up" className="section-title" style={{ color: '#EF4444' }}>DANH SÁCH CÁN BỘ VIÊN CHỨC</h2>
+            <div data-aos="fade-up" className="bg-white rounded-[2rem] shadow-xl text-center px-4 py-6 max-w-xs mx-auto mb-8">
                 {/* Hình tròn nền vàng và ảnh */}
                 <div className="relative w-28 h-28 mx-auto">
                     <div className="absolute inset-0 rounded-full bg-yellow-400 z-0" />
@@ -124,7 +128,7 @@ const Introduce = () => {
 
 
             </div>
-            <div className="bg-white rounded-[2rem] shadow-xl text-center px-4 py-6 max-w-xs mx-auto">
+            <div data-aos="fade-up" className="bg-white rounded-[2rem] shadow-xl text-center px-4 py-6 max-w-xs mx-auto">
                 {/* Hình tròn nền vàng và ảnh */}
                 <div className="relative w-28 h-28 mx-auto">
                     <div className="absolute inset-0 rounded-full bg-yellow-400 z-0" />

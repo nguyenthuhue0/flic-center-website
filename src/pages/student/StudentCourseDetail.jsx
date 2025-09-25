@@ -99,11 +99,11 @@ const StudentCourseDetail = () => {
   const getFileIcon = (type) => {
     switch (type) {
       case "Đề cương":
-        return <FaFilePdf className="text-red-600" />;
+        return <FaFilePdf className="text-red-600 dark:text-red-400" />;
       case "Slide":
-        return <FaFilePowerpoint className="text-orange-500" />;
+        return <FaFilePowerpoint className="text-orange-500 dark:text-orange-300" />;
       default:
-        return <FaFile />;
+        return <FaFile className="dark:text-gray-300" />;
     }
   };
   function mapDisplayToDbType(displayName) {
@@ -133,38 +133,38 @@ const StudentCourseDetail = () => {
   const isDeadline = (date) => deadlineDates.includes(date.toDateString());
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen font-sans">
+    <div className="p-6 space-y-6 bg-gray-50 dark:bg-[#18181b] min-h-screen font-sans transition-colors duration-300">
       {/* Header */}
-      <div className="border p-6">
-        <h1 className="text-5xl font-bold text-red-600 uppercase">
+      <div className="border p-6 bg-white dark:bg-[#232326] rounded-lg shadow transition-colors">
+        <h1 className="text-5xl font-bold text-red-600 dark:text-red-400 uppercase">
           {dataCourse.title}
         </h1>
-        <div className="flex items-center gap-2 mt-2 text-black-700 text-2xl">
+        <div className="flex items-center gap-2 mt-2 text-black-700 dark:text-gray-200 text-2xl">
           <FaChalkboardTeacher />
           <p>Giảng viên: {dataCourse.lecturerName}</p>
         </div>
-        <p className="mt-1 text-md text-gray-600">
+        <p className="mt-1 text-md text-gray-600 dark:text-gray-400">
           Học viên &gt; Khóa học &gt;{" "}
-          <span className="text-blue-600 cursor-pointer">
+          <span className="text-blue-600 dark:text-blue-300 cursor-pointer">
             {dataCourse.title}
           </span>
         </p>
       </div>
 
       {/* Course Documents */}
-      <div>
-        <h2 className="text-3xl font-semibold text-blue-600 mb-2">
+      <div className="bg-white dark:bg-[#232326] rounded-lg shadow transition-colors p-6">
+        <h2 className="text-3xl font-semibold text-blue-600 dark:text-blue-300 mb-2">
           Tài liệu khóa học
         </h2>
         <div className="space-y-2">
           {documents.map((doc, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 text-black-800 text-xl"
+              className="flex items-center gap-2 text-black-800 dark:text-gray-100 text-xl"
             >
-              <FaTags className="text-black-600" />
+              <FaTags className="text-black-600 dark:text-gray-400" />
               <span
-                className="hover:text-red-500 hover:underline cursor-pointer w-full py-2"
+                className="hover:text-red-500 dark:hover:text-red-400 hover:underline cursor-pointer w-full py-2"
                 onClick={() => {
                   setIsModalOpen(true);
                   setSelectedDoc(doc);
@@ -189,16 +189,16 @@ const StudentCourseDetail = () => {
             </div>
           ))}
         </div>
-        <hr className="mt-4 border-yellow-200" />
+        <hr className="mt-4 border-yellow-200 dark:border-yellow-900" />
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="w-[800px] mx-auto rounded-2xl bg-white">
-          <div className=" px-6 py-4 border-b">
-            <h2 className="text-center text-2xl font-bold text-blue-700">
+        <div className="w-[800px] mx-auto rounded-2xl bg-white dark:bg-[#232326] transition-colors">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-center text-2xl font-bold text-blue-700 dark:text-blue-300">
               {selectedDoc}
             </h2>
           </div>
-          <ul className="divide-y divide-gray-200 px-6 py-4 max-h-[400px] overflow-y-auto">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700 px-6 py-4 max-h-[400px] overflow-y-auto">
             {files.map((file, index) => (
               <li
                 key={index}
@@ -207,14 +207,14 @@ const StudentCourseDetail = () => {
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">{getFileIcon(file.type)}</div>
                   <div>
-                    <p className="font-medium text-gray-800 truncate max-w-[500px]">
+                    <p className="font-medium text-gray-800 dark:text-gray-100 truncate max-w-[500px]">
                       {file.title}
                     </p>
-                    <p className="text-xs text-gray-500">{file.size}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{file.size}</p>
                   </div>
                 </div>
                 <a
-                  className="flex items-center gap-1 text-xs bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition cursor-pointer"
+                  className="flex items-center gap-1 text-xs bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-full transition cursor-pointer"
                   href={file.fileUrl}
                   download
                 >
@@ -227,8 +227,8 @@ const StudentCourseDetail = () => {
         </div>
       </Modal>
 
-      <div className="bg-gray-50 min-h-screen font-sans">
-        <h2 className="text-3xl font-semibold text-blue-600 mb-6">
+      <div className="bg-gray-50 dark:bg-[#18181b] min-h-screen font-sans transition-colors duration-300">
+        <h2 className="text-3xl font-semibold text-blue-600 dark:text-blue-300 mb-6">
           Bài tập khóa học
         </h2>
 
@@ -239,10 +239,10 @@ const StudentCourseDetail = () => {
               <div key={dataLesson.id} className="mb-4">
                 {/* BOX BÀI HỌC */}
                 <div
-                  className="p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md cursor-pointer"
+                  className="p-4 bg-white dark:bg-[#232326] rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md cursor-pointer transition-colors"
                   onClick={() => toggleLesson(dataLesson.id)}
                 >
-                  <div className="flex items-center text-orange-600">
+                  <div className="flex items-center text-orange-600 dark:text-orange-400">
                     <span className="inline-block text-lg">
                       {isOpen ? (
                         <IoIosArrowDropdownCircle />
@@ -261,33 +261,33 @@ const StudentCourseDetail = () => {
                     {(assignments[dataLesson.id] || []).map((lab) => (
                       <div
                         key={lab.id}
-                        className="p-3 bg-white border-l-4 border-blue-500 rounded shadow-sm hover:bg-blue-50 cursor-pointer"
+                        className="p-3 bg-white dark:bg-[#232326] border-l-4 border-blue-500 dark:border-blue-400 rounded shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer transition-colors"
                         onClick={() =>
                           navigate(
                             `/student/studentsubmission/${lab.id}?submit=${lab.submitted}&detail=${id}`
                           )
                         }
                       >
-                        <div className="flex items-center gap-2 text-black font-medium text-lg">
+                        <div className="flex items-center gap-2 text-black dark:text-gray-100 font-medium text-lg">
                           <FaFileAlt />
-                          <span className="hover:text-red-500">
+                          <span className="hover:text-red-500 dark:hover:text-red-400">
                             {lab.title}
                           </span>
                         </div>
                         <p
                           className={`ml-6 text-sm mt-1 ${
                             lab.submitted === true
-                              ? "text-blue-600"
-                              : "text-red-600"
+                              ? "text-blue-600 dark:text-blue-300"
+                              : "text-red-600 dark:text-red-400"
                           }`}
                         >
-                          <span className="text-black">Trạng thái:</span>{" "}
+                          <span className="text-black dark:text-gray-200">Trạng thái:</span>{" "}
                           {lab.submitted === true
                             ? "Đã hoàn thành"
                             : "Chưa hoàn thành"}
                         </p>
-                        <div className="ml-6 mt-1 text-gray-700 text-sm">
-                          <span className="font-medium text-black">
+                        <div className="ml-6 mt-1 text-gray-700 dark:text-gray-300 text-sm">
+                          <span className="font-medium text-black dark:text-gray-200">
                             Hạn nộp:
                           </span>{" "}
                           <span className="italic">
@@ -303,8 +303,8 @@ const StudentCourseDetail = () => {
           </div>
 
           {/* Cột phải: Lịch deadline */}
-          <div className="w-full lg:w-[350px] bg-white p-4 rounded-lg shadow-md h-fit">
-            <h3 className="text-xl font-semibold text-blue-600 text-center mb-2">
+          <div className="w-full lg:w-[350px] bg-white dark:bg-[#232326] p-4 rounded-lg shadow-md h-fit transition-colors">
+            <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-300 text-center mb-2">
               📅 Lịch hạn nộp
             </h3>
             <Calendar
@@ -313,6 +313,8 @@ const StudentCourseDetail = () => {
               tileClassName={({ date }) =>
                 isDeadline(date) ? "deadline-day" : null
               }
+              className="!bg-white dark:!bg-[#232326] !text-black dark:!text-gray-100 !rounded-lg !border-gray-200 dark:!border-gray-700"
+           
             />
           </div>
         </div>

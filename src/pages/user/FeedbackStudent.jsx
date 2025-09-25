@@ -56,7 +56,7 @@ const FeedbackStudent = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 ">
-      <div className="text-center mb-8">
+      <div data-aos="fade-up" className="text-center mb-8">
         <h2 className="text-4xl font-bold text-blue-700">
           Cảm nhận của học viên sau khi học tại
         </h2>
@@ -72,6 +72,7 @@ const FeedbackStudent = () => {
         {students.map((student, index) => (
           <div
             key={index}
+            data-aos="fade-up"
             className="bg-white shadow-md rounded-lg overflow-hidden text-center p-10 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:scale-105 hover:shadow-lg"
           >
             <div className=" h-55 w-full">

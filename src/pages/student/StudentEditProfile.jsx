@@ -87,24 +87,24 @@ const handleFileChange = async (e) => {
 };
 
   return (
-    <div className="min-h-screen p-6 font-sans">
-      <div className="mx-auto bg-white shadow-lg rounded-2xl p-8 space-y-8">
-        <h1 className="text-4xl font-bold text-blue-700 text-center">
+    <div className="min-h-screen p-6 font-sans bg-gray-50 dark:bg-[#18181b] transition-colors duration-300">
+      <div className="mx-auto bg-white dark:bg-[#232326] shadow-lg rounded-2xl p-8 space-y-8 transition-colors">
+        <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-300 text-center">
           Chỉnh sửa thông tin cá nhân
         </h1>
 
         {/* Avatar + Thông tin cơ bản */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 border-b border-gray-200 pb-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 border-b border-gray-200 dark:border-gray-700 pb-6">
           {/* Avatar */}
           <div className="relative w-32 h-32 group">
             <img
-              src={linkImage ||null}
+              src={linkImage || null}
               alt="Avatar"
-              className="w-full h-full rounded-full object-cover border border-gray-300"
+              className="w-full h-full rounded-full object-cover border border-gray-300 dark:border-gray-600"
             />
 
-            <div className="absolute inset-0 bg-white/40 bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <span className="text-black text-sm flex items-center gap-1">
+            <div className="absolute inset-0 bg-white/40 dark:bg-black/40 bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="text-black dark:text-gray-200 text-sm flex items-center gap-1">
                 <FaCamera className="w-4 h-4" />
                 Sửa ảnh
               </span>
@@ -212,15 +212,16 @@ const handleFileChange = async (e) => {
         </Section>
 
         {/* Nút điều khiển */}
-        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-          <button className="bg-gray-300 text-gray-800 px-5 py-2 rounded hover:bg-gray-400 cursor-pointer"
-          onClick={() => navigate('/student/studentprofile')}
+        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button
+            className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-5 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 cursor-pointer"
+            onClick={() => navigate('/student/studentprofile')}
           >
             Hủy bỏ
           </button>
           <button
             onClick={handleSave}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 cursor-pointer"
+            className="bg-blue-600 dark:bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-800 cursor-pointer"
           >
             Lưu thay đổi
           </button>
@@ -232,21 +233,21 @@ const handleFileChange = async (e) => {
 
 const EditableInput = ({ label, name, value, onChange, type = "text" }) => (
   <div className="flex flex-col">
-    <label className="mb-1 text-gray-700 font-medium">{label}</label>
+    <label className="mb-1 text-gray-700 dark:text-gray-200 font-medium">{label}</label>
     <input
       type={type}
       name={name}
       value={value}
       disabled={name === "role"} // nếu name là role thì readonly
       onChange={onChange}
-      className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-[#232326] text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
     />
   </div>
 );
 
 const Section = ({ title, children }) => (
   <div className="space-y-4">
-    <h2 className="text-2xl font-semibold text-blue-700">{title}</h2>
+    <h2 className="text-2xl font-semibold text-blue-700 dark:text-blue-300">{title}</h2>
     {children}
   </div>
 );

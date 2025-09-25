@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import lessonAPI from "../../services/Lecturer/Lesson";
 import api from "../../utils/AxiosCustomize"; // gọi fallback /lesson/{id}
 
@@ -10,7 +10,7 @@ export default function StudyPlan() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState({}); // { type: 'session'|'week'|'save', id, field }
   const [editing, setEditing] = useState(null); // { weekId, lessonId, field: 'content'|'startTime'|'endTime', draft }
-
+  const navigate = useNavigate();
   // ------- utils -------
   const groupLessons = (arr) => {
     const grouped = arr.reduce((acc, item) => {
@@ -98,11 +98,11 @@ const removeLessonSafe = async (id) => {
       return await lessonAPI.removeByQuery(id);
     }
     return await api.delete(`/lesson`, { params: { lessonId: id } });
-  } catch (err1) {
+  } catch {
     // Fallback 1: /lesson/{id}
     try {
       return await api.delete(`/lesson/${id}`);
-    } catch (err2) {
+    } catch  {
       // Fallback 2: /lessons/{id}
       return await api.delete(`/lessons/${id}`);
     }
@@ -364,6 +364,7 @@ const updateLessonSafe = async (id, payload) => {
             <th className="border border-gray-400 p-2">Bắt đầu</th>
             <th className="border border-gray-400 p-2">Kết thúc</th>
             <th className="border border-gray-400 p-2">Thao tác</th>
+            <th className="border border-gray-400 p-2">Thêm Bài tập</th>
           </tr>
         </thead>
 
@@ -563,6 +564,13 @@ const updateLessonSafe = async (id, payload) => {
                       title="Xóa buổi"
                     >
                       <Trash2 size={18} />
+                    </button>
+                  </td>
+                  <td className="border border-gray-400 text-center">
+                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    onClick={() => (navigate(`/lecturer/lesson/${session.lessonId}?courseId=${courseId}`)) }
+                    >
+                      Thêm Bài tập
                     </button>
                   </td>
                 </tr>

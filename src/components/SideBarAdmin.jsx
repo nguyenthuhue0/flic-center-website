@@ -9,6 +9,8 @@ import {
   FaAtom,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { FaUserTie } from "react-icons/fa6";
+
 import { CiLogout } from "react-icons/ci";
 import { MdOutlineManageAccounts } from "react-icons/md";
 
@@ -19,11 +21,12 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: "Học viên", icon: <FaTachometerAlt /> },
-    { name: "Giảng viên", icon: <FaUser /> },
+    { name: "Giảng viên", icon: <FaUserTie /> },
     { name: "Khóa học", icon: <FaTable /> },
     { name: "Tin tức", icon: <FaFont /> },
     { name: "Hóa đơn", icon: <FaAtom /> },
     { name: "Thêm tài khoản", icon: <MdOutlineManageAccounts /> },
+    { name: "Người dùng", icon: <FaUser /> },
   ];
 
   const handleClick = (name) => {
@@ -45,6 +48,9 @@ const Sidebar = () => {
     }
     if (name === "Thêm tài khoản") {
       navigate("./newAccount");
+    }
+    if (name === "Người dùng") {
+      navigate("./userManagement");
     }
 
     // Các điều hướng khác bạn có thể thêm tại đây

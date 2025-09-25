@@ -5,7 +5,8 @@ import banner02 from "../../assets/images/banner02.png";
 import { getCourse } from "../../services/Student/Home";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import AOS from "aos";
+import CountUp from "react-countup";
 const Home = () => {
    const navigate = useNavigate()
    useEffect(() => {
@@ -16,6 +17,9 @@ const Home = () => {
       let courses = await getCourse();
       setDataCourse(courses);
    }
+   useEffect(() => {
+    AOS.init({ duration: 1000, once: true }); // once: true => chỉ chạy 1 lần
+  }, []);
    return (
       <div className="bg-white">
          {/* Section 1: Banner */}
@@ -50,15 +54,15 @@ const Home = () => {
                <div className="flex-1 bg-white text-blue-900 p-8 rounded-xl shadow-lg text-center">
                   <div className="grid grid-cols-3 gap-4 text-lg font-semibold">
                      <div>
-                        <p className="text-3xl font-bold text-blue-700">500+</p>
+                        <p className="text-3xl font-bold text-blue-700"><CountUp end={500} duration={1}/>+</p>
                         <p>Sinh viên</p>
                      </div>
                      <div>
-                        <p className="text-3xl font-bold text-blue-700">100+</p>
+                        <p className="text-3xl font-bold text-blue-700"><CountUp end={100} duration={1}/>+</p>
                         <p>Giảng viên</p>
                      </div>
                      <div>
-                        <p className="text-3xl font-bold text-blue-700">50+</p>
+                        <p className="text-3xl font-bold text-blue-700"><CountUp end={50} duration={1}/>+</p>
                         <p>Khoá học</p>
                      </div>
                   </div>
@@ -70,15 +74,15 @@ const Home = () => {
 
          <div className="py-16 bg-gray-100 px-6 md:px-16">
             <div className="max-w-7xl mx-auto text-center">
-               <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-4">Lý do chọn FLIC !</h2>
-               <p className="text-gray-700 mb-12 max-w-3xl mx-auto">
+               <h2 data-aos="fade-up" className="text-2xl md:text-3xl font-bold text-blue-700 mb-4">Lý do chọn FLIC !</h2>
+               <p data-aos="fade-up" className="text-gray-700 mb-12 max-w-3xl mx-auto">
                   FLIC là địa chỉ uy tín trong việc tổ chức các khóa học và cấp chứng chỉ thuộc hệ thống giáo dục quốc dân.
                </p>
 
                {/* 3 Columns */}
                <div className="grid md:grid-cols-3 gap-6 text-left">
                   {/* Box 1 */}
-                  <div className="bg-white border-2 border-red-400 rounded-xl p-6 shadow hover:shadow-md transition">
+                  <div data-aos="fade-up" className="bg-white border-2 border-red-400 rounded-xl p-6 shadow hover:shadow-md transition">
                      <div className="text-4xl mb-4">🛡️</div>
                      <h3 className="text-xl font-bold mb-2">Chất lượng, uy tín</h3>
                      <p className="text-gray-600">
@@ -87,7 +91,7 @@ const Home = () => {
                   </div>
 
                   {/* Box 2 */}
-                  <div className="bg-white border-2 border-yellow-400 rounded-xl p-6 shadow hover:shadow-md transition">
+                  <div data-aos="fade-up" className="bg-white border-2 border-yellow-400 rounded-xl p-6 shadow hover:shadow-md transition">
                      <div className="text-4xl mb-4">✅</div>
                      <h3 className="text-xl font-bold mb-2">Đào tạo đa dạng, linh hoạt</h3>
                      <p className="text-gray-600">
@@ -96,7 +100,7 @@ const Home = () => {
                   </div>
 
                   {/* Box 3 */}
-                  <div className="bg-white border-2 border-blue-400 rounded-xl p-6 shadow hover:shadow-md transition">
+                  <div data-aos="fade-up" className="bg-white border-2 border-blue-400 rounded-xl p-6 shadow hover:shadow-md transition">
                      <div className="text-4xl mb-4">⭐</div>
                      <h3 className="text-xl font-bold mb-2">Liên kết quốc tế</h3>
                      <p className="text-gray-600">
@@ -118,7 +122,7 @@ const Home = () => {
 
 
          {/* Section 3: Khóa học */}
-         <div className="py-16 bg-white px-6 md:px-16">
+         <div data-aos="fade-up" className="py-16 bg-white px-6 md:px-16">
             <div className="max-w-7xl mx-auto text-center">
                <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-4 text-center">Khóa học của chúng tôi</h2>
                <p className="text-gray-700 mb-12 max-w-3xl mx-auto">
@@ -131,7 +135,7 @@ const Home = () => {
                         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
                            <img src={course.imageUrl} alt="Khóa học 1" className="w-full h-40 object-cover rounded-t-lg" />
                            <h3 className="text-lg font-semibold mt-2">{course.title}</h3>
-                           <button className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
+                           <button onClick={() => navigate(`/course/${course.id}`)} className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-500">Chi tiết</button>
                         </div>
                      ))
                   }
@@ -144,7 +148,7 @@ const Home = () => {
 
 
          {/* Section 4: Lịch thi */}
-         <div className="max-w-5xl mx-auto bg-gray-100 rounded-xl shadow p-4">
+         <div data-aos="fade-up" className="max-w-5xl mx-auto bg-gray-100 rounded-xl shadow p-4">
             <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-4 text-center">Lịch thi</h2>
             <p className="text-gray-700 mb-12 max-w-3xl mx-auto text-center">
                Lịch thi được sắp xếp linh hoạt, phù hợp với từng khóa học và trình độ học viên.
@@ -225,7 +229,7 @@ const Home = () => {
          </div>
 
 
-         <div className="text-center my-12">
+         <div data-aos="fade-up" className="text-center my-12">
             <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-2">
                Chia sẻ từ học viên
             </h2>
@@ -328,7 +332,7 @@ const Home = () => {
          </div>
 
 
-         <div className="py-16 px-4 bg-white text-center">
+         <div data-aos="fade-up" className="py-16 px-4 bg-white text-center">
             <h2 className="text-2xl font-bold text-blue-700 mb-8">Đối tác tin tưởng chúng tôi</h2>
             <div className="grid grid-cols-3 gap-8 justify-items-center max-w-3xl mx-auto">
                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/5/5a/Logo_tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_th%C3%B4ng_tin_v%C3%A0_Truy%E1%BB%81n_th%C3%B4ng_Vi%E1%BB%87t_-_H%C3%A0n%2C_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_%C4%90%C3%A0_N%E1%BA%B5ng.svg/2560px-Logo_tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_th%C3%B4ng_tin_v%C3%A0_Truy%E1%BB%81n_th%C3%B4ng_Vi%E1%BB%87t_-_H%C3%A0n%2C_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_%C4%90%C3%A0_N%E1%BA%B5ng.svg.png" alt="IIG" className="w-20 h-20 object-contain grayscale hover:grayscale-0 transition" />

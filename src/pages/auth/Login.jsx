@@ -6,7 +6,6 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { postLogin } from "../../services/Auth/AuthService";
 import { jwtDecode } from "jwt-decode";
-
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

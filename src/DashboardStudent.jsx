@@ -12,7 +12,7 @@ function DashboardStudent() {
         <SideBarStudent />
 
         {/* Nội dung trang con (Outlet) bên phải */}
-        <div className="flex-1 p-4">
+        <div className="dark:bg-[#1c1e21] flex-1 p-4">
           <Outlet />
         </div>
       </div>

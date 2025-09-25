@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getAssignmentByLessonId } from "../../services/Student/Course";
 import { FaArrowLeft } from "react-icons/fa";
 import { MdAssignment } from "react-icons/md";
 
 const AssignmentManage = () => {
     const { id } = useParams();
+    const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const courseId = queryParams.get("courseId");
+  
     const [tableData, setTableData] = useState([])
     const navigate = useNavigate()
     useEffect(() => {
@@ -26,7 +30,7 @@ const AssignmentManage = () => {
                 <div className="flex justify-between mt-6 mb-4">
                     <button
                       type="button"
-                      onClick={() => navigate(`/lecturer/lesson/${id}`)}
+                      onClick={() => navigate(`/lecturer/learningpathlist/${courseId}`)}
                       className="btn-outline cursor-pointer bg-gray-300 p-3 hover:bg-gray-200 rounded-lg"
                     >
                       <FaArrowLeft className="inline mr-1" /> Quay lại

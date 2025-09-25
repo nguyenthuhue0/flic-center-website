@@ -6,7 +6,12 @@ export const getAdminCourses = (page = 0, size = 20, q = "") => {
   // BE nên có /api/admin/courses, filter q (tùy backend)
   return axios.get(`/admin/courses`, { params: { page, size, q } });
 };
-
+export const assignInstructorToCourse = (teacherId, courseId) => {
+  return axios.post(`/admin/course-to-instructor`, {
+    idUser: teacherId,
+    idCourse: courseId
+  })
+}
 // Xoá khoá học (nếu BE có)
 export const deleteCourse = (id) => {
   return axios.delete(`/admin/courses/${id}`);

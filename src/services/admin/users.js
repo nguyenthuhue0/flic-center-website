@@ -1,9 +1,24 @@
 import axios from "../../utils/AxiosCustomize";
 
 const getUsers = () => {
-  return axios.get(`/admin/users`);
+  return axios.get(`/admin/users`, {
+    params: { role: "USER" }
+  });
 };
+const getAllStudents = () => {
+  return axios.get(`/admin/users`, {
+    params: { role: "STUDENT" }
+  });
+}
 
+const getAllLectures = () => {
+  return axios.get(`/admin/lecturers`);
+}
+const updateUserRole = (id, role) => {
+  return axios.put(`/admin/lecturer/${id}`, 
+     { role: role }
+  );
+};
 const getUserDetail = (id) => {
   return axios.get(`/admin/users/${id}`);
 };
@@ -48,4 +63,4 @@ const createNewAccountRole = (email, fullName, password, role) => {
     role: role
   })
 }
-export { getUsers, getUserDetail, updateUser, uploadAvatar, deleteUser, createUser, updateLecturer, getLecturerDetail, uploadLecturerAvatar, createNewAccountRole };
+export { getUsers, updateUserRole, getUserDetail, updateUser, uploadAvatar, deleteUser, createUser, updateLecturer, getLecturerDetail, uploadLecturerAvatar, createNewAccountRole, getAllLectures, getAllStudents };

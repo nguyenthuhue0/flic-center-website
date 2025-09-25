@@ -121,42 +121,42 @@ export default function StudentSchedule() {
   }, [currentWeekStart]);
 
   return (
-    <div className="p-4 flex gap-4">
+    <div className="p-4 flex gap-4 bg-gray-50 dark:bg-[#18181b] min-h-screen transition-colors duration-300">
       {/* Trái: Thời khóa biểu */}
       <div className="flex-1">
         {/* Thanh chọn tuần */}
         <div className="flex justify-between items-center mb-2">
           <button
             onClick={() => setCurrentWeekStart(currentWeekStart.subtract(1, "week"))}
-            className="bg-gray-200 px-3 py-1 rounded ml-[49px] hover:bg-gray-300"
+            className="bg-gray-200 dark:bg-gray-700 dark:text-gray-100 px-3 py-1 rounded ml-[49px] hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             ← Tuần trước
           </button>
 
-          <div className="font-semibold">
+          <div className="font-semibold dark:text-white">
             Tuần: {currentWeekStart.format("DD/MM")} – {currentWeekStart.add(6, "day").format("DD/MM")}
           </div>
 
           <button
             onClick={() => setCurrentWeekStart(currentWeekStart.add(1, "week"))}
-            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 mr-[112px]"
+            className="bg-gray-200 dark:bg-gray-700 dark:text-gray-100 px-3 py-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600 mr-[112px] transition-colors"
           >
             Tuần sau →
           </button>
         </div>
 
         {/* Header: các thứ + ngày */}
-        <div className="grid grid-cols-7 ml-[49px] border border-black text-center font-semibold w-[1016px] h-[52px] bg-white">
+        <div className="grid grid-cols-7 ml-[49px] border border-black dark:border-gray-700 text-center font-semibold w-[1016px] h-[52px] bg-white dark:bg-[#232326] transition-colors">
           {days.map((day, index) => {
             const isSameWeek = currentWeekStart.isSame(dayjs().startOf("isoWeek"), "day");
             const isToday = isSameWeek && weekDates[index] === dayjs().format("DD/MM");
             return (
               <div
                 key={index}
-                className={`p-1 border-r last:border-r-0 ${isToday ? "bg-yellow-200 text-[#CC2B2B] font-bold rounded" : ""}`}
+                className={`p-1 border-r last:border-r-0 border-gray-200 dark:border-gray-700 ${isToday ? "bg-yellow-200 text-[#CC2B2B] font-bold rounded" : "dark:text-gray-100"}`}
               >
                 <div>{day}</div>
-                <div className="text-xs text-gray-500">{weekDates[index]}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{weekDates[index]}</div>
               </div>
             );
           })}
@@ -167,31 +167,31 @@ export default function StudentSchedule() {
           {/* Cột giờ bên trái */}
           <div className="flex flex-col text-sm mt-4 mr-2">
             {hours.map((hour, idx) => (
-              <div key={idx} className="h-[50px] flex items-start justify-end pr-2 text-gray-600">
+              <div key={idx} className="h-[50px] flex items-start justify-end pr-2 text-gray-600 dark:text-gray-400">
                 {hour}
               </div>
             ))}
           </div>
 
           {/* Lưới */}
-          <div className="border border-pink-200 w-[1016px] h-[750px] grid grid-cols-7 relative bg-white">
+          <div className="border border-pink-200 dark:border-pink-900 w-[1016px] h-[750px] grid grid-cols-7 relative bg-white dark:bg-[#232326] transition-colors">
             {/* Dòng lưới ngang */}
             {hours.map((_, rowIdx) => (
               <div
                 key={rowIdx}
-                className="absolute left-0 w-full border-t border-gray-200"
+                className="absolute left-0 w-full border-t border-gray-200 dark:border-gray-700"
                 style={{ top: `${(rowIdx + 1) * slotHeightPx}px` }}
               />
             ))}
 
             {/* Blocks từ API */}
             {loading && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-4 text-sm text-gray-500">
+              <div className="absolute left-1/2 -translate-x-1/2 top-4 text-sm text-gray-500 dark:text-gray-300">
                 Đang tải lịch...
               </div>
             )}
             {err && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-4 text-sm text-red-600">
+              <div className="absolute left-1/2 -translate-x-1/2 top-4 text-sm text-red-600 dark:text-red-400">
                 {err}
               </div>
             )}
@@ -208,13 +208,12 @@ export default function StudentSchedule() {
                       left: `calc(${leftPct}% )`,
                       width: `calc(${widthPct}% - 4px)`,
                       height: `${b.heightPx}px`,
-                      backgroundColor: "#60a5fa", // blue-400
+                      backgroundColor: "red",
                       border: "1px solid rgba(0,0,0,0.05)",
                     }}
                     title={b.note}
                   >
                     <div className="font-semibold truncate w-full text-center">{b.title}</div>
-                    {/* Không hiển thị giờ theo UI gọn; nếu muốn: <div className="text-xs opacity-90">{b.note}</div> */}
                   </div>
                 );
               })}

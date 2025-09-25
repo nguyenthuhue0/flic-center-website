@@ -63,6 +63,9 @@ import EditPayment from "./pages/admin/EditPayment";
 import AddAccount from "./pages/admin/AddAccount";
 import AddAssignment from "./pages/lecturer/AddAssignment";
 import AssignmentManage from "./pages/lecturer/AssignmentManage";
+import ScrollToTop from "./components/ScrollToTop";
+import UserManagement from "./pages/admin/UserManagement";
+import ChangePassword from "./pages/auth/ChangePassword";
 const NotFound = () => {
   const navigate = useNavigate()
 return (
@@ -86,6 +89,7 @@ return (
 const Layout = () => {
   return (
     <>
+      <ScrollToTop />
       <Routes>
         {/* Auth */}
         <Route path="login" element={<Login />} />
@@ -137,6 +141,8 @@ const Layout = () => {
 
             <Route path="lesson/:id" element={<AssignmentManage />} />
             <Route path="lesson/:id/assign" element={<AddAssignment />} />
+
+            <Route path="changePassword" element={<ChangePassword />} />
           </Route>
         </Route>
 
@@ -167,6 +173,7 @@ const Layout = () => {
             <Route path="payment/:id" element={<EditPayment />} />
 
             <Route path="newAccount" element={<AddAccount />} />
+            <Route path="userManagement" element={<UserManagement />} />
           </Route>
         </Route>
 
@@ -183,6 +190,7 @@ const Layout = () => {
             />
             <Route path="studentschedule" element={<StudentSchedule />} />
             <Route path="scheduledetail" element={<StudentScheduleDetail />} />
+            <Route path="changePassword" element={<ChangePassword />} />
           </Route>
         </Route>
 

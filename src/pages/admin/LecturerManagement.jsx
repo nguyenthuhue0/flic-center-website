@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { deleteUser, getUsers } from "../../services/admin/users";
+import { deleteUser, getAllLectures } from "../../services/admin/users";
 import { toast } from "react-toastify";
 
 const AdminLecturer = () => {
@@ -20,17 +20,13 @@ const AdminLecturer = () => {
         setLoading(true);
         setErr("");
 
-        const res = await getUsers();
-        console.log("[getUsers] axios response =", res);
-
+        const res = await getAllLectures();
         const list =
           Array.isArray(res) ? res :
           Array.isArray(res?.data) ? res.data :
           Array.isArray(res?.content) ? res.content :
           Array.isArray(res?.data?.content) ? res.data.content :
           [];
-
-        console.log("[getUsers] list length =", list.length);
         setRows(list);
       } catch (e) {
         console.error("[getUsers] error =", e);
@@ -46,10 +42,8 @@ const AdminLecturer = () => {
     const q = search.trim().toLowerCase();
 
     const teachers = rows.filter((u) => {
-      const role = String(u.role || "").trim().toLowerCase();
-      return role === "instructor";
+      return u.role === "INSTRUCTOR" || u.role === "instructor";
     });
-
     if (!q) return teachers;
 
     return teachers.filter(

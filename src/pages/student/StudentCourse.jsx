@@ -15,12 +15,12 @@ const CourseCard = ({ course, displayMode }) => {
   if (displayMode === "list") {
     return (
       <div
-        className="flex bg-white shadow-sm hover:shadow-md rounded-lg overflow-hidden mb-4 cursor-pointer"
+        className="flex bg-white dark:bg-[#232326] shadow-sm hover:shadow-md rounded-lg overflow-hidden mb-4 cursor-pointer transition-colors"
         onClick={() =>
           navigate(`/student/studentcourse/${course.courseDetail.id}`)
         }
       >
-        <div className="w-40 bg-purple-200 flex items-center justify-center text-gray-600 text-sm shrink-0">
+        <div className="w-40 bg-purple-200 dark:bg-purple-900 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm shrink-0">
           Ảnh
         </div>
 
@@ -28,27 +28,29 @@ const CourseCard = ({ course, displayMode }) => {
           <div className="flex items-start gap-3">
             <IoBookmarksSharp className="text-yellow-500 mt-1" />
             <div>
-              <div className="font-bold text-xl">
+              <div className="font-bold text-xl dark:text-gray-100">
                 {course.courseDetail.title}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
                 Lịch bắt đầu: {course.courseDetail.startMonth}
               </div>
             </div>
           </div>
 
-          <p className="text-sm text-gray-500 mt-2 truncate">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 truncate">
             {course.courseDetail.description}
           </p>
-          <p className="text-sm font-medium mt-2">
+          <p className="text-sm font-medium mt-2 dark:text-gray-200">
             Giảng viên: {course.courseDetail.lecturerName}
           </p>
 
           <div className="mt-auto">
-            <div className="text-right text-sm">{course.progress}%</div>
-            <div className="h-2 bg-red-200 rounded overflow-hidden mt-2">
+            <div className="text-right text-sm dark:text-gray-300">
+              {course.progress}%
+            </div>
+            <div className="h-2 bg-red-200 dark:bg-red-900 rounded overflow-hidden mt-2">
               <div
-                className="h-full bg-red-500"
+                className="h-full bg-red-500 dark:bg-red-600"
                 style={{ width: `${course.progress}%` }}
               />
             </div>
@@ -61,12 +63,12 @@ const CourseCard = ({ course, displayMode }) => {
   // GRID VIEW
   return (
     <div
-      className="rounded-lg shadow-sm overflow-hidden bg-white hover:shadow-md cursor-pointer h-full flex flex-col"
+      className="rounded-lg shadow-sm overflow-hidden bg-white dark:bg-[#232326] hover:shadow-md cursor-pointer h-full flex flex-col transition-colors"
       onClick={() =>
         navigate(`/student/studentcourse/${course.courseDetail.id}`)
       }
     >
-      <div className="h-40 bg-purple-200 flex items-center justify-center text-gray-600 w-full flex-shrink-0">
+      <div className="h-40 bg-purple-200 dark:bg-purple-900 flex items-center justify-center text-gray-600 dark:text-gray-300 w-full flex-shrink-0">
         Ảnh
       </div>
 
@@ -74,25 +76,29 @@ const CourseCard = ({ course, displayMode }) => {
         <div className="flex items-start gap-3">
           <IoBookmarksSharp className="text-yellow-500 mt-1" />
           <div>
-            <div className="font-bold text-xl">{course.courseDetail.title}</div>
-            <div className="text-xs text-gray-500">
+            <div className="font-bold text-xl dark:text-gray-100">
+              {course.courseDetail.title}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               Lịch bắt đầu: {course.courseDetail.startMonth}
             </div>
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 mt-2 truncate">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 truncate">
           {course.courseDetail.description}
         </p>
-        <p className="text-sm font-medium mt-2">
+        <p className="text-sm font-medium mt-2 dark:text-gray-200">
           Giảng viên: {course.courseDetail.lecturerName}
         </p>
 
         <div className="mt-auto">
-          <div className="text-right text-sm">{course.progress}%</div>
-          <div className="h-2 bg-red-200 rounded overflow-hidden mt-2">
+          <div className="text-right text-sm dark:text-gray-300">
+            {course.progress}%
+          </div>
+          <div className="h-2 bg-red-200 dark:bg-red-900 rounded overflow-hidden mt-2">
             <div
-              className="h-full bg-red-500"
+              className="h-full bg-red-500 dark:bg-red-600"
               style={{ width: `${course.progress}%` }}
             />
           </div>
@@ -155,8 +161,8 @@ export default function StudentCourse() {
       : mergedCourses.filter((c) => c.progress === 100);
 
   return (
-    <div className="p-4 pr-6">
-      <h2 className="text-blue-600 text-2xl font-semibold flex items-center gap-2 mb-7">
+    <div className="p-4 pr-6 bg-gray-50 dark:bg-[#18181b] min-h-screen transition-colors duration-300">
+      <h2 className="text-blue-600 dark:text-blue-300 text-2xl font-semibold flex items-center gap-2 mb-7">
         <FaInfoCircle />
         <span>Khóa học</span>
       </h2>
@@ -164,20 +170,20 @@ export default function StudentCourse() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-2">
         <div className="flex gap-2 text-lg">
           <button
-            className={`px-4 py-1 rounded cursor-pointer ${
+            className={`px-4 py-1 rounded cursor-pointer transition-colors ${
               tab === "registered"
                 ? "bg-orange-500 text-white"
-                : "text-gray-800 hover:bg-gray-100"
+                : "text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
             onClick={() => setTab("registered")}
           >
             Đã đăng ký
           </button>
           <button
-            className={`px-4 py-1 rounded cursor-pointer ${
+            className={`px-4 py-1 rounded cursor-pointer transition-colors ${
               tab === "completed"
                 ? "bg-orange-500 text-white"
-                : "text-gray-800 hover:bg-gray-100"
+                : "text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
             onClick={() => setTab("completed")}
           >
@@ -188,20 +194,20 @@ export default function StudentCourse() {
         <div className="flex gap-2">
           <button
             onClick={() => setDisplayMode("grid")}
-            className={`p-2 rounded ${
+            className={`p-2 rounded transition-colors ${
               displayMode === "grid"
                 ? "bg-orange-500 text-white"
-                : "bg-gray-100 text-gray-700"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
             }`}
           >
             <FaThLarge />
           </button>
           <button
             onClick={() => setDisplayMode("list")}
-            className={`p-2 rounded ${
+            className={`p-2 rounded transition-colors ${
               displayMode === "list"
                 ? "bg-orange-500 text-white"
-                : "bg-gray-100 text-gray-700"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
             }`}
           >
             <FaBars />
@@ -225,7 +231,7 @@ export default function StudentCourse() {
             </div>
           )
         ) : (
-          <div className="text-gray-500 text-center w-full py-4">
+          <div className="text-gray-500 dark:text-gray-400 text-center w-full py-4">
             Không có khóa học{" "}
             {tab === "completed" ? "hoàn thành" : "đã đăng ký"}.
           </div>

@@ -8,7 +8,7 @@ import "slick-carousel/slick/slick-theme.css";
 import 'nprogress/nprogress.css';
 
 import './App.css';
-
+import "aos/dist/aos.css";
 
 function App() {
 

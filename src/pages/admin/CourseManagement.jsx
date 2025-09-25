@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getAdminCourses, deleteCourse } from "../../services/admin/courses";
+import { getAdminCourses, deleteCourse, assignInstructorToCourse } from "../../services/admin/courses";
 import { toast } from "react-toastify";
+import { IoPersonAddSharp } from "react-icons/io5";
+import { getAllLectures } from "../../services/admin/users";
 
 const AdminCourse = () => {
   const [courses, setCourses] = useState([]);
@@ -15,7 +17,8 @@ const AdminCourse = () => {
   useEffect(() => {
     fetchCourses();
   }, []);
-
+  console.log(courses);
+  
   const fetchCourses = async (page = 0, size = 20) => {
     try {
       setLoading(true);
@@ -68,7 +71,32 @@ const AdminCourse = () => {
 
   const money = (n) =>
     typeof n === "number" ? n.toLocaleString("vi-VN") + " đ" : "—";
-
+  const [openTeacherBox, setOpenTeacherBox] = useState(false);
+  const [teacherId, setTeacherId] = useState(0);
+  const [courseId, setCourseId] = useState(0);
+  const [teachers, setTeachers] = useState([]);
+useEffect(() => {
+    if (openTeacherBox) {
+      fetchAllTeachers();
+    }
+  }, [openTeacherBox]);
+  const fetchAllTeachers = async () => {
+    let res = await getAllLectures();
+    console.log(res);
+    
+    if (res) {
+      setTeachers(res);
+    }
+  }
+  const handleSave = async () => {
+    let res = await assignInstructorToCourse(teacherId, courseId);
+    console.log(res);
+    if (res) {
+      toast.success(res);
+      fetchAllTeachers();
+    }
+    setOpenTeacherBox(false);
+  };
   return (
     <div className="p-6 min-h-screen ml-[250px] bg-gray-50">
       {/* Tiêu đề */}
@@ -124,6 +152,7 @@ const AdminCourse = () => {
         <th className="px-5">Giá</th>
         <th className="px-5">Thời lượng</th>
         <th className="px-5">Trạng thái</th>
+        <th className="px-5">Giáo viên</th>
         <th className="px-5 text-center">Thao tác</th>
       </tr>
     </thead>
@@ -160,6 +189,69 @@ const AdminCourse = () => {
                 {c.status || "—"}
               </span>
             </td>
+            <td className="px-5 py-3 align-top">
+              {c.nameLecturer && c.emailLecturer ? (
+  <span>
+    {c.nameLecturer} ({c.emailLecturer})
+  </span>
+) : (
+  <button
+    className="bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white"
+    title="Thêm giáo viên"
+    onClick={() => {
+      setOpenTeacherBox(true);
+      setCourseId(c.id);
+    }}
+  >
+    <IoPersonAddSharp />
+  </button>
+)}
+
+            </td>
+{openTeacherBox && (
+        <div
+          className="fixed inset-0 bg-white/20 bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setOpenTeacherBox(false)} // 👈 click nền ngoài thì đóng modal
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg w-full max-w-md p-6"
+            onClick={(e) => e.stopPropagation()} // 👈 chặn sự kiện click trong modal
+          >
+            <h2 className="text-lg font-semibold mb-4">
+              Chọn giáo viên cho khóa học
+            </h2>
+
+            <select
+                name="type"
+                value={teacherId}
+                onChange={(e) => setTeacherId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 "
+              >
+                <option value="">-- chọn giáo viên--</option>
+                 {teachers.map((t) => (
+    <option key={t.id} value={t.id}>
+      {t.fullName} ({t.email})
+    </option>
+  ))}
+              </select>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                onClick={() => setOpenTeacherBox(false)}
+              >
+                Hủy
+              </button>
+              <button
+                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                onClick={handleSave}
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
                   <td className="px-5 py-3">
                     <div className="flex justify-center gap-2">
                       <button

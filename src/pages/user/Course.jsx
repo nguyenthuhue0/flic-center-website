@@ -54,6 +54,7 @@ export default function App() {
             courses.map((course, idx) => (
               <div
                 key={course.id || idx}
+                data-aos="fade-up"
                 className={`shadow-md w-[345px] h-[430px] overflow-hidden flex flex-col rounded-xl`}
               >
                 {/* Màu nền thay ảnh */}
