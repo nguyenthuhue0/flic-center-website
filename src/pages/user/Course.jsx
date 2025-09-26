@@ -15,7 +15,7 @@ export default function App() {
   const fetchCourse = async () => {
     try {
       const res = await getCourse();
-      if (res) {
+      if (res) {        
         setCourses(res);
       }
     } catch (error) {
@@ -89,7 +89,7 @@ export default function App() {
                       <div className="font-bold pl-[8px]">
                         Khai giảng:{" "}
                         <span className="font-bold">
-                          {course.start_month || "Đang cập nhật"}
+                          {course.startMonth || "Đang cập nhật"}
                         </span>
                       </div>
                      <button

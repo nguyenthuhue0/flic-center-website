@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaClock, FaCalendarAlt, FaChartBar } from "react-icons/fa";
 import zalo from "../../assets/images/zalo.png";
 import { getCourseById, getLessonsByCourse } from "../../services/Auth/course";
+import { MdStarRate } from "react-icons/md";
 
 
 const fmtVND = (n) =>
@@ -43,6 +44,8 @@ useEffect(() => {
         getCourseById(id),       // /api/course/{id}
         getLessonsByCourse(id),  // /api/lesson?courseId={id}
       ]);
+      console.log(c, ls);
+      
       if (!alive) return;
       setCourse(c || null);      setLessons(Array.isArray(ls) ? ls : []);
     } catch (e) {
@@ -95,7 +98,7 @@ useEffect(() => {
         <div className="flex items-center gap-6">
           <FaClock size={55} />
           <span className="text-[22px] md:text-[32px] font-bold">
-            Suất học: Tùy gv
+            Suất học: -
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -106,8 +109,8 @@ useEffect(() => {
         </div>
         <div className="flex items-center gap-4">
           <FaChartBar size={55} />
-          <span className="text-[22px] md:text-[32px] font-bold">
-            Thời gian: {course?.duration ? `${course.duration}` : "-"}
+          <span className="text-[22px] md:text-[32px] font-bold flex items-center">
+            Đánh giá: {course?.rating}<span className="inline-block text-yellow-400"><MdStarRate /></span> 
           </span>
         </div>
       </div>
