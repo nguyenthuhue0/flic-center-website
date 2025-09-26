@@ -76,7 +76,7 @@ const AdminCourse = () => {
   const [courseId, setCourseId] = useState(0);
   const [teachers, setTeachers] = useState([]);
 useEffect(() => {
-    if (openTeacherBox) {
+    if (!openTeacherBox) {
       fetchAllTeachers();
     }
   }, [openTeacherBox]);
@@ -93,7 +93,6 @@ useEffect(() => {
     console.log(res);
     if (res) {
       toast.success(res);
-      fetchAllTeachers();
     }
     setOpenTeacherBox(false);
   };

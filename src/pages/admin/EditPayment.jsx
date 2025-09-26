@@ -60,11 +60,11 @@ const [paymentStatus, setPaymentStatus] = useState("")
         <div className="grid md:grid-cols-3 gap-4">
           <div className="bg-[#F6F8FF] rounded-2xl p-5 border border-gray-100">
             <p className="text-sm text-gray-500 mb-1">Tên người dùng</p>
-            <p className="text-xl font-bold break-words">{dataPayment.email || "—"}</p>
+            <p className="text-xl font-bold break-words">{dataPayment?.student?.fullName || "—"}</p>
           </div>
           <div className="bg-[#F6F8FF] rounded-2xl p-5 border border-gray-100">
             <p className="text-sm text-gray-500 mb-1">Email</p>
-            <p className="text-xl font-bold">{dataPayment.phone || "—"}</p>
+            <p className="text-xl font-bold">{dataPayment?.student?.email || "—"}</p>
           </div>
           <div className="bg-[#F6F8FF] rounded-2xl p-5 border border-gray-100">
             <p className="text-sm text-gray-500 mb-1">Trạng thái</p>
@@ -85,9 +85,9 @@ const [paymentStatus, setPaymentStatus] = useState("")
               Thông tin khóa học
             </h3>
 
-            <Row label="Tên khóa học" value={dataPayment.fullName} />
-            <Row label="Giá tiền" value={dataPayment.phone} />
-            <Row label="Thời gian bắt đầu học" value={dataPayment.studentId} />
+            <Row label="Tên khóa học" value={dataPayment?.course?.title} />
+            <Row label="Giá tiền" value={dataPayment?.course?.price.toLocaleString("vi-VN") + "đ"} />
+            <Row label="Thời gian bắt đầu học" value={dataPayment?.course?.startMonth} />
           </div>
 
           <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 shadow-sm">
