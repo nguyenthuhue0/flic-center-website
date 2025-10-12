@@ -49,7 +49,7 @@ const [title, setTitle] = useState("");
             <div>
               <label className="block font-medium mb-2">Mô tả nội dung bài tập</label>
                   <textarea
-                placeholder="Nội dung tin tức..."
+                placeholder="Nội dung bài tập..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="border p-2 w-full mb-2 h-40"

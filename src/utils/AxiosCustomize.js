@@ -6,7 +6,7 @@ nProgress.configure ({
   trickleSpeed: 100, 
 })
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'https://flicbe-production.up.railway.app/api',
 
 });
 

@@ -1,7 +1,7 @@
 // src/pages/lecturer/Teachingschedule.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTeachingSchedule } from "../../services/lecturer/schedule.js";
+import { getTeachingSchedule } from "../../services/Lecturer/schedule.js";
 
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";

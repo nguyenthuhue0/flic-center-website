@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { X } from "lucide-react";
-import { uploadMaterial } from "../../services/lecturer/DocumentApi";
+import { uploadMaterial } from "../../services/Lecturer/DocumentApi";
 
 export default function DocumentUpload({ courseId: propCourseId }) {
   const params = useParams();

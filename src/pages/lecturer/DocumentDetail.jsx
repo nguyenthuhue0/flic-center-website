@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Book, Presentation, ClipboardList } from "lucide-react";
-import { getLessonMaterials } from "../../services/lecturer/DocumentApi";
+import { getLessonMaterials } from "../../services/Lecturer/DocumentApi";
 
 const DocumentDetail = () => {
   const [sortField, setSortField] = useState("uploadedAt");

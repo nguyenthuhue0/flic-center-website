@@ -2,8 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useLocation } from "react-router-dom";
-import { getLessonAttendance, saveLessonAttendance } from "../../services/lecturer/attendance.js";
-import { getLessonById } from "../../services/lecturer/lessons.js"; // <-- dùng để backfill meta
+import { getLessonAttendance, saveLessonAttendance } from "../../services/Lecturer/attendance.js";
+import { getLessonById } from "../../services/Lecturer/lessons.js"; // <-- dùng để backfill meta
 
 // Map trạng thái hiển thị <-> giá trị server
 const ATT_STATES = [

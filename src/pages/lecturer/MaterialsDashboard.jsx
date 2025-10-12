@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { getTeachingSchedule } from "../../services/lecturer/schedule.js";
+import { getTeachingSchedule } from "../../services/Lecturer/schedule.js";
 
 dayjs.extend(isoWeek);
 dayjs.extend(customParseFormat);
